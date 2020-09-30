@@ -11,14 +11,17 @@ client = discord.Client()
 emojiname='darkalpha'
 anime_reply = False
 botcount = 0
+currentcount = 0
+
+d_token = open(r"D:\Downloads\bot.token",'r').readlines()[0]
 
 debugchat = False
-serverlist = {'705682250460823602': {'emoji': 'blackaus'}, '433901628018655232': {'emoji': 'sus'}, '685469328929587268': {'emoji': 'kikiangry'}}
+serverlist = {'705682250460823602': {'emoji': 'blackaus' , 'debug':1 }, '433901628018655232': {'emoji': 'sus' , 'debug':0 }, '685469328929587268': {'emoji': 'kikiangry' , 'debug':0 }}
 
 
 #additional variables
 ecchi_vote = False
-bad_person = ['This doesnt look like NSFW :/','Kids arent allowed to see such stuff','What you lookin for boi 👀','Kids these days ...pfft','So you want "Pixels fucking pixels" ~ LeoJesvyn huh ']
+bad_person = ['This isnt an NSFW Channel :/','Kids are in this server shhhh','Look where you texting ... this aint NSFW','So you want "Pixels fucking pixels" ~ LeoJesvyn huh ']
 irumalinks = [
     'https://static.wikia.nocookie.net/mairimashita-irumakun/images/c/c9/Iruma_Suzuki.png/revision/latest?cb=20191217095641',
     'https://www.monstersandcritics.com/wp-content/uploads/2019/12/Welcome-to-Demon-School-Iruma-kun-Season-2-release-date-Mairimashita-Iruma-kun-manga-compared-to-the-anime.jpg',
@@ -43,7 +46,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    global darkemoji,client,channel,ecchi_vote,botcount,serverlist,debugchat
+    global darkemoji,client,channel,ecchi_vote,botcount,serverlist,debugchat,currentcount
     if message.author == client.user:
         if(ecchi_vote):
             await message.add_reaction('⬆')
@@ -205,7 +208,7 @@ async def on_message(message):
                 
                 break
         
-
+    
 
 
     #Upcomming 
@@ -299,8 +302,6 @@ async def on_message(message):
 
 
 
-
-
 ###############################################################################
 def joyreactor():
     f = open("joyreactor(REDONE).bin.npy","rb")
@@ -328,4 +329,6 @@ def src3():
     aaa=choice(aa)
     return aaa
 ################################################################################
+#token = str(d_token.readline()[0])
+
 client.run('TOKEN')

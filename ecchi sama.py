@@ -51,8 +51,8 @@ async def on_message(message):
             ecchi_vote = False
         return
 
-    if(message.content.startswith(':')):
-        nonnitro = message.content.replace(':','')
+    if(message.content.startswith('>')):
+        nonnitro = message.content.replace('>','')
         print(nonnitro)
         if(str(message.guild.id) in serverlist):
             for ej in client.emojis:

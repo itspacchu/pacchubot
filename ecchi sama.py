@@ -328,4 +328,4 @@ def src3():
     aaa=choice(aa)
     return aaa
 ################################################################################
-client.run('NzA1NDI3MjA3ODc4ODY5MDk0.XqriSA.p6oOZsrT5L7FQm6KhDcynzjvZjc')
+client.run('TOKEN')

@@ -1,7 +1,9 @@
 from time import *
 from random import *
-import time,subprocess,discord,os, mal
+import time,subprocess,discord,os, mal,json,io
 import numpy as np
+
+jsonfile = io.open("perks.json",mode="r",encoding="utf-8")
 
 
 # REMOVE TOKEN BEFORE COMMITTING CHANGES
@@ -19,22 +21,10 @@ d_token = open(r"D:\Downloads\bot.token",'r').readlines()[0]
 
 debugchat = False
 serverlist = {'705682250460823602': {'emoji': 'blackaus' , 'debug':1 }, '433901628018655232': {'emoji': 'sus' , 'debug':0 }, '685469328929587268': {'emoji': 'kikiangry' , 'debug':0 }}
-
+perks = json.load(jsonfile)
 
 #additional variables
 ecchi_vote = False
-bad_person = ['This isnt an NSFW Channel :/','Kids are in this server shhhh','Look where you texting ... this aint NSFW','So you want "Pixels fucking pixels" ~ LeoJesvyn huh','This is only supposed to be used in NSFW channels']
-irumalinks = [
-    'https://static.wikia.nocookie.net/mairimashita-irumakun/images/c/c9/Iruma_Suzuki.png/revision/latest?cb=20191217095641',
-    'https://www.monstersandcritics.com/wp-content/uploads/2019/12/Welcome-to-Demon-School-Iruma-kun-Season-2-release-date-Mairimashita-Iruma-kun-manga-compared-to-the-anime.jpg',
-    'https://static.wikia.nocookie.net/mairimashita-irumakun/images/b/b9/WickedIruma.png/revision/latest?cb=20200430234437',
-    'https://spoilerguy.com/wp-content/uploads/2020/02/Welcome-to-Demon-School-Iruma-kun-Episode-19.jpg',
-    'https://i.ytimg.com/vi/kXmUWo7jTdk/maxresdefault.jpg',
-    'https://simkl.net/episodes/88/8887367035de32433_w.jpg',
-    'https://media1.tenor.com/images/e17290e12dc0f60ab3021e100fa33438/tenor.gif?itemid=15870136',
-    'https://64.media.tumblr.com/60aabf00e266eae4253fcdaf60076d49/tumblr_pywk6pYme91v6bs4yo4_r1_250.gifv',
-    'https://media.discordapp.net/attachments/757838382419279903/760583834764181554/318964034116201.png'
-]
 
 @client.event
 async def on_ready():
@@ -145,7 +135,7 @@ async def on_message(message):
         await message.channel.send(embed=embed)
 
     if(message.content.startswith('-irumachi')):
-        await message.channel.send(choice(irumalinks))
+        await message.channel.send(choice(perks["links"]["iruma"]))
 
     if(message.content.startswith("-anime")):
         asrc = [" "]
@@ -198,7 +188,7 @@ async def on_message(message):
 
 
     #Temporary use of MyAnimeList until Manbonpan adds his own API implementation
-
+    #
     if(message.content.startswith("-anime")):
         asrc = [" "]
         animestr = str(message.content)[6:]
@@ -219,7 +209,7 @@ async def on_message(message):
             embed=discord.Embed(color=0xff0000)
             embed.add_field(name="Anime Not Found", value="That Anime is not found on MyAnimeList", inline=False)
             await message.channel.send(embed=embed)
-    
+    #  
     # End of temp function
     
 
@@ -314,8 +304,8 @@ async def on_message(message):
         if message.content.startswith('-ecchi'):
             ecchi_vote = False
             await message.add_reaction('😒')
-            await message.channel.send(choice(bad_person))
-            await message.channel.send('https://toxicmuffin.files.wordpress.com/2016/06/kono-subarashi-sekai-ni-shukufuku-wo-22.jpg')
+            await message.channel.send(choice(perks['replies']['nsfw_error']))
+            await message.channel.send('')
 
 
 

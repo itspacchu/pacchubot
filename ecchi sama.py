@@ -1,6 +1,7 @@
 from time import *
 from random import *
-import time,subprocess,discord,os, mal,json,io
+import time,subprocess,discord,os,json,io
+from jikanpy import Jikan
 import numpy as np
 
 jsonfile = io.open("perks.json",mode="r",encoding="utf-8")
@@ -8,7 +9,7 @@ jsonfile = io.open("perks.json",mode="r",encoding="utf-8")
 
 # REMOVE TOKEN BEFORE COMMITTING CHANGES
 
-
+anime = Jikan() #new ANIME API
 client = discord.Client()
 darkemoji = None
 client = discord.Client()
@@ -193,15 +194,17 @@ async def on_message(message):
         asrc = [" "]
         animestr = str(message.content)[6:]
         try:
-            asrc = mal.AnimeSearch(animestr).results
-            embed=discord.Embed(title=asrc[0].title, description=f"[{asrc[0].type}]")
-            embed.set_author(name=asrc[0].title)
-            embed.set_thumbnail(url=asrc[0].image_url)
-            embed.add_field(name="Rating", value=asrc[0].score, inline=False)
-            embed.add_field(name="Episodes", value=asrc[0].episodes, inline=True)
-            embed.add_field(name="Synopsis", value=asrc[0].synopsis, inline=True)
-            embed.set_footer(text="data scraped from myanimelist")
-            anime_flag = False
+            asrc = anime.search('anime',animestr)['results'][0]
+            embed=discord.Embed(title="Anime Search result", description=asrc['mal_id'], color=0x3dff77)
+            embed.set_author(name="Houseki no Kuni", url=asrc['url'])
+            embed.set_thumbnail(url=asrc['image_url'])
+            embed.add_field(name="Airing", value=f"{asrc['start_date'][:10]} to {asrc['end_date'][:10]}", inline=False)
+            embed.add_field(name="Rating", value=f"{int(asrc['score'])}/10", inline=False)
+            embed.add_field(name="synopsis", value=asrc['synopsis'], inline=False)
+            embed.add_field(name="episodes", value=asrc['episodes'], inline=False)
+            embed.add_field(name="views", value=asrc['members'], inline=True)
+            embed.add_field(name="Rated", value=asrc['rated'], inline=True)
+            embed.set_footer(text="results from Jikan.moe api")
             await message.channel.send(embed=embed)
             
 

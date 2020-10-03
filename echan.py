@@ -189,8 +189,8 @@ async def on_message(message):
                 break
 
 
-
-    if(message.content.startswith("-raw_anime")):
+    
+    if(message.content.startswith("-raw_anime") and debugchat):
         asrc = [" "]
         animestr = str(message.content)[10:]
         try:
@@ -396,4 +396,4 @@ def src3():
 ################################################################################
 #token = str(d_token.readline()[0])
 
-client.run('TOKEN')
+client.run('TOKEN') #i keep forgetting to remove this thing

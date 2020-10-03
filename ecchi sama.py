@@ -17,15 +17,28 @@ emojiname='darkalpha' #defaulted emojiname
 anime_reply = False
 botcount = 0
 currentcount = 0
+asrc = ['']
 
 d_token = open(r"D:\Downloads\bot.token",'r').readlines()[0]
 
 debugchat = False
-serverlist = {'705682250460823602': {'emoji': 'blackaus' , 'debug':1 }, '433901628018655232': {'emoji': 'sus' , 'debug':0 }, '685469328929587268': {'emoji': 'kikiangry' , 'debug':0 }}
+serverlist = {'default' : {'emoji':'🌊','debug':0,'bruh':'https://media.discordapp.net/attachments/760741167876538419/760744075132534784/DeepFryer_20200930_113458.jpg?width=448&height=518'},'705682250460823602': {'emoji': 'blackaus' , 'debug':1 , 'bruh':'https://media.discordapp.net/attachments/760741167876538419/760744075132534784/DeepFryer_20200930_113458.jpg?width=448&height=518' }, '433901628018655232': {'emoji': 'sus' , 'debug':0 }, '685469328929587268': {'emoji': 'kikiangry' , 'debug':0 }}
 perks = json.load(jsonfile)
 
 #additional variables
 ecchi_vote = False
+
+def list_to_string(the_list,no_of_items:int):
+    returnstr = ''
+    count = 0
+    for _ in the_list:
+        if(count > no_of_items):
+            break
+        count+= 1
+        returnstr += str(_ + "\n")
+    return returnstr
+
+
 
 @client.event
 async def on_ready():
@@ -39,7 +52,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    global darkemoji,client,channel,ecchi_vote,botcount,serverlist,debugchat,currentcount
+    global darkemoji,client,channel,ecchi_vote,botcount,serverlist,debugchat,currentcount,asrc
     if message.author == client.user:
         if(ecchi_vote):
             await message.add_reaction('⬆')
@@ -110,8 +123,10 @@ async def on_message(message):
         embed.add_field(name="How can I help you", value="echan commands", inline=False)
         embed.add_field(name="-anime", value="Searches for given anime [BETA] ", inline=True)
         embed.add_field(name="-manga", value="Searches for give Manga [BETA] ", inline=True)
+        embed.add_field(name="-anipictures", value="Fetches images from the previously searched Anime [BETA] ", inline=True)
         embed.add_field(name="-status newstatus", value="changes status of the bot", inline=False)
         embed.add_field(name="-bruh", value="bruh", inline=False)
+
 
         if (message.channel.nsfw==True):
             embed.add_field(name="NSFW COMMANDS", value=" ", inline=False)
@@ -142,7 +157,19 @@ async def on_message(message):
         await message.channel.send(choice(perks["links"]["iruma"]))
 
     if(message.content.startswith('-bruh')):
-        await message.channel.send("https://media.discordapp.net/attachments/760741167876538419/760744075132534784/DeepFryer_20200930_113458.jpg?width=448&height=518")
+        after = message.content[5:]
+        if(message.content == '-bruh'):
+            try:
+                await message.channel.send(serverlist[str(message.guild.id)]['bruh'])
+            except KeyError:
+                await message.channel.send(serverlist['default']['bruh'])
+        else:
+            serverlist[str(message.guild.id)] = {'bruh':after}
+            embed=discord.Embed(color=0x00ff00)
+            embed.add_field(name="Bruh image Updated", value="Bruh image has been sucessfully updated", inline=False)
+            embed.set_footer(text="love from echan ;)")
+            await message.channel.send(embed=embed)
+
 
     if(message.content.startswith('-emoji')):
         emname = message.content[6:].replace(' ','')
@@ -172,22 +199,34 @@ async def on_message(message):
 
     #Temporary use of MyAnimeList until Manbonpan adds his own API implementation
     #
+
+
     if(message.content.startswith("-anime")):
         asrc = [" "]
         animestr = str(message.content)[6:]
         try:
             start = time.time()
             asrc = anime.search('anime',animestr)['results'][0]
+            mal_id = asrc['mal_id']
+            more_info = anime.anime(mal_id)
             end = time.time()
-            embed=discord.Embed(title="Anime Search result", description=asrc['mal_id'], color=0x3dff77)
-            embed.set_author(name=asrc['title'], url=asrc['url'])
+            embed=discord.Embed(title="Trailer", url=more_info['trailer_url'], description="Trailer", color=0x6bffb8)
+            try:
+                embed.set_author(name=more_info['title_japanese'], url=asrc['url'])
+            except:
+                embed.set_author(name=asrc['title'], url=asrc['url'])
+            
             embed.set_thumbnail(url=asrc['image_url'])
-            embed.add_field(name="Started Airing", value=f"{asrc['start_date'][:10]} to {asrc['end_date'][:10]}", inline=False)
-            embed.add_field(name="Rating", value=f"{int(asrc['score'])}/10", inline=False)
-            embed.add_field(name="synopsis", value=asrc['synopsis'], inline=False)
+            embed.add_field(name="Studio", value=more_info['studios'][0]['name'], inline=True)
+            embed.add_field(name="Started Airing", value=f"{asrc['start_date'][:10]}", inline=True)
+            embed.add_field(name="Rating", value=f"{int(asrc['score'])}/10", inline=True)
+            embed.add_field(name="synopsis", value=more_info['synopsis'][:512]+'...', inline=False)
             embed.add_field(name="episodes", value=asrc['episodes'], inline=False)
             embed.add_field(name="views", value=asrc['members'], inline=True)
-            embed.add_field(name="Rated", value=asrc['rated'], inline=True)
+            embed.add_field(name="Rated", value=asrc['rated'], inline=True) 
+            embed.add_field(name="Openings", value=list_to_string(more_info['opening_themes'],4), inline=False)
+            embed.add_field(name="Endings", value=list_to_string(more_info['ending_themes'],4), inline=False)
+            
             embed.set_footer(text=f"from echan [ fetched in {np.around(end-start,1)}s ]")
             await message.channel.send(embed=embed)
             
@@ -352,4 +391,4 @@ def src3():
 ################################################################################
 #token = str(d_token.readline()[0])
 
-client.run('NzA4NzAyMTMwNjg0NTU5MzYw.XrbMSw.TLH8w5xaEPGJIg03FzQ5Zu2Rn1Y')
+client.run('NzA4NzAyMTMwNjg0NTU5MzYw.XrbMSw.IVFt0C1T-4tl0y-ANxKf9vOlVWE')

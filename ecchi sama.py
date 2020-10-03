@@ -31,7 +31,7 @@ ecchi_vote = False
 async def on_ready():
     global darkemoji,client
     print('We have logged in as {0.user}'.format(client))
-    statustxt = "with irumachi's pp"
+    statustxt = "Running in Experimental mode"
     activity = discord.Game(name=statustxt)
     await client.change_presence(status=discord.Status.online, activity=activity)
 
@@ -105,14 +105,16 @@ async def on_message(message):
         await client.change_presence(status=discord.Status.online, activity=activity)
         
     if(message.content.startswith('-help')):
-        embed=discord.Embed(color=0xff00bb)
+        embed=discord.Embed(color=0xae00ff)
         embed.set_thumbnail(url="http://i.redd.it/5xkpkqjoz9g11.jpg")
-        embed.add_field(name="echan", value="Echan help", inline=False)
-        embed.add_field(name="-irumachi", value="Sends a Shriram approved photo of Irumakun :D", inline=False)
+        embed.add_field(name="How can I help you", value="echan commands", inline=False)
+        embed.add_field(name="-anime", value="Searches for given anime [BETA] ", inline=True)
+        embed.add_field(name="-manga", value="Searches for give Manga [BETA] ", inline=True)
         embed.add_field(name="-status newstatus", value="changes status of the bot", inline=False)
         embed.add_field(name="-bruh", value="bruh", inline=False)
 
         if (message.channel.nsfw==True):
+            embed.add_field(name="NSFW COMMANDS", value=" ", inline=False)
             embed.add_field(name="-recchi", value="gets latest r/ecchi post from reddit [ COMMING SOON ]", inline=False)
             embed.add_field(name="-ecchi", value="sends a random nsfw image", inline=False)
             embed.add_field(name="-hentai", value="Suggests a random hentai from database", inline=False)
@@ -120,11 +122,12 @@ async def on_message(message):
             embed.add_field(name="-upload link", value="send newds wink [ COMMING SOON ;) ]", inline=False)
             embed.add_field(name="-stats", value="Check who used ecchibot alot", inline=False)
         else:
-            embed.add_field(name="-------", value="6 NSFW commands hidden", inline=False)
+            embed.add_field(name="="*10, value="_NSFW Commands hidden_", inline=False)
 
+        embed.add_field(name="-irumachi", value="Sends a Shriram approved photo of Irumakun :D", inline=False)
         embed.add_field(name="-perks", value="Lists the perks of this bot", inline=False)
         embed.add_field(name="-help", value="bruh this is exactly the same command you ran", inline=False)
-        embed.set_footer(text="Love from echan ")
+        embed.set_footer(text="Love from echan [alpha v2]")
         await message.channel.send(embed=embed)
 
     if(message.content.startswith('-perks')):
@@ -137,27 +140,6 @@ async def on_message(message):
 
     if(message.content.startswith('-irumachi')):
         await message.channel.send(choice(perks["links"]["iruma"]))
-
-    if(message.content.startswith("-anime")):
-        asrc = [" "]
-        animestr = str(message.content)[6:]
-        try:
-            asrc = mal.AnimeSearch(animestr).results
-            embed=discord.Embed(title=asrc[0].title, description=f"[{asrc[0].type}]")
-            embed.set_author(name=asrc[0].title)
-            embed.set_thumbnail(url=asrc[0].image_url)
-            embed.add_field(name="Rating", value=asrc[0].score, inline=False)
-            embed.add_field(name="Episodes", value=asrc[0].episodes, inline=True)
-            embed.add_field(name="Synopsis", value=asrc[0].synopsis, inline=True)
-            embed.set_footer(text="data from Pacchu's slave bot")
-            await message.channel.send(embed=embed)
-
-
-        except ValueError:
-            embed=discord.Embed(color=0xff0000)
-            embed.add_field(name="Whoops", value="Unable to find anime with that name", inline=False)
-            embed.set_footer(text="result 404")
-            await message.channel.send(embed=embed)
 
     if(message.content.startswith('-bruh')):
         await message.channel.send("https://media.discordapp.net/attachments/760741167876538419/760744075132534784/DeepFryer_20200930_113458.jpg?width=448&height=518")
@@ -194,17 +176,46 @@ async def on_message(message):
         asrc = [" "]
         animestr = str(message.content)[6:]
         try:
+            start = time.time()
             asrc = anime.search('anime',animestr)['results'][0]
+            end = time.time()
             embed=discord.Embed(title="Anime Search result", description=asrc['mal_id'], color=0x3dff77)
-            embed.set_author(name="Houseki no Kuni", url=asrc['url'])
+            embed.set_author(name=asrc['title'], url=asrc['url'])
             embed.set_thumbnail(url=asrc['image_url'])
-            embed.add_field(name="Airing", value=f"{asrc['start_date'][:10]} to {asrc['end_date'][:10]}", inline=False)
+            embed.add_field(name="Started Airing", value=f"{asrc['start_date'][:10]} to {asrc['end_date'][:10]}", inline=False)
             embed.add_field(name="Rating", value=f"{int(asrc['score'])}/10", inline=False)
             embed.add_field(name="synopsis", value=asrc['synopsis'], inline=False)
             embed.add_field(name="episodes", value=asrc['episodes'], inline=False)
             embed.add_field(name="views", value=asrc['members'], inline=True)
             embed.add_field(name="Rated", value=asrc['rated'], inline=True)
-            embed.set_footer(text="results from Jikan.moe api")
+            embed.set_footer(text=f"from echan [ fetched in {np.around(end-start,1)}s ]")
+            await message.channel.send(embed=embed)
+            
+
+        except ValueError:
+            embed=discord.Embed(color=0xff0000)
+            embed.add_field(name="Anime Not Found", value="That Anime is not found on MyAnimeList", inline=False)
+            await message.channel.send(embed=embed)
+
+
+    if(message.content.startswith("-manga")):
+        asrc = [" "]
+        mangastr = str(message.content)[6:]
+        try:
+            start = time.time()
+            asrc = anime.search('manga',mangastr)['results'][0]
+            end = time.time()
+            embed=discord.Embed(title="Manga Search result", description=asrc['mal_id'], color=0x3dff77)
+            embed.set_author(name=asrc['title'], url=asrc['url'])
+            embed.set_thumbnail(url=asrc['image_url'])
+            embed.add_field(name="Started Publishing", value=f"{asrc['start_date'][:10]}", inline=False)
+            embed.add_field(name="Rating", value=f"{int(asrc['score'])}/10", inline=False)
+            embed.add_field(name="synopsis", value=asrc['synopsis'], inline=False)
+            embed.add_field(name="Volumes", value=asrc['volumes'], inline=True)
+            embed.add_field(name="chapters", value=asrc['chapters'], inline=True)
+            embed.add_field(name="views", value=asrc['members'], inline=True)
+
+            embed.set_footer(text=f"from echan [ fetched in {np.around(end-start,1)}s ]")
             await message.channel.send(embed=embed)
             
 
@@ -308,7 +319,7 @@ async def on_message(message):
             ecchi_vote = False
             await message.add_reaction('😒')
             await message.channel.send(choice(perks['replies']['nsfw_error']))
-            await message.channel.send('')
+            await message.channel.send(choice(perks['links']['nsfw_error']))
 
 
 
@@ -341,4 +352,4 @@ def src3():
 ################################################################################
 #token = str(d_token.readline()[0])
 
-client.run('TOKEN')
+client.run('NzA4NzAyMTMwNjg0NTU5MzYw.XrbMSw.TLH8w5xaEPGJIg03FzQ5Zu2Rn1Y')

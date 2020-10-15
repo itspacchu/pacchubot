@@ -68,7 +68,7 @@ async def on_message(message):
         hug_person = str(message.content)[8:-1]
         hgp = client.get_user(int(hug_person))
         await message.add_reaction('🤗')
-        if(message.author == hgp):
+        if(message.author == hgp  or hgp == None):
             embed = discord.Embed(title=" ",description=f"{message.author.mention} hugs themselves", colour=discord.Colour(0xcd94ff))
             embed.add_field(name="😢", value=f"Don't worry {message.author.mention}.. {choice(perks['replies']['sadhugs'])}")
             embed.set_image(url=choice(perks['links']['sadhugs']))
@@ -86,7 +86,7 @@ async def on_message(message):
         hug_person = str(message.content)[9:-1]
         hgp = client.get_user(int(hug_person))
         await message.add_reaction('🤗')
-        if(message.author == hgp):
+        if(message.author == hgp  or hgp == None):
             embed = discord.Embed(title=" ",description=f"{message.author.mention} kisses themselves", colour=discord.Colour(0xcd94ff))
             embed.add_field(name="👀", value=f"HOW!!!?")
             embed.set_image(url=choice(perks['links']['erotic_perv']))
@@ -103,7 +103,7 @@ async def on_message(message):
         hug_person = str(message.content)[8:-1]
         hgp = client.get_user(int(hug_person))
         await message.add_reaction('🤗')
-        if(message.author == hgp):
+        if(message.author == hgp or hgp == None):
             embed = discord.Embed(title=" ",description=f"{message.author.mention} pats themselves", colour=discord.Colour(0xcd94ff))
             embed.add_field(name="👋", value=f"{message.author.mention}.. i'll pat you :3")
             embed.set_image(url=choice(perks['links']['pats']))
@@ -298,7 +298,7 @@ async def on_message(message):
             await message.channel.send(embed=embed)
             
 
-        except ValueError:
+        except:
             embed=discord.Embed(color=0xff0000)
             embed.add_field(name="Anime Not Found", value="That Anime is not found on MyAnimeList", inline=False)
             await message.channel.send(embed=embed)
@@ -325,7 +325,7 @@ async def on_message(message):
             await message.channel.send(embed=embed)
             
 
-        except ValueError:
+        except:
             embed=discord.Embed(color=0xff0000)
             embed.add_field(name="Anime Not Found", value="That Anime is not found on MyAnimeList", inline=False)
             await message.channel.send(embed=embed)
@@ -451,4 +451,4 @@ def src3():
 ################################################################################
 #token = str(d_token.readline()[0])
 
-client.run('MEGUMI') #i keep forgetting to remove this thing
+client.run('') #i keep forgetting to remove this thing

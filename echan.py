@@ -19,7 +19,6 @@ botcount = 0
 currentcount = 0
 asrc = ['']
 
-d_token = open(r"D:\Downloads\bot.token",'r').readlines()[0]
 
 debugchat = False
 serverlist = {'default' : {'emoji':'🌊','debug':0,'bruh':'https://media.discordapp.net/attachments/760741167876538419/760744075132534784/DeepFryer_20200930_113458.jpg?width=448&height=518'},'705682250460823602': {'emoji': 'blackaus' , 'debug':1 , 'bruh':'https://media.discordapp.net/attachments/760741167876538419/760744075132534784/DeepFryer_20200930_113458.jpg?width=448&height=518' }, '433901628018655232': {'emoji': 'sus' , 'debug':0 }, '685469328929587268': {'emoji': 'kikiangry' , 'debug':0 }}
@@ -51,6 +50,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    #print(message.author.avatar_url)
     global darkemoji,client,channel,ecchi_vote,botcount,serverlist,debugchat,currentcount,asrc
     if message.author == client.user:
         if(ecchi_vote):
@@ -59,7 +59,66 @@ async def on_message(message):
             ecchi_vote = False
         return
 
+    for x in message.mentions:
+        if(x==client.user):
+            await message.channel.send(choice(perks['replies']['pings']) + message.author.mention)
+    
+    
+    if(message.content.startswith('-hug')):
+        hug_person = str(message.content)[8:-1]
+        hgp = client.get_user(int(hug_person))
+        await message.add_reaction('🤗')
+        if(message.author == hgp):
+            embed = discord.Embed(title=" ",description=f"{message.author.mention} hugs themselves", colour=discord.Colour(0xcd94ff))
+            embed.add_field(name="😢", value=f"Don't worry {message.author.mention}.. {choice(perks['replies']['sadhugs'])}")
+            embed.set_image(url=choice(perks['links']['sadhugs']))
+        else:
+            embed = discord.Embed(title=" ",description=f"{message.author.mention} hugs {hgp.mention}", colour=discord.Colour(0xcd94ff))
+            embed.set_image(url=choice(perks['links']['hugs']))
+
+        embed.set_thumbnail(url=hgp.avatar_url)
+        embed.set_author(name=" ", icon_url=message.author.avatar_url)
+        embed.set_footer(text="With love from echan")
+        await message.channel.send(embed=embed)
+    
+    
+    if(message.content.startswith('-kiss')):
+        hug_person = str(message.content)[9:-1]
+        hgp = client.get_user(int(hug_person))
+        await message.add_reaction('🤗')
+        if(message.author == hgp):
+            embed = discord.Embed(title=" ",description=f"{message.author.mention} kisses themselves", colour=discord.Colour(0xcd94ff))
+            embed.add_field(name="👀", value=f"HOW!!!?")
+            embed.set_image(url=choice(perks['links']['erotic_perv']))
+        else:
+            embed = discord.Embed(title=" ",description=f"{message.author.mention} kisses {hgp.mention}", colour=discord.Colour(0xcd94ff))
+            embed.set_image(url=choice(perks['links']['kiss']))
+
+        embed.set_thumbnail(url=hgp.avatar_url)
+        embed.set_author(name=" ", icon_url=message.author.avatar_url)
+        embed.set_footer(text="With love from echan")
+        await message.channel.send(embed=embed)
+
+    if(message.content.startswith('-pat')):
+        hug_person = str(message.content)[8:-1]
+        hgp = client.get_user(int(hug_person))
+        await message.add_reaction('🤗')
+        if(message.author == hgp):
+            embed = discord.Embed(title=" ",description=f"{message.author.mention} pats themselves", colour=discord.Colour(0xcd94ff))
+            embed.add_field(name="👋", value=f"{message.author.mention}.. i'll pat you :3")
+            embed.set_image(url=choice(perks['links']['pats']))
+        else:
+            embed = discord.Embed(title=" ",description=f"{message.author.mention} pats {hgp.mention}", colour=discord.Colour(0xcd94ff))
+            embed.set_image(url=choice(perks['links']['pats']))
+
+        embed.set_thumbnail(url=hgp.avatar_url)
+        embed.set_author(name=" ", icon_url=message.author.avatar_url)
+        embed.set_footer(text="With love from echan")
+        await message.channel.send(embed=embed)
+
 # Perks from Pacchu :D
+    '''
+    REMOVING DEBUG MODE owo
     if(message.content.startswith('-debug')):
         if(not debugchat):
             debugchat = True
@@ -71,14 +130,16 @@ async def on_message(message):
             embed=discord.Embed(color=0xff0000)
             embed.add_field(name="DEBUG", value="DISABLED", inline=False)
             await message.channel.send(embed=embed)        
+    '''
 
-    if(str(message.channel.name) == "cursed-by-shriram"):
+    if(str(message.channel.name) == "cursed-by-darkness"):
         for role in message.author.roles:
             if(role.name == "smolpp"):
-                print("yes he has small pp")
                 await message.add_reaction('🤏')
                 await message.add_reaction('🍆')
         
+
+
         if(str(message.guild.id) in serverlist):
             for ej in client.emojis:
                 if(ej.name == serverlist[str(message.guild.id)]['emoji'] and str(ej.guild.id) == str(message.guild.id)):
@@ -90,6 +151,7 @@ async def on_message(message):
                             embed.add_field(name="Emoji Guild ID", value=str(ej.guild.id), inline=False)
                             embed.set_footer(text="Debug window")
                             await message.channel.send(embed=embed)
+
 
                      
 
@@ -106,6 +168,7 @@ async def on_message(message):
         newstatus = str(message.content)[7:]
         activity = discord.Game(name=newstatus)
         await message.channel.send(f'Changed status to **Playing {newstatus}**')
+        await message.channel.send(f'_💀 This is visible in all the servers the bot is in_')
         await message.add_reaction('✋')
         await client.change_presence(status=discord.Status.online, activity=activity)
         
@@ -115,26 +178,23 @@ async def on_message(message):
         embed.add_field(name="How can I help you", value="echan commands", inline=False)
         embed.add_field(name="-anime", value="Searches for given anime [BETA] ", inline=True)
         embed.add_field(name="-manga", value="Searches for give Manga [BETA] ", inline=True)
-        embed.add_field(name="-anipictures", value="Fetches images from the previously searched Anime [BETA] ", inline=True)
         embed.add_field(name="-status newstatus", value="changes status of the bot", inline=False)
         embed.add_field(name="-bruh", value="bruh", inline=False)
 
 
         if (message.channel.nsfw==True):
-            embed.add_field(name="NSFW COMMANDS", value=" ", inline=False)
+            embed.add_field(name="NSFW COMMANDS", value="18+", inline=False)
             embed.add_field(name="-recchi", value="gets latest r/ecchi post from reddit [ COMMING SOON ]", inline=False)
             embed.add_field(name="-ecchi", value="sends a random nsfw image", inline=False)
-            embed.add_field(name="-hentai", value="Suggests a random hentai from database", inline=False)
-            embed.add_field(name="-sauce", value="sends source of image [ COMMING SOON ]", inline=False)
-            embed.add_field(name="-upload link", value="send newds wink [ COMMING SOON ;) ]", inline=False)
+            embed.add_field(name="-hentai", value="Suggests a random hentai from database [ COMMING SOON ]", inline=False)
             embed.add_field(name="-stats", value="Check who used ecchibot alot", inline=False)
 
             #Completely Hiding NSFW Commands
 
         embed.add_field(name="-irumachi", value="Sends an Adorable photo of irumakun from Marimashita irumakun", inline=False)
         embed.add_field(name="-perks", value="Lists the perks of this bot", inline=False)
-        embed.add_field(name="-help", value="bruh this is exactly the same command you ran", inline=False)
-        embed.set_footer(text="Love from echan [alpha v2]")
+        embed.add_field(name="-help", value="isnt it obvious :o", inline=False)
+        embed.set_footer(text="Love from echan [alpha v3]")
         await message.channel.send(embed=embed)
 
     if(message.content.startswith('-perks')):
@@ -190,7 +250,8 @@ async def on_message(message):
 
 
     
-    if(message.content.startswith("-raw_anime") and debugchat):
+    
+    if(message.content.startswith("-raw_anime")):
         asrc = [" "]
         animestr = str(message.content)[10:]
         try:
@@ -318,52 +379,46 @@ async def on_message(message):
 
 
     if (message.channel.nsfw==True):
-        for role in message.author.roles:
-            if(role.name == "18+"):
-                # These are only allowed by 18+ Role
+        # These are only allowed by 18+ Role
+        if 'busta' in message.content.lower():
+            await message.channel.send('bust-a-nut')
+        if message.content.startswith('-ecchi'):
+            botcount+=1
+            ecchi_vote = True
+            await message.add_reaction('😏')
+            methods=['joyreactor','imgbin','img2wall','src3']
+            a=choice(methods)
 
-                if 'busta' in message.content.lower():
-                    await message.channel.send('bust-a-nut')
-                if message.content.startswith('-ecchi'):
-                    botcount+=1
-                    ecchi_vote = True
-                    await message.add_reaction('😏')
-                    methods=['joyreactor','imgbin','img2wall','src3']
-                    a=choice(methods)
-                    if a=='joyreactor':
-                        joyreactor()
-                        x=joyreactor()
-                        await message.channel.send(x)
+            if a=='joyreactor':
+                joyreactor()
+                x=joyreactor()
+                await message.channel.send(x)
 
-                    elif a=='imgbin':
-                        imgbin()
-                        x=imgbin()
-                        await message.channel.send(x)
-                    elif a=='img2wall':
-                        img2wall()
-                        x=img2wall()
-                        await message.channel.send(x)
-                    elif a=='src3':
-                        src3()
-                        x=src3()
-                        await message.channel.send(x)
-     
-    # Anyone can use these commands now :D
-    if 'good-bot' in message.content.lower():
-         await message.channel.send(f'ありがとう {message.author.name} i shall pleasure you for eternity')
-    if 'echo' in message.content.lower():
-        await message.channel.send(message.content[5:len(message.content)])
-    if  message.content.startswith('!python'):
-        import subprocess
-        x=message.content[7:]
-        p = subprocess.run('''python "{0}"'''.format(x), capture_output=True, shell=True)
-        await message.channel.send((p.stdout.decode(),p.stderr.decode()))
+            elif(a=='imgbin'):
+                imgbin()
+                x=imgbin()
+                await message.channel.send(x)
+            elif(a=='img2wall'):
+                img2wall()
+                x=img2wall()
+                await message.channel.send(x)
+            elif(a=='src3'):
+                src3()
+                x=src3()
+                await message.channel.send(x) 
     else:
         if message.content.startswith('-ecchi'):
             ecchi_vote = False
             await message.add_reaction('😒')
             await message.channel.send(choice(perks['replies']['nsfw_error']))
             await message.channel.send(choice(perks['links']['nsfw_error']))
+
+    if 'good-bot' in message.content.lower():
+         await message.channel.send(f'ありがとう {message.author.name} i shall pleasure you for eternity')
+    if 'echo' in message.content.lower():
+        await message.channel.send(message.content[5:len(message.content)])
+
+    
 
 
 
@@ -396,4 +451,4 @@ def src3():
 ################################################################################
 #token = str(d_token.readline()[0])
 
-client.run('TOKEN') #i keep forgetting to remove this thing
+client.run('MEGUMI') #i keep forgetting to remove this thing

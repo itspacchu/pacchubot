@@ -191,7 +191,7 @@ async def on_message(message):
         embed.add_field(name="-manga", value="Searches for give Manga", inline=True)
         embed.add_field(name="-anichar", value="Searches for given Anime Charactor [BETA] ", inline=True)
         embed.add_field(name="-anipics", value="Searches for Images of given Anime Charactor [ALPHA] ", inline=True)
-
+        embed.add_field(name="-avatar <person>", value="Steals the person's DP :d", inline=False)
         embed.add_field(name="-status newstatus", value="changes status of the bot", inline=False)
         embed.add_field(name="-bruh", value="bruh", inline=False)
 

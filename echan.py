@@ -84,6 +84,20 @@ async def on_message(message):
         await message.channel.send(embed=embed)
         return
     
+    if(message.content.startswith('-avatar')):
+        hug_person = str(message.content)[11:-1]
+        hgp = client.get_user(int(hug_person))
+        await message.add_reaction('👌')
+        if(message.author == hgp  or hgp == None):
+            embed = discord.Embed(title=" ",description=f"{message.author.mention} steals ...wait thats your OWN", colour=discord.Colour(0xcd94ff))
+            embed.set_image(url=message.author.avatar_url)
+        else:
+            embed = discord.Embed(title=" ",description=f"{message.author.mention} steals {hgp.mention}'s profile pic 👀'", colour=discord.Colour(0xcd94ff))
+            embed.set_image(url=hgp.avatar_url)
+        embed.set_footer(text=f"with love from {client.user.name} :)", icon_url=client.user.avatar_url)
+        await message.channel.send(embed=embed)
+        return
+    
     
     if(message.content.startswith('-kiss')):
         hug_person = str(message.content)[9:-1]
@@ -495,4 +509,4 @@ def src3():
 ################################################################################
 #token = str(d_token.readline()[0])
 
-client.run('MEGUMICHAN') #i keep forgetting to remove this thing
+client.run('MEGU') #i keep forgetting to remove this thing

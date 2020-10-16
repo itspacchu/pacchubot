@@ -117,6 +117,23 @@ async def on_message(message):
         embed.set_footer(text=f"with love from {client.user.name} ;)", icon_url=client.user.avatar_url)
         await message.channel.send(embed=embed)
 
+    if(message.content.startswith('-kill')):
+        hug_person = str(message.content)[9:-1]
+        hgp = client.get_user(int(hug_person))
+        print(hug_person)
+        await message.add_reaction('🤗')
+        if(message.author == hgp  or hgp == None):
+            embed = discord.Embed(title=" ",description=f"{message.author.mention} you know there are better ways for than .. than to ask me", colour=discord.Colour(0xcd94ff))
+            embed.set_image(url="https://i.pinimg.com/originals/53/4d/f2/534df2eed76c2b48bc9f892086f1e749.jpg")
+        else:
+            embed = discord.Embed(title=" ",description=f"{message.author.mention} kills {hgp.mention}", colour=discord.Colour(0xcd94ff))
+            embed.set_image(url=choice(perks['links']['kill']))
+
+        embed.set_thumbnail(url=hgp.avatar_url)
+        embed.set_author(name=" ", icon_url=message.author.avatar_url)
+        embed.set_footer(text=f"with love from {client.user.name} ;)", icon_url=client.user.avatar_url)
+        await message.channel.send(embed=embed)
+
     if(message.content.startswith('-pat')):
         hug_person = str(message.content)[8:-1]
         hgp = client.get_user(int(hug_person))
@@ -278,11 +295,11 @@ async def on_message(message):
    ### ANIME RELATED STUFF 
     
     if(message.content.startswith("-anichar")):
-        anicharstr = str(message.content)[8:]
+        thestr = str(message.content)[8:]
         try:
             await message.add_reaction('😉')
-            asrc = anime.character(anime.search('Character ',anicharstr)['results'][0]['mal_id'])
-            embed = discord.Embed(title=f"**{asrc['name']}**", colour=discord.Colour(0xa779ff), url=asrc['url'], description=asrc['about'][:512].strip()+'...')
+            asrc = anime.character(anime.search('character',str(thestr))['results'][0]['mal_id'])
+            embed = discord.Embed(title=f"**{asrc['name']}**", colour=discord.Colour(0xa779ff), url=asrc['url'], description=asrc['about'][:512].strip().replace(r'\n','')+'...')
             embed.set_image(url=asrc['image_url'])
             embed.set_footer(text=f"Not the correct Character ... Try spelling their full name", icon_url=client.user.avatar_url)
             embed.add_field(name="Waifu/Husbando-Meter", value=f"{asrc['member_favorites']} have liked them", inline=False)
@@ -509,4 +526,4 @@ def src3():
 ################################################################################
 #token = str(d_token.readline()[0])
 
-client.run('MEGU') #i keep forgetting to remove this thing
+client.run('MEMEGO') #i keep forgetting to remove this thing

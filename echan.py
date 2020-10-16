@@ -3,12 +3,12 @@ from random import *
 import time,subprocess,discord,os,json,io
 from jikanpy import Jikan
 import numpy as np
+import urllib3
 
 jsonfile = io.open("perks.json",mode="r",encoding="utf-8")
 
-
 # REMOVE TOKEN BEFORE COMMITTING CHANGES Dont forget pls
-
+http = urllib3.PoolManager()
 anime = Jikan() #new ANIME API
 client = discord.Client()
 darkemoji = None
@@ -18,6 +18,7 @@ anime_reply = False
 botcount = 0
 currentcount = 0
 asrc = ['']
+prefix = ''
 
 
 debugchat = False
@@ -42,7 +43,7 @@ def list_to_string(the_list,no_of_items:int):
 async def on_ready():
     global darkemoji,client
     print('We have logged in as {0.user}'.format(client))
-    statustxt = "Running in Experimental mode"
+    statustxt = "Running in sorta Confident mode :D"
     activity = discord.Game(name=statustxt)
     await client.change_presence(status=discord.Status.online, activity=activity)
 
@@ -50,8 +51,9 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    #print(message.author.avatar_url)
-    global darkemoji,client,channel,ecchi_vote,botcount,serverlist,debugchat,currentcount,asrc
+    global darkemoji,client,channel,ecchi_vote,botcount,serverlist,debugchat,currentcount,asrc,http
+    pacchu_user = client.get_user(int("170783707647442947"))
+    temp_user = client.get_user(int("569911088141959189"))
     if message.author == client.user:
         if(ecchi_vote):
             await message.add_reaction('⬆')
@@ -78,13 +80,15 @@ async def on_message(message):
 
         embed.set_thumbnail(url=hgp.avatar_url)
         embed.set_author(name=" ", icon_url=message.author.avatar_url)
-        embed.set_footer(text="With love from echan")
+        embed.set_footer(text=f"with love from {client.user.name} :)", icon_url=client.user.avatar_url)
         await message.channel.send(embed=embed)
+        return
     
     
     if(message.content.startswith('-kiss')):
         hug_person = str(message.content)[9:-1]
         hgp = client.get_user(int(hug_person))
+        print(hug_person)
         await message.add_reaction('🤗')
         if(message.author == hgp  or hgp == None):
             embed = discord.Embed(title=" ",description=f"{message.author.mention} kisses themselves", colour=discord.Colour(0xcd94ff))
@@ -96,7 +100,7 @@ async def on_message(message):
 
         embed.set_thumbnail(url=hgp.avatar_url)
         embed.set_author(name=" ", icon_url=message.author.avatar_url)
-        embed.set_footer(text="With love from echan")
+        embed.set_footer(text=f"with love from {client.user.name} ;)", icon_url=client.user.avatar_url)
         await message.channel.send(embed=embed)
 
     if(message.content.startswith('-pat')):
@@ -113,24 +117,10 @@ async def on_message(message):
 
         embed.set_thumbnail(url=hgp.avatar_url)
         embed.set_author(name=" ", icon_url=message.author.avatar_url)
-        embed.set_footer(text="With love from echan")
+        embed.set_footer(text=f"with love from {client.user.name} ;)", icon_url=client.user.avatar_url)
         await message.channel.send(embed=embed)
 
 # Perks from Pacchu :D
-    '''
-    REMOVING DEBUG MODE owo
-    if(message.content.startswith('-debug')):
-        if(not debugchat):
-            debugchat = True
-            embed=discord.Embed(color=0x00ff00)
-            embed.add_field(name="DEBUG", value="ENABLED", inline=False)
-            await message.channel.send(embed=embed)
-        elif(debugchat):
-            debugchat = False
-            embed=discord.Embed(color=0xff0000)
-            embed.add_field(name="DEBUG", value="DISABLED", inline=False)
-            await message.channel.send(embed=embed)        
-    '''
 
     if(str(message.channel.name) == "cursed-by-darkness"):
         for role in message.author.roles:
@@ -149,7 +139,7 @@ async def on_message(message):
                             embed.add_field(name="Guild ID", value=message.guild.id, inline=False)
                             embed.add_field(name="Guild Emoji set", value=serverlist[str(message.guild.id)]['emoji'], inline=False)
                             embed.add_field(name="Emoji Guild ID", value=str(ej.guild.id), inline=False)
-                            embed.set_footer(text="Debug window")
+                            embed.set_footer(text=f"with love from {client.user.name} ;)", icon_url=client.user.avatar_url)
                             await message.channel.send(embed=embed)
 
 
@@ -160,7 +150,7 @@ async def on_message(message):
             if(debugchat):
                 embed=discord.Embed(color=0xff0000)
                 embed.add_field(name="Emoji not found", value="Consider setting server reaction emoji using -emoji emojiname", inline=False)
-                embed.set_footer(text="result 404")
+                embed.set_footer(text=f"404 ;)", icon_url=client.user.avatar_url)
                 await message.channel.send(embed=embed)
                 
         
@@ -172,12 +162,22 @@ async def on_message(message):
         await message.add_reaction('✋')
         await client.change_presence(status=discord.Status.online, activity=activity)
         
+
+
+
+
+    ## HELP COMMAND <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
     if(message.content.startswith('-help')):
-        embed=discord.Embed(color=0xae00ff)
+        embed=discord.Embed(color=0xae00ff,description=f"Created by Pacchu and TemperatureWash")
         embed.set_thumbnail(url="http://i.redd.it/5xkpkqjoz9g11.jpg")
         embed.add_field(name="How can I help you", value="echan commands", inline=False)
-        embed.add_field(name="-anime", value="Searches for given anime [BETA] ", inline=True)
-        embed.add_field(name="-manga", value="Searches for give Manga [BETA] ", inline=True)
+        embed.add_field(name="-anime", value="Searches for given anime", inline=True)
+        embed.add_field(name="-manga", value="Searches for give Manga", inline=True)
+        embed.add_field(name="-anichar", value="Searches for given Anime Charactor [BETA] ", inline=True)
+        embed.add_field(name="-anipics", value="Searches for Images of given Anime Charactor [ALPHA] ", inline=True)
+
         embed.add_field(name="-status newstatus", value="changes status of the bot", inline=False)
         embed.add_field(name="-bruh", value="bruh", inline=False)
 
@@ -194,19 +194,29 @@ async def on_message(message):
         embed.add_field(name="-irumachi", value="Sends an Adorable photo of irumakun from Marimashita irumakun", inline=False)
         embed.add_field(name="-perks", value="Lists the perks of this bot", inline=False)
         embed.add_field(name="-help", value="isnt it obvious :o", inline=False)
-        embed.set_footer(text="Love from echan [alpha v3]")
+
+        embed.set_footer(text=f"I am {client.user.name} v0.4 alpha", icon_url=client.user.avatar_url)
         await message.channel.send(embed=embed)
+        return
+
+
+
+     ## PERKS COMMAND <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
 
     if(message.content.startswith('-perks')):
         embed=discord.Embed(title="EcchiChan", description="Ecchi perks ", color=0xff9500)
         embed.set_thumbnail(url="https://i.redd.it/5xkpkqjoz9g11.jpg")
         embed.add_field(name="Emote spammer", value=f"Spams {emojiname} emote in #cursed-by-dark", inline=False)
         embed.add_field(name="Nice Lenny", value=f"searches for nice or noice in messages", inline=False)
-        embed.set_footer(text="with love from ecchichan")
+        embed.add_field(name="Ping Awareness", value=f"I Know when you ping me", inline=False)
+        embed.set_footer(text=f" {client.user.name} v0.4 alpha", icon_url=client.user.avatar_url)
         await message.channel.send(embed=embed)
+        return
 
     if(message.content.startswith('-irumachi')):
         await message.channel.send(choice(perks["links"]["iruma"]))
+        return
 
     if(message.content.startswith('-bruh')):
         after = message.content[5:]
@@ -219,8 +229,9 @@ async def on_message(message):
             serverlist[str(message.guild.id)] = {'bruh':after}
             embed=discord.Embed(color=0x00ff00)
             embed.add_field(name="Bruh image Updated", value="Bruh image has been sucessfully updated", inline=False)
-            embed.set_footer(text="love from echan ;)")
+            embed.set_footer(text=f" {client.user.name} v0.4 alpha", icon_url=client.user.avatar_url)
             await message.channel.send(embed=embed)
+        return
 
 
     if(message.content.startswith('-emoji')):
@@ -247,30 +258,55 @@ async def on_message(message):
                     await message.channel.send(embed=embed)
                 
                 break
+        return
 
 
+   ### ANIME RELATED STUFF 
     
-    
-    if(message.content.startswith("-raw_anime")):
-        asrc = [" "]
-        animestr = str(message.content)[10:]
+    if(message.content.startswith("-anichar")):
+        anicharstr = str(message.content)[8:]
         try:
-            start = time.time()
-            asrc = anime.search('anime',animestr)['results'][0]
-            end = time.time()
-
-            await message.channel.send(asrc)
-            
-
-        except ValueError:
-            embed=discord.Embed(color=0xff0000)
-            embed.add_field(name="Anime Not Found", value="That Anime is not found on MyAnimeList", inline=False)
+            await message.add_reaction('😉')
+            asrc = anime.character(anime.search('Character ',anicharstr)['results'][0]['mal_id'])
+            embed = discord.Embed(title=f"**{asrc['name']}**", colour=discord.Colour(0xa779ff), url=asrc['url'], description=asrc['about'][:512].strip()+'...')
+            embed.set_image(url=asrc['image_url'])
+            embed.set_footer(text=f"Not the correct Character ... Try spelling their full name", icon_url=client.user.avatar_url)
+            embed.add_field(name="Waifu/Husbando-Meter", value=f"{asrc['member_favorites']} have liked them", inline=False)
             await message.channel.send(embed=embed)
+        except:
+            await message.add_reaction('😞')
+            embed=discord.Embed(color=0xff0000)
+            embed.add_field(name="Character Not Found", value="That Character is not found ", inline=False)
+            embed.set_footer(text=f"with love from {client.user.name} ;)", icon_url=client.user.avatar_url)
+            await message.channel.send(embed=embed)
+        return
+    
+    if(message.content.startswith("-anipics")):
+        anicharstr = str(message.content)[8:]
+        try:
+            await message.add_reaction('😉')
+            charid = anime.search('character',anicharstr)['results'][0]
+            url = f"https://api.jikan.moe/v3/character/{charid['mal_id']}/pictures"
+            picdat = json.loads(http.request('GET',url).data.decode())['pictures']
+            embed = discord.Embed(title=f"**{charid['name']}**", colour=discord.Colour(0xa779ff), url=charid['url'])
+            embed.set_image(url=choice(picdat)['small'])
+            embed.set_footer(text=f"Not the correct charector... Try spelling their full name", icon_url=client.user.avatar_url)
+            await message.channel.send(embed=embed)
+        except:
+            await message.add_reaction('😞')
+            embed=discord.Embed(color=0xff0000)
+            embed.add_field(name="Images Not Found", value=" Coudn't find any images on given Query ", inline=False)
+            embed.set_footer(text=f"with love from {client.user.name} ;)", icon_url=client.user.avatar_url)
+            await message.channel.send(embed=embed)
+        return
+
+
 
     if(message.content.startswith("-anime")):
         asrc = [" "]
         animestr = str(message.content)[6:]
         try:
+            await message.add_reaction('😉')
             start = time.time()
             asrc = anime.search('anime',animestr)['results'][0]
             end = time.time()
@@ -294,14 +330,18 @@ async def on_message(message):
             embed.add_field(name="Openings", value=list_to_string(more_info['opening_themes'],4), inline=False)
             embed.add_field(name="Endings", value=list_to_string(more_info['ending_themes'],4), inline=False)
             
-            embed.set_footer(text=f"from echan [ fetched in {np.around(end-start,1)}s ]")
+            embed.set_footer(text=f"Not the correct Anime ... use the full name including OVA or TV series", icon_url=client.user.avatar_url)
             await message.channel.send(embed=embed)
+
             
 
         except:
+            await message.add_reaction('😭')
             embed=discord.Embed(color=0xff0000)
             embed.add_field(name="Anime Not Found", value="That Anime is not found on MyAnimeList", inline=False)
+            embed.set_footer(text=f"with love from {client.user.name} ;)", icon_url=client.user.avatar_url)
             await message.channel.send(embed=embed)
+        return
 
 
     if(message.content.startswith("-manga")):
@@ -321,15 +361,19 @@ async def on_message(message):
             embed.add_field(name="chapters", value=asrc['chapters'], inline=True)
             embed.add_field(name="views", value=asrc['members'], inline=True)
 
-            embed.set_footer(text=f"from echan [ fetched in {np.around(end-start,1)}s ]")
+            embed.set_footer(text=f"Not the right manga .. try searching with its full title", icon_url=client.user.avatar_url)
             await message.channel.send(embed=embed)
             
 
         except:
             embed=discord.Embed(color=0xff0000)
-            embed.add_field(name="Anime Not Found", value="That Anime is not found on MyAnimeList", inline=False)
+            embed.add_field(name="Manga Not Found", value="That manga was not found on MyAnimeList.. webtoons are not yet supported", inline=False)
             await message.channel.send(embed=embed)
+        return
+
    
+
+    ### END OF ANIME RELATED STUFF
 
     if('nice' in str(message.content).lower().replace(' ','') or 'noice' in str(message.content).lower().replace(' ','') and str(message.channel.name) == "cursed-by-shriram"):
         await message.channel.send(r'( ͡° ͜ʖ ͡°)')
@@ -354,7 +398,7 @@ async def on_message(message):
     if(message.content.startswith('-upload')):
         embed=discord.Embed(color=0xff0000)
         embed.add_field(name="COMMING SOON", value="function not defined", inline=False)
-        embed.set_footer(text="Feature_Not_Defined")
+        embed.set_footer(text="Feature_Not_Defined",icon_url=client.user.avatar_url)
         await message.channel.send(embed=embed)
     
     if(message.content.startswith('-hentai')):
@@ -366,7 +410,7 @@ async def on_message(message):
     if(message.content.startswith('-stats')):
         embed=discord.Embed(color=0xff0000)
         embed.add_field(name="Bot summons", value=f"This bot was summoned {botcount} times", inline=False)
-        embed.set_footer(text="With love from echan")
+        embed.set_footer(text=f"with love from {client.user.name} ;)", icon_url=client.user.avatar_url)
         await message.channel.send(embed=embed)
         if(debugchat):
                 embed=discord.Embed(color=0xff0000)
@@ -451,4 +495,4 @@ def src3():
 ################################################################################
 #token = str(d_token.readline()[0])
 
-client.run('') #i keep forgetting to remove this thing
+client.run('MEGUMICHAN') #i keep forgetting to remove this thing

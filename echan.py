@@ -389,7 +389,7 @@ async def on_message(message):
                     x=src3()
                     embed = discord.Embed(title=f"**Src3's Source**", description=f"Requested by {message.author.mention}", colour=discord.Colour(0xa779ff), url=x)
                     embed.set_image(url=x)
-                    embed.set_footer(text=f"🔞 Courtsey of TemperatureWash", icon_url=client.user.avatar_url)
+                    embed.set_footer(text=f"🔞 Courtesy of TemperatureWash", icon_url=client.user.avatar_url)
                     await message.channel.send(embed=embed)
                 __count_statistics__(serverlist,message.guild.id,'ecchi_command')
         else:

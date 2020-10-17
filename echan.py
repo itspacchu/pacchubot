@@ -4,6 +4,7 @@ import time,subprocess,discord,os,json,io
 from jikanpy import Jikan
 import numpy as np
 import urllib3
+from discord import Spotify
 
 jsonfile = io.open("perks.json",mode="r",encoding="utf-8")
 
@@ -22,7 +23,44 @@ prefix = ''
 
 
 debugchat = False
-serverlist = {'default' : {'emoji':'🌊','debug':0,'bruh':'https://media.discordapp.net/attachments/760741167876538419/760744075132534784/DeepFryer_20200930_113458.jpg?width=448&height=518'},'705682250460823602': {'emoji': 'blackaus' , 'debug':1 , 'bruh':'https://media.discordapp.net/attachments/760741167876538419/760744075132534784/DeepFryer_20200930_113458.jpg?width=448&height=518' }, '433901628018655232': {'emoji': 'sus' , 'debug':0 }, '685469328929587268': {'emoji': 'kikiangry' , 'debug':0 }}
+try:
+    kek = open('forcesave.json','r')
+    serverlist = json.load(kek)
+    kek.close
+except FileNotFoundError:
+    serverlist = {}
+
+
+
+def __initiate_default_stats__(serverid:str):
+    global serverlist
+    serverlist[serverid] = {
+        'emoji':'🌊',
+        'debug':0,
+        'bruh':'https://media.discordapp.net/attachments/760741167876538419/760744075132534784/DeepFryer_20200930_113458.jpg?width=448&height=518',
+        'prefix' : '',
+        'stats': {
+            'bot_summons':0,
+            'ecchi_command':0,
+            'hugs':0,
+            'pats':0,
+            'kiss':0,
+            'kills':0,
+            'anipics':0,
+            'anime':0,
+            'manga':0,
+            'echos':0,
+            'bruhs':0,
+            'nice':0
+        }
+        }
+
+def __count_statistics__(serverid:str,stattitle:str):
+    try:
+        serverlist[serverid]['stats'][stattitle] += 1
+    except KeyError:
+        __initiate_default_stats__(serverid)
+
 perks = json.load(jsonfile)
 
 #additional variables
@@ -43,7 +81,7 @@ def list_to_string(the_list,no_of_items:int):
 async def on_ready():
     global darkemoji,client
     print('We have logged in as {0.user}'.format(client))
-    statustxt = "Running in sorta Confident mode :D"
+    statustxt = "Running with 80% confidence"
     activity = discord.Game(name=statustxt)
     await client.change_presence(status=discord.Status.online, activity=activity)
 
@@ -82,6 +120,9 @@ async def on_message(message):
         embed.set_author(name=" ", icon_url=message.author.avatar_url)
         embed.set_footer(text=f"with love from {client.user.name} :)", icon_url=client.user.avatar_url)
         await message.channel.send(embed=embed)
+
+        ## STAT COUNTING
+        __count_statistics__(message.guild.id,'hugs')
         return
     
     if(message.content.startswith('-avatar')):
@@ -117,6 +158,9 @@ async def on_message(message):
         embed.set_footer(text=f"with love from {client.user.name} ;)", icon_url=client.user.avatar_url)
         await message.channel.send(embed=embed)
 
+        __count_statistics__(message.guild.id,'kiss')
+        return
+
     if(message.content.startswith('-kill')):
         hug_person = str(message.content)[9:-1]
         hgp = client.get_user(int(hug_person))
@@ -133,8 +177,11 @@ async def on_message(message):
         embed.set_author(name=" ", icon_url=message.author.avatar_url)
         embed.set_footer(text=f"with love from {client.user.name} ;)", icon_url=client.user.avatar_url)
         await message.channel.send(embed=embed)
+        __count_statistics__(message.guild.id,'kills')
+        return
 
     if(message.content.startswith('-pat')):
+        serverlist[str(message.guild.id)]['stats']['pats']+=1
         hug_person = str(message.content)[8:-1]
         hgp = client.get_user(int(hug_person))
         await message.add_reaction('🤗')
@@ -150,6 +197,8 @@ async def on_message(message):
         embed.set_author(name=" ", icon_url=message.author.avatar_url)
         embed.set_footer(text=f"with love from {client.user.name} ;)", icon_url=client.user.avatar_url)
         await message.channel.send(embed=embed)
+        __count_statistics__(message.guild.id,'pats')
+        return
 
 # Perks from Pacchu :D
 
@@ -193,9 +242,6 @@ async def on_message(message):
         await message.add_reaction('✋')
         await client.change_presence(status=discord.Status.online, activity=activity)
         
-
-
-
 
     ## HELP COMMAND <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -245,6 +291,9 @@ async def on_message(message):
         await message.channel.send(embed=embed)
         return
 
+
+    ## <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
     if(message.content.startswith('-irumachi')):
         await message.channel.send(choice(perks["links"]["iruma"]))
         return
@@ -262,6 +311,7 @@ async def on_message(message):
             embed.add_field(name="Bruh image Updated", value="Bruh image has been sucessfully updated", inline=False)
             embed.set_footer(text=f" {client.user.name} v0.4 alpha", icon_url=client.user.avatar_url)
             await message.channel.send(embed=embed)
+        __count_statistics__(message.guild.id,'bruhs')
         return
 
 
@@ -286,8 +336,7 @@ async def on_message(message):
                 if(debugchat):
                     embed=discord.Embed(color=0x00ff00)
                     embed.add_field(name="DEBUG", value=serverlist, inline=False)
-                    await message.channel.send(embed=embed)
-                
+                    await message.channel.send(embed=embed)              
                 break
         return
 
@@ -310,6 +359,7 @@ async def on_message(message):
             embed.add_field(name="Character Not Found", value="That Character is not found ", inline=False)
             embed.set_footer(text=f"with love from {client.user.name} ;)", icon_url=client.user.avatar_url)
             await message.channel.send(embed=embed)
+        __count_statistics__(message.guild.id,'anichars')
         return
     
     if(message.content.startswith("-anipics")):
@@ -329,6 +379,7 @@ async def on_message(message):
             embed.add_field(name="Images Not Found", value=" Coudn't find any images on given Query ", inline=False)
             embed.set_footer(text=f"with love from {client.user.name} ;)", icon_url=client.user.avatar_url)
             await message.channel.send(embed=embed)
+        __count_statistics__(message.guild.id,'anipics')
         return
 
 
@@ -362,16 +413,14 @@ async def on_message(message):
             embed.add_field(name="Endings", value=list_to_string(more_info['ending_themes'],4), inline=False)
             
             embed.set_footer(text=f"Not the correct Anime ... use the full name including OVA or TV series", icon_url=client.user.avatar_url)
-            await message.channel.send(embed=embed)
-
-            
-
+            await message.channel.send(embed=embed)   
         except:
             await message.add_reaction('😭')
             embed=discord.Embed(color=0xff0000)
             embed.add_field(name="Anime Not Found", value="That Anime is not found on MyAnimeList", inline=False)
             embed.set_footer(text=f"with love from {client.user.name} ;)", icon_url=client.user.avatar_url)
             await message.channel.send(embed=embed)
+        __count_statistics__(message.guild.id,'anime')
         return
 
 
@@ -400,19 +449,33 @@ async def on_message(message):
             embed=discord.Embed(color=0xff0000)
             embed.add_field(name="Manga Not Found", value="That manga was not found on MyAnimeList.. webtoons are not yet supported", inline=False)
             await message.channel.send(embed=embed)
+        __count_statistics__(message.guild.id,'manga')
         return
-
-   
 
     ### END OF ANIME RELATED STUFF
 
     if('nice' in str(message.content).lower().replace(' ','') or 'noice' in str(message.content).lower().replace(' ','') and str(message.channel.name) == "cursed-by-shriram"):
         await message.channel.send(r'( ͡° ͜ʖ ͡°)')
-        if(debugchat):
-                embed=discord.Embed(color=0xff0000)
-                embed.add_field(name="DEBUG", value="noice found", inline=False)
-                await message.channel.send(embed=embed)
+        __count_statistics__(message.guild.id,'nice')
+                
 
+    ## <<<< STATISTICS COMMAND <<<<<
+
+    if(message.content.startswith('-stats')):
+        embed=discord.Embed(color=0xff0000)
+        embed.add_field(name="Echan stat counter", value="shows all the statistics of the bot **Server Independant**", inline=False)
+        embed.add_field(name="Hugs delivered", value=serverlist[message.guild.id]['stats']['hugs'], inline=True)
+        embed.add_field(name="Kisses", value=serverlist[message.guild.id]['stats']['kiss'], inline=True)
+        embed.add_field(name="Pats delivered", value=serverlist[message.guild.id]['stats']['pats'], inline=True)
+        embed.add_field(name="Kills executed", value=serverlist[message.guild.id]['stats']['kills'], inline=True)
+        embed.add_field(name="Lennies delivered", value=serverlist[message.guild.id]['stats']['nice'], inline=True)
+        embed.add_field(name="bruhs delivered", value=serverlist[message.guild.id]['stats']['bruhs'], inline=True)
+        embed.add_field(name="Weebo Anime searches", value=serverlist[message.guild.id]['stats']['anime'], inline=True)
+        embed.add_field(name="Weebo Manga searches", value=serverlist[message.guild.id]['stats']['manga'], inline=True)
+        embed.add_field(name="Anime images delivered for simps", value=serverlist[message.guild.id]['stats']['anipics'], inline=True)
+        embed.set_footer(text=f"with love from {client.user.name} ;)", icon_url=client.user.avatar_url)
+        await message.channel.send(embed=embed)
+        return
 
     #Upcomming 
 
@@ -421,32 +484,42 @@ async def on_message(message):
         embed.add_field(name="COMMING SOON", value="function not defined", inline=False)
         embed.set_footer(text="Feature_Not_Defined")
         await message.channel.send(embed=embed)
-        if(debugchat):
-                embed=discord.Embed(color=0xff0000)
-                embed.add_field(name="DEBUG", value="function not available", inline=False)
-                await message.channel.send(embed=embed)
+        return
 
     if(message.content.startswith('-upload')):
         embed=discord.Embed(color=0xff0000)
         embed.add_field(name="COMMING SOON", value="function not defined", inline=False)
         embed.set_footer(text="Feature_Not_Defined",icon_url=client.user.avatar_url)
         await message.channel.send(embed=embed)
+        return
     
     if(message.content.startswith('-hentai')):
         embed=discord.Embed(color=0xff0000)
         embed.add_field(name="COMMING SOON", value="function not defined", inline=False)
         embed.set_footer(text="Feature_Not_Defined")
         await message.channel.send(embed=embed)
+        return
     
-    if(message.content.startswith('-stats')):
-        embed=discord.Embed(color=0xff0000)
-        embed.add_field(name="Bot summons", value=f"This bot was summoned {botcount} times", inline=False)
-        embed.set_footer(text=f"with love from {client.user.name} ;)", icon_url=client.user.avatar_url)
-        await message.channel.send(embed=embed)
-        if(debugchat):
-                embed=discord.Embed(color=0xff0000)
-                embed.add_field(name="DEBUG", value="This command is a debug command basically", inline=False)
-                await message.channel.send(embed=embed)
+    if(message.content.startswith('-fap')):
+        await message.channel.send('oi .. get a room')
+        return
+    
+    if(message.content.startswith('-fap')):
+        await message.channel.send('oi .. get a room')
+        return
+
+    if(message.content.startswith('-pacchu')):
+        await message.channel.send('All heil de Pacchu')
+        return
+    
+    if(message.content.startswith('-save')):
+        await message.channel.send('Force saving the data')
+        forcesave = open('datasave.json','w')
+        json.dump(serverlist,forcesave)
+        forcesave.close()
+        return
+    
+
         
         
 
@@ -488,10 +561,12 @@ async def on_message(message):
             await message.channel.send(choice(perks['replies']['nsfw_error']))
             await message.channel.send(choice(perks['links']['nsfw_error']))
 
-    if 'good-bot' in message.content.lower():
-         await message.channel.send(f'ありがとう {message.author.name} i shall pleasure you for eternity')
-    if 'echo' in message.content.lower():
-        await message.channel.send(message.content[5:len(message.content)])
+    if '-echo' in message.content.lower():
+        await message.channel.send(message.content[5:len(message.content)] + f'_ ~ {message.author.mention}_')
+        await message.delete()
+        __count_statistics__(message.guild.id,'echos')
+        return
+        
 
     
 
@@ -526,4 +601,4 @@ def src3():
 ################################################################################
 #token = str(d_token.readline()[0])
 
-client.run('MEMEGO') #i keep forgetting to remove this thing
+client.run(' MOOHIMOMO') #i keep forgetting to remove this thing

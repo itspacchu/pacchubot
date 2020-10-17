@@ -116,8 +116,7 @@ async def on_message(message):
             embed = discord.Embed(title=" ",description=f"{message.author.mention} hugs {hgp.mention}", colour=discord.Colour(0xcd94ff))
             embed.set_image(url=choice(perks['links']['hugs']))
 
-        embed.set_thumbnail(url=hgp.avatar_url)
-        embed.set_author(name=" ", icon_url=message.author.avatar_url)
+        embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
         embed.set_footer(text=f"with love from {client.user.name} :)", icon_url=client.user.avatar_url)
         await message.channel.send(embed=embed)
 
@@ -153,8 +152,7 @@ async def on_message(message):
             embed = discord.Embed(title=" ",description=f"{message.author.mention} kisses {hgp.mention}", colour=discord.Colour(0xcd94ff))
             embed.set_image(url=choice(perks['links']['kiss']))
 
-        embed.set_thumbnail(url=hgp.avatar_url)
-        embed.set_author(name=" ", icon_url=message.author.avatar_url)
+        embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
         embed.set_footer(text=f"with love from {client.user.name} ;)", icon_url=client.user.avatar_url)
         await message.channel.send(embed=embed)
 
@@ -173,8 +171,7 @@ async def on_message(message):
             embed = discord.Embed(title=" ",description=f"{message.author.mention} kills {hgp.mention}", colour=discord.Colour(0xcd94ff))
             embed.set_image(url=choice(perks['links']['kill']))
 
-        embed.set_thumbnail(url=hgp.avatar_url)
-        embed.set_author(name=" ", icon_url=message.author.avatar_url)
+        embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
         embed.set_footer(text=f"with love from {client.user.name} ;)", icon_url=client.user.avatar_url)
         await message.channel.send(embed=embed)
         __count_statistics__(message.guild.id,'kills')
@@ -462,19 +459,28 @@ async def on_message(message):
     ## <<<< STATISTICS COMMAND <<<<<
 
     if(message.content.startswith('-stats')):
-        embed=discord.Embed(color=0xff0000)
-        embed.add_field(name="Echan stat counter", value="shows all the statistics of the bot **Server Independant**", inline=False)
-        embed.add_field(name="Hugs delivered", value=serverlist[message.guild.id]['stats']['hugs'], inline=True)
-        embed.add_field(name="Kisses", value=serverlist[message.guild.id]['stats']['kiss'], inline=True)
-        embed.add_field(name="Pats delivered", value=serverlist[message.guild.id]['stats']['pats'], inline=True)
-        embed.add_field(name="Kills executed", value=serverlist[message.guild.id]['stats']['kills'], inline=True)
-        embed.add_field(name="Lennies delivered", value=serverlist[message.guild.id]['stats']['nice'], inline=True)
-        embed.add_field(name="bruhs delivered", value=serverlist[message.guild.id]['stats']['bruhs'], inline=True)
-        embed.add_field(name="Weebo Anime searches", value=serverlist[message.guild.id]['stats']['anime'], inline=True)
-        embed.add_field(name="Weebo Manga searches", value=serverlist[message.guild.id]['stats']['manga'], inline=True)
-        embed.add_field(name="Anime images delivered for simps", value=serverlist[message.guild.id]['stats']['anipics'], inline=True)
-        embed.set_footer(text=f"with love from {client.user.name} ;)", icon_url=client.user.avatar_url)
-        await message.channel.send(embed=embed)
+        embed = discord.Embed(color=0xf3d599)
+        embed.set_author(name=client.user.name, icon_url=client.user.avatar_url)
+        try:
+            embed.add_field(name="Echan stat counter", value="shows all the statistics of the bot **Server Independant**", inline=False)
+            embed.add_field(name="Hugs delivered", value=serverlist[message.guild.id]['stats']['hugs'], inline=True)
+            embed.add_field(name="Kisses", value=serverlist[message.guild.id]['stats']['kiss'], inline=True)
+            embed.add_field(name="Pats delivered", value=serverlist[message.guild.id]['stats']['pats'], inline=True)
+            embed.add_field(name="Kills executed", value=serverlist[message.guild.id]['stats']['kills'], inline=True)
+            embed.add_field(name="Lennies delivered", value=serverlist[message.guild.id]['stats']['nice'], inline=True)
+            embed.add_field(name="bruhs delivered", value=serverlist[message.guild.id]['stats']['bruhs'], inline=True)
+            embed.add_field(name="Weebo Anime searches", value=serverlist[message.guild.id]['stats']['anime'], inline=True)
+            embed.add_field(name="Weebo Manga searches", value=serverlist[message.guild.id]['stats']['manga'], inline=True)
+            embed.add_field(name="Anime images delivered for simps", value=serverlist[message.guild.id]['stats']['anipics'], inline=True)
+            embed.add_field(name="Ecchi summons", value=serverlist[message.guild.id]['stats']['ecchi_command'], inline=True)
+            embed.set_footer(text=f"with love from {client.user.name} ;)", icon_url=client.user.avatar_url)
+            await message.channel.send(embed=embed)
+        except KeyError:
+            __initiate_default_stats__(message.guild.id)
+            embed.add_field(name="No Data", value="The bot was not run at all T_T pls use me", inline=True)
+            embed.set_footer(text=f"data is volatile", icon_url=client.user.avatar_url)
+            await message.channel.send(embed=embed)
+
         return
 
     #Upcomming 
@@ -531,6 +537,7 @@ async def on_message(message):
         if 'busta' in message.content.lower():
             await message.channel.send('bust-a-nut')
         if message.content.startswith('-ecchi'):
+            __count_statistics__(message.guild.id,'ecchi_command')
             botcount+=1
             ecchi_vote = True
             await message.add_reaction('😏')
@@ -555,11 +562,12 @@ async def on_message(message):
                 x=src3()
                 await message.channel.send(x) 
     else:
-        if message.content.startswith('-ecchi'):
+        if message.content.startswith('-ecchi_command'):
             ecchi_vote = False
             await message.add_reaction('😒')
             await message.channel.send(choice(perks['replies']['nsfw_error']))
             await message.channel.send(choice(perks['links']['nsfw_error']))
+    
 
     if '-echo' in message.content.lower():
         await message.channel.send(message.content[5:len(message.content)] + f'_ ~ {message.author.mention}_')
@@ -601,4 +609,4 @@ def src3():
 ################################################################################
 #token = str(d_token.readline()[0])
 
-client.run(' MOOHIMOMO') #i keep forgetting to remove this thing
+client.run('UWUCHA') #i keep forgetting to remove this thing

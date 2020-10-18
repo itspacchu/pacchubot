@@ -7,6 +7,7 @@ import time,subprocess,discord,os,json,io
 from jikanpy import Jikan
 import numpy as np
 import urllib3
+import asyncio , youtube_dl
 from discord.ext import commands
 from pacchufunctions import __count_statistics__,__initiate_default_stats__,mentionToId,queryToName,list_to_string
 from vijaysfunctions import joyreactor , src3 , img2wall , imgbin
@@ -327,14 +328,149 @@ async def stats(ctx):
         await ctx.send(embed=embed)
 
 
-@client.command()
+@client.command(pass_context=True,aliases=['Pacchu','94cchu'])
 async def pacchu(ctx):
-    ctx.send('Hail pacchu')
+    await ctx.send('Hail pacchu')
 
+@client.command()
+async def status(ctx,newstatus):
+    activity = discord.Game(name=newstatus)	
+    await ctx.send(f'Changed status to **Playing {newstatus}**')
+    await ctx.send(f'_💀 This is visible in all the servers the bot is in_')	
+    await ctx.message.add_reaction('✋')	
+    await client.change_presence(status=discord.Status.online, activity=activity)
+
+# Yeeting someone's code
+
+youtube_dl.utils.bug_reports_message = lambda: ''
+
+ytdl_format_options = {
+    'format': 'bestaudio/best',
+    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
+    'restrictfilenames': True,
+    'noplaylist': True,
+    'nocheckcertificate': True,
+    'ignoreerrors': False,
+    'logtostderr': False,
+    'quiet': True,
+    'no_warnings': True,
+    'default_search': 'auto',
+    'source_address': '0.0.0.0' # bind to ipv4 since ipv6 addresses cause issues sometimes
+}
+
+ffmpeg_options = {
+    'options': '-vn'
+}
+
+ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
+
+class YTDLSource(discord.PCMVolumeTransformer):
+    def __init__(self, source, *, data, volume=0.5):
+        super().__init__(source, volume)
+
+        self.data = data
+
+        self.title = data.get('title')
+        self.url = data.get('url')
+
+    @classmethod
+    async def from_url(cls, url, *, loop=None, stream=False):
+        loop = loop or asyncio.get_event_loop()
+        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
+
+        if 'entries' in data:
+            # take first item from a playlist
+            data = data['entries'][0]
+
+        filename = data['url'] if stream else ytdl.prepare_filename(data)
+        return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
+
+
+class Music(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
+    @commands.command()
+    async def join(self, ctx, *, channel: discord.VoiceChannel):
+        """Joins a voice channel"""
+
+        if ctx.voice_client is not None:
+            return await ctx.voice_client.move_to(channel)
+
+        await channel.connect()
+
+
+
+    @commands.command()
+    async def stream(self, ctx, *, url):
+        async with ctx.typing():
+            player = await YTDLSource.from_url(url, loop=self.bot.loop)
+            ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
+
+        await ctx.message.add_reaction('🎧')
+        embed = discord.Embed(title="Playing from Youtube", colour=discord.Colour(0xff5065), url=url, description=player.title)
+        embed.set_author(name=ctx.message.author.name, icon_url=ctx.message.author.avatar_url)
+        embed.set_footer(text=client.user.name, icon_url=client.user.avatar_url)
+        await ctx.send(embed=embed)
+
+    @commands.command()
+    async def play(self, ctx, *, url):
+        async with ctx.typing():
+            player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
+            ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
+        
+        await ctx.message.add_reaction('🎧')
+        embed = discord.Embed(title="Playing from Youtube", colour=discord.Colour(0xff5065), url=url, description=player.title)
+        embed.set_author(name=ctx.message.author.name, icon_url=ctx.message.author.avatar_url)
+        embed.set_footer(text=client.user.name, icon_url=client.user.avatar_url)
+        await ctx.send(embed=embed)
+        
+
+    @commands.command()
+    async def volume(self, ctx, volume: int):
+        """Changes the player's volume"""
+
+        if ctx.voice_client is None:
+            embed = discord.Embed(title=f"{ctx.message.author.mention} is not connected to any Voice channel", colour=discord.Colour(0xff5065))
+            embed.set_author(name=ctx.message.author.name, icon_url=ctx.message.author.avatar_url)
+            embed.set_footer(text=client.user.name, icon_url=client.user.avatar_url)
+            return await ctx.send(embed=embed)
+
+        ctx.voice_client.source.volume = volume / 100
+        await ctx.send("Changed volume to {}%".format(volume))
+
+    @commands.command()
+    async def stop(self, ctx):
+        """Stops and disconnects the bot from voice"""
+        embed = discord.Embed(title=f"Exiting", colour=discord.Colour(0xff5065))
+        embed.set_author(name=ctx.message.author.name, icon_url=ctx.message.author.avatar_url)
+        embed.set_footer(text=client.user.name, icon_url=client.user.avatar_url)
+        return await ctx.send(embed=embed)
+        await ctx.voice_client.disconnect()
+
+    @play.before_invoke
+    @stream.before_invoke
+    async def ensure_voice(self, ctx):
+        if ctx.voice_client is None:
+            if ctx.author.voice.channel:
+                await ctx.author.voice.channel.connect()
+            else:
+                embed = discord.Embed(title=f"{ctx.message.author.mention} is not connected to any Voice channel", colour=discord.Colour(0xff5065))
+                embed.set_author(name=ctx.message.author.name, icon_url=ctx.message.author.avatar_url)
+                embed.set_footer(text=client.user.name, icon_url=client.user.avatar_url)
+                return await ctx.send(embed=embed)
+
+        elif ctx.voice_client.is_playing():
+            ctx.voice_client.stop()
+
+
+client.add_cog(Music(client))
+
+# End
 
 @client.event
 async def on_message(message):
-    global darkemoji,client,ecchi_vote,botcount,serverlist,currentcount,asrc,http,command_prefix
+    global darkemoji,client,ecchi_vote,botcount,serverlist,currentcount,http,command_prefix
     if message.author == client.user:
         if(ecchi_vote):
             await message.add_reaction('⬆')
@@ -433,4 +569,4 @@ async def on_message(message):
                 await message.add_reaction('❌')
 
 
-client.run('REWRITE') #REMOVE TOKEN
+client.run('UWUCHANO') #REMOVE TOKEN

@@ -18,3 +18,5 @@
 > _perk Extra stuff run the command for more commands
 
 i'll work on readme later
+
+![image](https://user-images.githubusercontent.com/37984032/114234321-3a7ab400-999c-11eb-8382-3894877caec4.png)

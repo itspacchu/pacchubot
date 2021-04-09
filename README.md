@@ -1,5 +1,6 @@
 # Pacchu-s-Slave discord bot
 
+ ## [invite it to your server](https://discord.com/api/oauth2/authorize?client_id=709426015759368282&permissions=0&scope=bot)
 
 > _anime  Searches for given anime
 
@@ -17,7 +18,6 @@
 
 > _perk Extra stuff run the command for more commands
 
-i'll work on readme later
 
 ![image](https://user-images.githubusercontent.com/37984032/114234535-875e8a80-999c-11eb-8fb4-2a36ffe310ee.png)
 

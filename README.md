@@ -19,4 +19,11 @@
 
 i'll work on readme later
 
+![image](https://user-images.githubusercontent.com/37984032/114234535-875e8a80-999c-11eb-8fb4-2a36ffe310ee.png)
+
+![image](https://user-images.githubusercontent.com/37984032/114234600-9f360e80-999c-11eb-8bb3-a23f69198243.png)
+
+![image](https://user-images.githubusercontent.com/37984032/114234663-b2e17500-999c-11eb-804a-ca3802562234.png)
+
+
 ![image](https://user-images.githubusercontent.com/37984032/114234321-3a7ab400-999c-11eb-8382-3894877caec4.png)

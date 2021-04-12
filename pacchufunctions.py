@@ -1,4 +1,4 @@
-
+#deprecated by mongo db ill remove it later
 def __initiate_default_stats__(serverlist:dict,serverid:str):
     serverlist[serverid] = {
         'emoji':'🌊',
@@ -28,7 +28,9 @@ def __count_statistics__(serverlist:dict,serverid:str,stattitle:str):
         __initiate_default_stats__(serverlist,serverid)
 
 def mentionToId(mention:str):
+    print(mention)
     return int(mention[3:-1])
+
 
 def queryToName(var):
     name = ""

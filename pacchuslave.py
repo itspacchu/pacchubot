@@ -19,6 +19,7 @@ mangaSearch = db['mangaSearch']
 gptDb = db['gptQuery']
 #PodcastDb = db['PodcastQ']
 PodcastSuggest = db['PodSuggest']
+VoiceUsage = db['VoiceActivity']
 
 # global variables
 serverlist = {}  # gonna be removed next
@@ -676,8 +677,10 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
 
 class Music(commands.Cog):
+    StartTime = float(0.0)
     def __init__(self, bot):
         self.bot = bot
+        
 
     @commands.command()
     async def join(self, ctx, *, channel: discord.VoiceChannel):
@@ -689,6 +692,7 @@ class Music(commands.Cog):
     @commands.command(pass_context=True, aliases=['p', 's'])
     async def play(self, ctx, *, url="https://youtu.be/dQw4w9WgXcQ"):
         await ctx.message.add_reaction('🎧')
+        self.StartTime += ttime.time()
         if ("youtube.com" in str(url) or "youtu.be"):
             async with ctx.typing():
                 player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
@@ -718,6 +722,7 @@ class Music(commands.Cog):
         
     @commands.command(pass_context=True, aliases=['pl'])
     async def lofi(self, ctx, *, url="https://youtu.be/5qap5aO4i9A"):
+        self.StartTime += ttime.time()
         await ctx.message.add_reaction('🎧')
         async with ctx.typing():
             player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
@@ -818,10 +823,13 @@ class Music(commands.Cog):
         if context.voice_client is None:
             if context.author.voice.channel:
                 await context.author.voice.channel.connect()
+                
         guild = context.guild
         voice_client: discord.VoiceClient = discord.utils.get(
             self.bot.voice_clients, guild=guild)
         _source_ = currentpod.GetEpisodeMp3(podepi)
+        self.StartTime += ttime.time()
+        print("timer started")
         audio_source = discord.FFmpegPCMAudio(_source_)
         if not voice_client.is_playing():
             voice_client.play(audio_source, after=None)
@@ -829,11 +837,32 @@ class Music(commands.Cog):
     @commands.command(aliases=['fuckoff', 'dc' , 'disconnect'])
     async def stop(self, ctx ):
         if(ctx.author.voice.channel):
+            StopTime = ttime.time()
+            TotalPlayed = StopTime - self.StartTime
+            print(TotalPlayed)
+            try:
+                timeSend = VoiceUsage.find_one({"guild": ctx.message.guild.id})['time'] + TotalPlayed
+            except:
+                timesend = TotalPlayed
             await ctx.message.add_reaction('👍')
-            embed = discord.Embed( title=f"Exiting", colour=discord.Colour(0xff5065))
+            embed = discord.Embed( title=f"Exiting", description=f"played for {TotalPlayed%60} Minutes" ,colour=discord.Colour(0xff5065))
             embed.set_author(name=ctx.message.author.name,icon_url=ctx.message.author.avatar_url)
             embed.set_footer(text=client.user.name,icon_url=client.user.avatar_url)
             await ctx.voice_client.disconnect()
+            if(VoiceUsage.find_one({"guild": ctx.message.guild.id}) == None):
+                dbStore = {
+                    "guild": ctx.message.guild.id,
+                    "time": 0.0
+                }
+                VoiceUsage.insert_one(
+                    {"guild": ctx.message.guild.id}, dbStore)
+            else:
+                dbStore = {
+                    "guild": ctx.message.guild.id,
+                    "time": timeSend
+                }
+                VoiceUsage.replace_one(
+                    {"guild": ctx.message.guild.id}, dbStore)
             return await ctx.reply(embed=embed)
         else:
             await ctx.message.add_reaction('❗')
@@ -849,6 +878,8 @@ class Music(commands.Cog):
     async def ensure_voice(self, ctx):
         if ctx.voice_client is None:
             if ctx.author.voice.channel:
+                self.StartTime += ttime.time()
+                print("timer started")
                 await ctx.author.voice.channel.connect()
             else:
                 embed = discord.Embed(

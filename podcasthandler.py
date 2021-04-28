@@ -1,28 +1,48 @@
 import feedparser as fp 
+import requests
+import json
+from math import ceil
+
+def Pagination(totlen:int,indsiz:int):
+    return ceil(totlen/indsiz)
 
 
-podcasts = {
-    0 : {
-        "name":"crimejunkie",
-        "rss":"https://feeds.megaphone.fm/ADL9840290619",
-        "image":"https://upload.wikimedia.org/wikipedia/commons/0/0b/Crime_Junkie_Logo.jpg"
-    },
-    
-    1 : {
-        "name":"darknetdiary",
-        "rss": "https://feeds.megaphone.fm/darknetdiaries"
-    },
-    
-    2 : {
-        "name":"redhanded",
-        "rss": "https://rss.acast.com/redhanded"
-    },
-    
-    3 : {
-        "name":"waveform",
-        "rss": "http://feeds.feedburner.com/WaveformWithMkbhd"
-    }
-}
+def PodSearch(query):
+    formattedQuery = query.replace(' ', '+')
+    response = requests.get(f"https://itunes.apple.com/search?term={formattedQuery}&entity=podcast").json()
+    try:
+        Result = response['results'][0]
+        stuff_to_return = {
+            "name":Result['collectionName'],
+            "rss":Result['feedUrl'],
+            "image":Result['artworkUrl100'],
+            "count":Result['trackCount'],
+            "date":Result['releaseDate'][:-10],
+            "rating":Result['contentAdvisoryRating']
+        }
+    except IndexError:
+        stuff_to_return = {
+            "name": "Podcast Not Found",
+            "rss": ' ',
+            "image": ' ',
+            "count": ' ',
+            "date": ' This date is in Future wut ',
+            "rating": ' Baby Allowed '
+        }
+    return stuff_to_return
+
+def RawSearch(query):
+    formattedQuery = query.replace(' ', '+')
+    response = requests.get(f"https://itunes.apple.com/search?term={formattedQuery}&entity=podcast").json()
+    Result = response['results']
+    return Result    
+
+def PodResults(query):
+    formattedQuery = query.replace(' ', '+')
+    response = requests.get(f"https://itunes.apple.com/search?term={formattedQuery}&entity=podcast").json()
+    Results = response['results']
+    return Results
+
 
 class Podcast:
     entries = {}
@@ -93,6 +113,7 @@ class Podcast:
             }
         return details
     
-            
-crimejunkie = Podcast(
-    'crimejunkie', "https://feeds.megaphone.fm/ADL9840290619")
+
+
+
+ 

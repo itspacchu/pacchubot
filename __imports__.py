@@ -22,3 +22,4 @@ import feedparser
 from discord_slash import SlashCommand, SlashContext
 import podcasthandler as ph
 from discord import Spotify
+import asyncio

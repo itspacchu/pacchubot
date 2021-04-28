@@ -6,7 +6,7 @@ jsonfile = io.open("perks.json", mode="r", encoding="utf-8")
 perks = json.load(jsonfile)
 
 #database stuff
-client = MongoClient('mongodb+srv://pacchu:kiminonawa@pslave.da85h.mongodb.net/test')
+client = MongoClient('')
 db = client['PacchuSlave']
 ## collection variables
 
@@ -22,7 +22,7 @@ PodcastSuggest = db['PodSuggest']
 
 # global variables
 serverlist = {}  # gonna be removed next
-version = "v0.4.4 mongoDB edition"
+version = "v0.4.5 mongoDB edition"
 http = urllib3.PoolManager()
 ani = Jikan()
 self_name = "Pacchu's Slave"
@@ -75,6 +75,12 @@ async def help(ctx,kwargs = ''):
                     value="Steals the person's DP :d", inline=False)
     embed.add_field(name=f"{command_prefix}stats",
                     value="disabled **bugs**", inline=False)
+        embed.add_field(name=f"{command_prefix}spotify @mention",
+                    value="Gets the user's Spotify activity", inline=False)
+    embed.add_field(name=f"{command_prefix}pod",
+                    value="Podcast Playback stuff", inline=False)
+        embed.add_field(name=f"{command_prefix}play",
+                    value="Youtube Playback stuff", inline=False)
     embed.add_field(name=f"{command_prefix}help",
                     value="isnt it obvious :o", inline=False)
     embed.add_field(name=f"{command_prefix}perk",

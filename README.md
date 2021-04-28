@@ -18,6 +18,14 @@
 
 > _perk Extra stuff run the command for more commands
 
+> _pod Podcast support
+
+> _spotify spotify yeet
+
+
+![image](https://user-images.githubusercontent.com/37984032/116387756-be57eb80-a838-11eb-8121-31f3c23bd668.png)
+
+![image](https://user-images.githubusercontent.com/37984032/116387840-d891c980-a838-11eb-8880-a54110722704.png)
 
 ![image](https://user-images.githubusercontent.com/37984032/114234535-875e8a80-999c-11eb-8fb4-2a36ffe310ee.png)
 

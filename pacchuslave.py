@@ -6,7 +6,7 @@ jsonfile = io.open("perks.json", mode="r", encoding="utf-8")
 perks = json.load(jsonfile)
 
 #database stuff
-client = MongoClient('mongodb+srv://pacchu:kiminonawa@pslave.da85h.mongodb.net/test')
+client = MongoClient('mmmh')
 db = client['PacchuSlave']
 ## collection variables
 

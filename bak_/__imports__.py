@@ -18,7 +18,3 @@ from jikanpy import Jikan
 import numpy as np
 from discord.ext import commands
 from pacchufunctions import __initiate_default_stats__, mentionToId, queryToName, list_to_string
-import feedparser
-from discord_slash import SlashCommand, SlashContext
-import podcasthandler as ph
-from discord import Spotify

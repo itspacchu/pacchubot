@@ -6,7 +6,7 @@ jsonfile = io.open("perks.json", mode="r", encoding="utf-8")
 perks = json.load(jsonfile)
 
 #database stuff
-client = MongoClient('')
+client = MongoClient('mongodb+srv://pacchu:kiminonawa@pslave.da85h.mongodb.net/test')
 db = client['PacchuSlave']
 ## collection variables
 
@@ -17,8 +17,6 @@ charSearch = db['charSearch']
 animePics = db['animePics']
 mangaSearch = db['mangaSearch']
 gptDb = db['gptQuery']
-#PodcastDb = db['PodcastQ']
-PodcastSuggest = db['PodSuggest']
 
 # global variables
 serverlist = {}  # gonna be removed next
@@ -30,11 +28,8 @@ self_avatar = "https://raw.githubusercontent.com/itspacchu/Pacchu-s-Slave/master
 command_prefix = '_'
 
 # Discord bot
-client = commands.Bot(command_prefix=command_prefix, intents=discord.Intents.all())
+client = commands.Bot(command_prefix=command_prefix)
 client.remove_command('help')
-slash = SlashCommand(client, sync_commands=True)
-guild_ids = [685469328929587268]
-
 
 
 @client.event
@@ -50,14 +45,8 @@ async def on_ready():
     await client.change_presence(status=discord.Status.online, activity=activity)
 
 
-@slash.slash(name="test",description="This is just a test command, nothing more.")
-async def test(ctx):
-  await ctx.send(content="Yeeting from documentation is fun amiright")
-
-
-@slash.slash(name="help",description="Shows all the help commands of this bot :D")
 @client.command()
-async def help(ctx,kwargs = ''):
+async def help(ctx):
     embed = discord.Embed(color=0xae00ff, description=f"Created by Pacchu")
     embed.set_author(name=self_name, icon_url=self_avatar)
     embed.set_thumbnail(url=self_avatar)
@@ -80,13 +69,9 @@ async def help(ctx,kwargs = ''):
     embed.add_field(name=f"{command_prefix}perk",
                     value="Extra stuff run the command for more commands", inline=False)
     embed.set_footer(text=f"{self_name} {version}", icon_url=self_avatar)
-    try:
-        await ctx.reply(embed=embed)
-    except AttributeError:
-        await ctx.send(embed=embed)
+    await ctx.reply(embed=embed)
 
 
-@slash.slash(name="perks",description="Shows the perks")
 @client.command()
 async def perk(ctx):
     embed = discord.Embed(title=client.user.name.title(),
@@ -111,13 +96,10 @@ async def perk(ctx):
     embed.add_field(name=f"{command_prefix}gpt",
                     value="Sends a query response from openai gpt2 model", inline=False)
     embed.set_footer(text=f" {client.user.name} {version}",
-                     icon_url=client.user.avatar_url)  
-    try:
-        await ctx.reply(embed=embed)
-    except AttributeError:
-        await ctx.send(embed=embed)
+                     icon_url=client.user.avatar_url)
+    await ctx.reply(embed=embed)
 
-@slash.slash(name="avatar",description="Shows the avatar of the person mentioned")
+
 @client.command()
 async def avatar(ctx, member: discord.Member):
     global serverlist
@@ -135,13 +117,9 @@ async def avatar(ctx, member: discord.Member):
     embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
     embed.set_footer(text=f"{client.user.name}",
                      icon_url=client.user.avatar_url)
-    try:
-        await ctx.reply(embed=embed)
-    except AttributeError:
-        await ctx.send(embed=embed)
+    await ctx.reply(embed=embed)
 
 
-@slash.slash(name="animechar",description="Searches for the anime character from Myanimelist")
 @client.command()
 async def anichar(ctx, *Query):
     global serverlist, ani
@@ -161,10 +139,7 @@ async def anichar(ctx, *Query):
             text=f"Not the correct Character ... Try spelling their full name", icon_url=client.user.avatar_url)
         embed.add_field(
             name="Waifu Vote", value=f"{asrc['member_favorites']} have liked them", inline=False)
-        try:
-            await ctx.reply(embed=embed)
-        except AttributeError:
-            await ctx.send(embed=embed)
+        await ctx.reply(embed=embed)
         try:
             #datastore
             dbStore = {
@@ -185,10 +160,7 @@ async def anichar(ctx, *Query):
         embed.add_field(name="Character Not Found",
                         value="That Character is not found ", inline=False)
         embed.set_footer(text=f" {self_name} {version}", icon_url=self_avatar)
-        try:
-            await ctx.reply(embed=embed)
-        except AttributeError:
-            await ctx.send(embed=embed)
+        await ctx.reply(embed=embed)
 
 
 @client.command()
@@ -429,16 +401,6 @@ async def gpt(ctx, *lquery):
             }
     gptDb.insert_one(dbStore)
 
-@client.command()
-async def podsuggest(ctx, *lquery):
-    await ctx.message.add_reaction('🙏')
-    query = queryToName(lquery)
-    await ctx.reply(f"Added ```{query}```Podcast would be added as soon as its added in Database")
-    dbStore = {
-                "suggestion": query,
-                "username": ctx.message.author.name,
-            }
-    PodcastSuggest.insert_one(dbStore)
 
 
 @client.command(pass_context=True, aliases=['q', 'que'])
@@ -585,33 +547,6 @@ async def pacchu(ctx):
     await ctx.reply('Hail pacchu')
 
 
-
-@client.command()
-async def spotify(ctx, user:discord.Member = None):
-    await ctx.message.add_reaction('🎵')
-    if user == None:
-        user = ctx.author
-        pass
-    if user.activities:
-        for activity in user.activities:
-            if isinstance(activity, Spotify):
-                embed = discord.Embed(
-                    title = f"{user.name}'s Spotify",
-                    description = "Listening to {}".format(activity.title),
-                    color = 0x1DB954)
-                embed.set_thumbnail(url=activity.album_cover_url)
-                embed.add_field(name="Artist", value=activity.artist)
-                embed.set_footer(text="Listening Since {}".format(activity.created_at.strftime("%H:%M")))
-                await ctx.reply(embed=embed)
-    else:
-        embed = discord.Embed(
-                    title = f"{user.name}'s Spotify",
-                    description = "Not Listening to anything",
-                    color = 0x1DB954)
-        await ctx.reply(embed=embed)
-        
-
-
 @client.event
 async def on_message(message):
     global darkemoji, client, botcount, serverlist, currentcount, http, command_prefix
@@ -621,10 +556,10 @@ async def on_message(message):
     for x in message.mentions:
         if(x == client.user):
             await message.channel.send(choice(perks['replies']['pings']))
-    #try:
-    await client.process_commands(message)
-    #except:
-    #    print("dis has error")
+    try:
+        await client.process_commands(message)
+    except:
+        print("dis has error")
 
 
 ###################################################################################################################################### Yeeting someone's code
@@ -676,14 +611,16 @@ class Music(commands.Cog):
 
     @commands.command()
     async def join(self, ctx, *, channel: discord.VoiceChannel):
+        """Joins a voice channel"""
+
         if ctx.voice_client is not None:
             return await ctx.voice_client.move_to(channel)
+
         await channel.connect()
 
 
     @commands.command(pass_context=True, aliases=['p', 's'])
     async def play(self, ctx, *, url="https://youtu.be/dQw4w9WgXcQ"):
-        await ctx.message.add_reaction('🎧')
         if ("youtube.com" in str(url) or "youtu.be"):
             async with ctx.typing():
                 player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
@@ -705,7 +642,7 @@ class Music(commands.Cog):
                 player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
                 ctx.voice_client.play(player, after=None)
 
-        
+        await ctx.message.add_reaction('🎧')
         embed.set_author(name=ctx.message.author.name,
                          icon_url=ctx.message.author.avatar_url)
         embed.set_footer(text=self_name, icon_url=self_avatar)
@@ -713,7 +650,6 @@ class Music(commands.Cog):
         
     @commands.command(pass_context=True, aliases=['pl'])
     async def lofi(self, ctx, *, url="https://youtu.be/5qap5aO4i9A"):
-        await ctx.message.add_reaction('🎧')
         async with ctx.typing():
             player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
             ctx.voice_client.play(player, after=None)
@@ -721,83 +657,14 @@ class Music(commands.Cog):
                 0xff5065), url=url, description=player.title)
             embed.set_image(
                 url="https://i.ytimg.com/vi/5qap5aO4i9A/maxresdefault.jpg")
+        await ctx.message.add_reaction('🎧')
         embed.set_author(name=ctx.message.author.name,
                          icon_url=ctx.message.author.avatar_url)
         embed.set_footer(text=self_name, icon_url=self_avatar)
         await ctx.reply(embed=embed)
-    
-    @commands.command(aliases=['podplay', 'podcast'])
-    async def pod(self,ctx , * , strparse = " "):
-        await ctx.message.add_reaction('🔎')
-        if(':' in strparse):
-            podname,num = strparse.replace(' ','').split(':')
-            podepi = int(num)
-        elif(not strparse == ' '):
-            podname = strparse.replace(' ','')
-            podepi = None
-        else:
-            podname = ' '
-            podepi = None
-        
-        all_pods = [ph.podcasts[x]['name'] for x in ph.podcasts]
-        if(podname == " "):
-            await ctx.send('Enter the podcast name you want to listen to')
-            embed = discord.Embed(colour=discord.Colour(0xbd10e0), description="All the supported podcasts for now [ usage pod name:episode ]")
-
-            embed.set_thumbnail(url=self_avatar)
-            embed.set_author(name=self_name, url=self_avatar,
-                             icon_url=self_avatar)
-
-            embed.set_footer(text="Page 1/1", icon_url=self_avatar)
-            for singlepod in ph.podcasts:
-                embed.add_field(name=ph.podcasts[singlepod]['name'],
-                                value=str(ph.podcasts[singlepod]['rss']) )
-        
-        if(podepi == None and not podname == " "):
-            await ctx.send(f'Searching for episodes in {podname}')
-            embed = discord.Embed(colour=discord.Colour(
-                0xbd10e0), description=" ")
-
-            embed.set_thumbnail(url=self_avatar)
-            embed.set_author(name=self_name, url=self_avatar,
-                             icon_url=self_avatar)
-
-            embed.set_footer(text=f"Page 1/NaN", icon_url=self_avatar)
-            k = ph.podcasts[all_pods.index(podname.lower().replace(' ', ''))]
-            currentpod = ph.Podcast(k['name'], k['rss'])
-            ind = 0
-            for episode_ in currentpod.ListEpisodes():
-                embed.add_field(name=episode_,value=f"Select {ind} from "+podname)
-                ind += 1
-                if(ind > 10):
-                    break
-        
-        if(not podepi == None and not podname == " "):
-            k = ph.podcasts[all_pods.index(podname.lower().replace(' ', ''))]
-            currentpod = ph.Podcast(k['name'], k['rss'])
-            await self.playPodcast(ctx,podepi=podepi,currentpod=currentpod,k=k)  
-            embed = discord.Embed(title=currentpod.GetEpisodeDetails(podepi)['title'], 
-                                  colour=discord.Colour(0xb8e986), url=currentpod.GetEpisodeDetails(podepi)['link'],
-                                  description=currentpod.GetEpisodeDetails(podepi)['summary'])
-            embed.set_thumbnail(url=currentpod.PodcastImage(podepi))
-            embed.set_author(name=self_name, 
-                             icon_url=self_avatar)
-            embed.set_footer(text="Alpha",
-                 icon_url=self_avatar)
-        await ctx.send(embed=embed)
-    
-    async def playPodcast(self, context, podepi, currentpod, k):
-        guild = context.guild
-        voice_client: discord.VoiceClient = discord.utils.get(
-            self.bot.voice_clients, guild=guild)
-        _source_ = currentpod.GetEpisodeMp3(podepi)
-        audio_source = discord.FFmpegPCMAudio(_source_)
-        if not voice_client.is_playing():
-            voice_client.play(audio_source, after=None)
 
     @commands.command()
-    async def stop(self, ctx ):
-        await ctx.message.add_reaction('👍')
+    async def stop(self, ctx):
         """Stops and disconnects the bot from voice"""
         embed = discord.Embed(
             title=f"Exiting", colour=discord.Colour(0xff5065))
@@ -810,7 +677,6 @@ class Music(commands.Cog):
 
     @lofi.before_invoke
     @play.before_invoke
-    @pod.before_invoke
     async def ensure_voice(self, ctx):
         if ctx.voice_client is None:
             if ctx.author.voice.channel:
@@ -826,15 +692,9 @@ class Music(commands.Cog):
 
         elif ctx.voice_client.is_playing():
             ctx.voice_client.stop()
-            
-    
-        
 
 
-
-            
 client.add_cog(Music(client))
-
 
 ##################################################################################################################################### End
 

@@ -6,7 +6,7 @@ jsonfile = io.open("perks.json", mode="r", encoding="utf-8")
 perks = json.load(jsonfile)
 
 #database stuff
-client = MongoClient(' mgdb ')
+client = MongoClient('heh')
 db = client['PacchuSlave']
 ## collection variables
 
@@ -22,19 +22,18 @@ PodcastSuggest = db['PodSuggest']
 VoiceUsage = db['VoiceActivity']
 
 # global variables
-serverlist = {}  # gonna be removed next
-version = "v0.5 Podcast Edition"
+version = "v0.5.1"
 http = urllib3.PoolManager()
 ani = Jikan()
 self_name = "Pacchu's Slave"
 self_avatar = "https://raw.githubusercontent.com/itspacchu/Pacchu-s-Slave/master/Screenshot%202021-04-09%20225421.png"  # copy pacchu's dp
-command_prefix = '.'
+command_prefix = '_'
 
 # Discord bot
 client = commands.Bot(command_prefix=command_prefix, intents=discord.Intents.all())
 client.remove_command('help')
 slash = SlashCommand(client, sync_commands=True)
-guild_ids = [685469328929587268]
+guild_ids = [685469328929587268,705682250460823602]
 
 
 
@@ -51,14 +50,9 @@ async def on_ready():
     await client.change_presence(status=discord.Status.online, activity=activity)
 
 
-@slash.slash(name="test",description="This is just a test command, nothing more.")
-async def test(ctx):
-  await ctx.send(content="Yeeting from documentation is fun amiright")
-
-
 @slash.slash(name="help",description="Shows all the help commands of this bot :D")
-@client.command()
-async def help(ctx,kwargs = ''):
+@client.command(aliases=['h', 'halp' , 'hel'])
+async def help(ctx):
     embed = discord.Embed(color=0xae00ff, description=f"Created by Pacchu")
     embed.set_author(name=self_name, icon_url=self_avatar)
     embed.set_thumbnail(url=self_avatar)
@@ -96,7 +90,7 @@ async def help(ctx,kwargs = ''):
 
 
 @slash.slash(name="perks",description="Shows the perks")
-@client.command()
+@client.command(aliases=['per', 'perks'])
 async def perk(ctx):
     embed = discord.Embed(title=client.user.name.title(),
                           description=f"{self_name} Perks", color=0xff9500)
@@ -127,9 +121,8 @@ async def perk(ctx):
         await ctx.send(embed=embed)
 
 @slash.slash(name="avatar",description="Shows the avatar of the person mentioned")
-@client.command()
-async def avatar(ctx, member: discord.Member):
-    global serverlist
+@client.command(aliases=['av', 'pic' , 'dp'])
+async def avatar(ctx, member: discord.Member = None):
     hgp = member
     await ctx.message.add_reaction('🙄')
     if(ctx.message.author == hgp or hgp == None):
@@ -140,8 +133,10 @@ async def avatar(ctx, member: discord.Member):
         embed = discord.Embed(
             title="Beep Boop", description=f"{ctx.message.author.mention} steals {hgp.mention}'s profile pic 👀'", colour=discord.Colour(0x00ffb7))
         embed.set_image(url=hgp.avatar_url)
-
-    embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
+    try:
+        embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
+    except:
+        embed.set_author(name=ctx.message.author.name, icon_url=ctx.message.author.avatar_url)
     embed.set_footer(text=f"{client.user.name}",
                      icon_url=client.user.avatar_url)
     try:
@@ -151,9 +146,9 @@ async def avatar(ctx, member: discord.Member):
 
 
 @slash.slash(name="animechar",description="Searches for the anime character from Myanimelist")
-@client.command()
+@client.command(aliases=['achar', 'ac'])
 async def anichar(ctx, *Query):
-    global serverlist, ani
+    global ani
     animeQuery = queryToName(Query)
     try:
         await ctx.message.add_reaction('🔍')
@@ -200,9 +195,9 @@ async def anichar(ctx, *Query):
             await ctx.send(embed=embed)
 
 
-@client.command()
+@client.command(aliases=['ap', 'anip' ,'anishow'])
 async def anipics(ctx, *Query):
-    global serverlist, ani, http
+    global  ani, http
     charQuery = queryToName(Query)
     try:
         await ctx.message.add_reaction('🔍')
@@ -238,9 +233,9 @@ async def anipics(ctx, *Query):
         await ctx.reply(embed=embed)
 
 
-@client.command()
+@client.command(aliases=['ani', 'anim'])
 async def anime(ctx, *Query):
-    global serverlist, ani
+    global  ani
     animeQuery = queryToName(Query)
     try:
     #datastore
@@ -352,9 +347,9 @@ async def anime(ctx, *Query):
             await ctx.send(embed=embed)
 
 
-@client.command()
+@client.command(aliases=['man', 'm'])
 async def manga(ctx, *Query):
-    global serverlist, ani
+    global  ani
     mangaQuery = queryToName(Query)
     try:
         #datastore
@@ -408,7 +403,6 @@ async def manga(ctx, *Query):
 
 @client.command()
 async def hug(ctx, member: discord.Member):
-    global serverlist
     hgp = member
     await ctx.message.add_reaction('🤗')
     if(ctx.message.author == hgp or hgp == None):
@@ -475,7 +469,6 @@ async def question(ctx, *lquery):
 
 @client.command()
 async def kiss(ctx, member: discord.Member):
-    global serverlist
     hgp = member
     await ctx.message.add_reaction('👄')
     if(ctx.message.author == hgp or hgp == None):
@@ -493,7 +486,7 @@ async def kiss(ctx, member: discord.Member):
 
 @client.command()
 async def kill(ctx, member: discord.Member):
-    global serverlist
+
     hgp = member
     await ctx.message.add_reaction('🔪')
     if(ctx.message.author == hgp or hgp == None):
@@ -513,7 +506,6 @@ async def kill(ctx, member: discord.Member):
 
 @client.command()
 async def pat(ctx, member: discord.Member):
-    global serverlist
     hgp = member
     await ctx.message.add_reaction('👊')
     print(hgp)
@@ -536,7 +528,6 @@ async def pat(ctx, member: discord.Member):
 @client.command()
 async def bruh(ctx, *qlink):
     link = queryToName(qlink)
-    global serverlist
     if(ctx.message.guild == None):
         await ctx.reply("This is a dm tho? try it in a server m8")
     else:
@@ -588,7 +579,6 @@ async def irumachi(ctx):
 
 @client.command()
 async def stats(ctx):
-    global serverlist
     embed = discord.Embed(color=0xf3d599)
     embed.set_author(name=client.user.name, icon_url=client.user.avatar_url)
     try:
@@ -644,7 +634,7 @@ async def spotify(ctx, user:discord.Member = None):
 
 @client.event
 async def on_message(message):
-    global darkemoji, client, botcount, serverlist, currentcount, http, command_prefix
+    global darkemoji, client, botcount, currentcount, http, command_prefix
     if message.author == client.user:
         return
 
@@ -652,6 +642,8 @@ async def on_message(message):
         if(x == client.user):
             await message.channel.send(choice(perks['replies']['pings']))
     #try:
+    if("pacchu" in message.content.lower()):
+        await message.channel.send('Hail Pacchu')
     await client.process_commands(message)
     #except:
     #    print("dis has error")

@@ -1,12 +1,12 @@
 from __imports__ import *
-from gpt2api import *
+import gpt2api as g2a
 
 # File Imports
 jsonfile = io.open("perks.json", mode="r", encoding="utf-8")
 perks = json.load(jsonfile)
 
 #database stuff
-client = MongoClient(' ')
+client = MongoClient(' mgdb ')
 db = client['PacchuSlave']
 ## collection variables
 
@@ -23,12 +23,12 @@ VoiceUsage = db['VoiceActivity']
 
 # global variables
 serverlist = {}  # gonna be removed next
-version = "v0.4.5 mongoDB edition"
+version = "v0.5 Podcast Edition"
 http = urllib3.PoolManager()
 ani = Jikan()
 self_name = "Pacchu's Slave"
 self_avatar = "https://raw.githubusercontent.com/itspacchu/Pacchu-s-Slave/master/Screenshot%202021-04-09%20225421.png"  # copy pacchu's dp
-command_prefix = '$'
+command_prefix = '.'
 
 # Discord bot
 client = commands.Bot(command_prefix=command_prefix, intents=discord.Intents.all())
@@ -79,9 +79,11 @@ async def help(ctx,kwargs = ''):
     embed.add_field(name=f"{command_prefix}spotify @mention",
                     value="Gets the user's Spotify activity", inline=False)
     embed.add_field(name=f"{command_prefix}pod",
-                    value="Podcast Playback stuff", inline=False)
+                    value="Shows Podcast playback help section", inline=False)
     embed.add_field(name=f"{command_prefix}play",
                     value="Youtube Playback stuff", inline=False)
+    embed.add_field(name=f"{command_prefix}invite",
+                    value="Invite link for this bot", inline=False)
     embed.add_field(name=f"{command_prefix}help",
                     value="isnt it obvious :o", inline=False)
     embed.add_field(name=f"{command_prefix}perk",
@@ -421,13 +423,22 @@ async def hug(ctx, member: discord.Member):
     embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
     embed.set_footer(text=f"{self_name}", icon_url=self_avatar)
     await ctx.reply(embed=embed)
-    
+
+
+@client.command()
+async def invite(ctx):
+    await ctx.message.add_reaction('♥')
+    embed=discord.Embed(title="Click here", url="https://discord.com/api/oauth2/authorize?client_id=709426015759368282&permissions=8&scope=bot", description="Invite link for this bot", color=0xff2429)
+    embed.set_thumbnail(url=self_avatar)
+    await ctx.reply(embed=embed)
+
+
 
 @client.command()
 async def gpt(ctx, *lquery):
     await ctx.message.add_reaction('💡')
     query = queryToName(lquery)
-    reply = gptquery(query)
+    reply = g2a.gptquery(query)
     await ctx.reply(reply)
     dbStore = {
                 "query": query,
@@ -452,7 +463,7 @@ async def podsuggest(ctx, *lquery):
 async def question(ctx, *lquery):
     await ctx.message.add_reaction('🔎')
     query = queryToName(lquery)
-    reply = questionreply(query)
+    reply = g2a.questionreply(query)
     await ctx.reply(reply)
     dbStore = {
         "query": query,
@@ -539,6 +550,18 @@ async def bruh(ctx, *qlink):
                 embed.set_footer(text=f" {self_name} {version}", icon_url=self_avatar)
                 await ctx.message.channel.send(embed=embed)
         else:
+            if(bruhs.find_one({"guild": ctx.message.guild.id}) == None):
+                dbStore = {
+                    "guild": ctx.message.guild.id,
+                    "link": link
+                }
+                bruhs.insert_one({"guild": ctx.message.guild.id}, dbStore)
+            else:
+                dbStore = {
+                    "guild": ctx.message.guild.id,
+                    "link": link
+                }
+                bruhs.replace_one({"guild": ctx.message.guild.id}, dbStore)
             if(bruhs.find_one({"guild": ctx.message.guild.id}) == None):
                 dbStore = {
                     "guild": ctx.message.guild.id,
@@ -677,7 +700,8 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
 
 class Music(commands.Cog):
-    StartTime = float(0.0)
+    StartTime = 0
+    lastPod = None
     def __init__(self, bot):
         self.bot = bot
         
@@ -736,6 +760,35 @@ class Music(commands.Cog):
         embed.set_footer(text=self_name, icon_url=self_avatar)
         await ctx.reply(embed=embed)
 
+    @commands.command(aliases=['podp'])
+    async def podplay(self,ctx,epno=0):
+        
+        podepi = epno
+        if(self.lastPod == None):
+            embed = discord.Embed(colour=discord.Colour(
+                0xbd10e0), description=" ")
+            embed.set_thumbnail(url=self_avatar)
+            embed.set_author(name=self_name, url=self_avatar,
+                             icon_url=self_avatar)
+            embed.add_field(name=f"No Recent Podcast Searches",value=f"search for podcast using {command_prefix}pod",inline=False)  
+            embed.set_thumbnail(url=self_avatar)
+            await ctx.send(embed=embed)
+        else:
+            currentpod = self.lastPod
+            try:
+                await self.playPodcast(ctx,podepi=podepi,currentpod=currentpod)  
+                embed = discord.Embed(title=currentpod.GetEpisodeDetails(podepi)['title'], 
+                                      colour=discord.Colour(0xb8e986), url=currentpod.GetEpisodeDetails(podepi)['link'],
+                                      description=currentpod.GetEpisodeDetails(podepi)['summary'],
+                                      inline=False) 
+                embed.set_thumbnail(url=currentpod.PodcastImage(podepi))
+                embed.set_author(name=self_name,icon_url=self_avatar)
+                embed.set_footer(text=currentpod.GetEpisodeDetails(podepi)['title'],icon_url=self_avatar)
+                await ctx.send(embed=embed)
+            except AttributeError:
+                await ctx.send("You aren't in voice channel m8")
+        
+
     @commands.command(aliases=['podcast'])
     async def pod(self,ctx , * , strparse = " "):
         await ctx.message.add_reaction('🔎')
@@ -765,22 +818,30 @@ class Music(commands.Cog):
             embed.add_field(name=f"{command_prefix}pod", value="This very command you ran",inline=False)
             embed.add_field(name=f"{command_prefix}pod [Name of Podcast]",
                             value="Searches for the Podcast and shows Episodes related to it.", inline=False)
-            embed.add_field(name=f"{command_prefix}pod [Name of Podcast] : [Selection Number]", value="Play the podcast selection , default 0 plays the latest available episode",inline=False)
+            embed.add_field(name=f"{command_prefix}pod [Name of Podcast] : [Selection Number] or {command_prefix}podp [Selection No]", value="Play the podcast selection , default 0 plays the latest available episode",inline=False)
             embed.add_field(name=f"{command_prefix}stop or {command_prefix}dc",
                             value="Stop and Disconnect\n Sadly Haven't Implemented any Pause for now", inline=False)
 
         if(podepi == None and not podname == " "):
-            await ctx.send(f'Searching for {podname}')
+            await ctx.send(f'Searching 🔍')
             embed = discord.Embed(colour=discord.Colour(
                 0xbd10e0), description=" ")
-
             embed.set_thumbnail(url=self_avatar)
             embed.set_author(name=self_name, url=self_avatar,
                              icon_url=self_avatar)
-            k = ph.PodSearch(podname)
+            try:
+                k = ph.PodSearch(podname)
+            except json.JSONDecodeError:
+                embed.add_field(name=f"Corrupted Feed",value="Command raised an exception: JSONDecodeError",inline=False)
+                return
+            except:
+                embed.add_field(name=f"Somewhere Something went wrong",
+                                value=r"I have 0 clue what the hell happened rn ¯\_(ツ)_/¯", inline=False)
+                return
             await ctx.message.add_reaction('⏳')
             if(not k['name'] == "Podcast Not Found"):
                 currentpod = ph.Podcast(k['name'], k['rss'])
+                self.lastPod = currentpod
                 paginationsize = ph.Pagination(k['count'],5)
                 ind = 0 + 5*start
                 for episode_ in currentpod.ListEpisodes()[start:start+5]:
@@ -788,7 +849,7 @@ class Music(commands.Cog):
                     ind += 1
                 if(paginationsize > 1):
                     embed.add_field(name="Change Page",value=f"```{command_prefix}pod {podname} - [Page_Number]```")
-                embed.set_footer(text=f"Page 1/{paginationsize}", icon_url=self_avatar)
+                embed.set_footer(text=f"Page {start}/{paginationsize}", icon_url=self_avatar)
                 try:
                     embed.set_thumbnail(url=k['image'])
                 except:
@@ -798,9 +859,13 @@ class Music(commands.Cog):
                 embed.set_thumbnail(url=self_avatar)
                         
         if(not podepi == None and not podname == " "):
-            k = ph.PodSearch(podname)
-            currentpod = ph.Podcast(k['name'], k['rss'])
-            await self.playPodcast(ctx,podepi=podepi,currentpod=currentpod,k=k)  
+            if(self.lastPod == None):
+                k = ph.PodSearch(podname)
+                currentpod = ph.Podcast(k['name'], k['rss'])
+                self.lastPod = currentpod
+            else:
+                currentpod = self.lastPod
+            await self.playPodcast(ctx,podepi=podepi,currentpod=currentpod)  
             embed = discord.Embed(title=currentpod.GetEpisodeDetails(podepi)['title'], 
                                   colour=discord.Colour(0xb8e986), url=currentpod.GetEpisodeDetails(podepi)['link'],
                                   description=currentpod.GetEpisodeDetails(podepi)['summary'],
@@ -819,9 +884,15 @@ class Music(commands.Cog):
             pass
             
     
-    async def playPodcast(self, context, podepi, currentpod, k):
+    async def playPodcast(self, context, podepi, currentpod):
+        try:
+            await context.voice_client.disconnect()
+        except:
+            pass
         if context.voice_client is None:
+        
             if context.author.voice.channel:
+        
                 await context.author.voice.channel.connect()
                 
         guild = context.guild
@@ -829,7 +900,6 @@ class Music(commands.Cog):
             self.bot.voice_clients, guild=guild)
         _source_ = currentpod.GetEpisodeMp3(podepi)
         self.StartTime += ttime.time()
-        print("timer started")
         audio_source = discord.FFmpegPCMAudio(_source_)
         if not voice_client.is_playing():
             voice_client.play(audio_source, after=None)
@@ -838,14 +908,13 @@ class Music(commands.Cog):
     async def stop(self, ctx ):
         if(ctx.author.voice.channel):
             StopTime = ttime.time()
-            TotalPlayed = StopTime - self.StartTime
-            print(TotalPlayed)
+            TotalPlayed = abs(StopTime - self.StartTime)
             try:
                 timeSend = VoiceUsage.find_one({"guild": ctx.message.guild.id})['time'] + TotalPlayed
             except:
                 timesend = TotalPlayed
             await ctx.message.add_reaction('👍')
-            embed = discord.Embed( title=f"Exiting", description=f"played for {TotalPlayed%60} Minutes" ,colour=discord.Colour(0xff5065))
+            embed = discord.Embed( title=f"Exiting", description=f"played for {int(TotalPlayed/60)} Minutes" ,colour=discord.Colour(0xff5065))
             embed.set_author(name=ctx.message.author.name,icon_url=ctx.message.author.avatar_url)
             embed.set_footer(text=client.user.name,icon_url=client.user.avatar_url)
             await ctx.voice_client.disconnect()
@@ -878,7 +947,7 @@ class Music(commands.Cog):
     async def ensure_voice(self, ctx):
         if ctx.voice_client is None:
             if ctx.author.voice.channel:
-                self.StartTime += ttime.time()
+                self.StartTime = ttime.time()
                 print("timer started")
                 await ctx.author.voice.channel.connect()
             else:
@@ -895,4 +964,4 @@ class Music(commands.Cog):
                        
 client.add_cog(Music(client))
 
-client.run(db['discordToken'].find_one({"botname": "pacchuslave"})['token'])
+client.run(db['discordToken'].find_one({"botname": "tracebot"})['token'])

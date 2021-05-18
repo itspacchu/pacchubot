@@ -17,8 +17,7 @@ def PodSearch(query):
             "rss":Result['feedUrl'],
             "image":Result['artworkUrl100'],
             "count":Result['trackCount'],
-            "date":Result['releaseDate'][:-10],
-            "rating":Result['contentAdvisoryRating']
+            "date":Result['releaseDate'][:-10]
         }
     except IndexError:
         stuff_to_return = {
@@ -26,8 +25,7 @@ def PodSearch(query):
             "rss": ' ',
             "image": ' ',
             "count": ' ',
-            "date": ' This date is in Future wut ',
-            "rating": ' Baby Allowed '
+            "date": ' This date is in Future wut '
         }
     return stuff_to_return
 

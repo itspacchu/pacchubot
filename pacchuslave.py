@@ -130,6 +130,10 @@ async def avatar(ctx, member: discord.Member):
     global serverlist
     hgp = member
     await ctx.message.add_reaction('🙄')
+    if(not hgp.mention):
+        embed = discord.Embed(
+            title="OwO", description=f"{ctx.message.author.mention} steals ...wait thats your OWN", colour=discord.Colour(0xa06a6a))
+        embed.set_image(url=ctx.message.author.avatar_url)
     if(ctx.message.author == hgp or hgp == None):
         embed = discord.Embed(
             title="OwO", description=f"{ctx.message.author.mention} steals ...wait thats your OWN", colour=discord.Colour(0xa06a6a))

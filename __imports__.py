@@ -4,8 +4,10 @@ from random import *
 import time
 import re
 import subprocess
+import requests
 import discord
 from discord.utils import get
+from injectPayload import cartoonize
 import os
 import json
 import io

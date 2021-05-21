@@ -8,7 +8,7 @@ import requests
 import discord
 from multiprocessing.pool import ThreadPool
 from discord.utils import get
-from injectPayload import cartoonize
+from injectPayload import downloadFileFromUrl
 import os
 import json
 import io
@@ -28,3 +28,9 @@ from discord import Spotify
 import asyncio
 from gpt2api import *
 import time as ttime
+
+# later in sep module pls
+from io import FileIO
+import requests,shutil
+from bs4 import BeautifulSoup
+import time

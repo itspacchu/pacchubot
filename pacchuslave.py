@@ -317,15 +317,34 @@ async def gpt(ctx, *lquery):
             }
     gptDb.insert_one(dbStore)
 
-@client.command()
-async def cartoonize(ctx):
-    pool = ThreadPool(processes=1)
-    attachment_url = ctx.message.attachments[0].url    
-    waited = pool.apply_async(cartoonize,(attachment_url))
-    time.sleep(0.5)
-    res = waited.get()
-    print(res)
-    await ctx.send(file=discord.File(res + '.png'))
+@client.command(aliases=['c', 'cartoon'])
+async def cartoonize(ctx, member: discord.Member = None):
+    filname = str(round(time.time()))
+    await ctx.message.add_reaction('⏳')
+    try:
+        attachment_url = ctx.message.attachments[0].url
+        await ctx.reply("Processing will take a few moments...")
+    except:
+        hgp = member
+        await ctx.message.add_reaction('🙄')
+        if(ctx.message.author == hgp or hgp == None):
+            attachment_url = ctx.message.author.avatar_url
+        else:
+            attachment_url = hgp.avatar_url
+        await ctx.reply("Fetching user's Avatar")
+            
+    downloadFileFromUrl(attachment_url,filname)
+    s = requests.Session()
+    url = "https://cartoonize-lkqov62dia-de.a.run.app/cartoonize"
+    with open(str(filname + '.png'), 'rb') as f:
+        r = s.post(url, files={'image': f})  
+    soup = BeautifulSoup(r.text,'html.parser')
+    dlink = soup.find_all('a')[0]['href']
+    downloadFileFromUrl(dlink,filname)
+    s.close()
+    await ctx.reply(file=discord.File(filname + '.png'))
+    await asyncio.sleep(3)
+    os.remove(filname + '.png')
     
 @client.command(pass_context=True, aliases=['q', 'que'])
 async def question(ctx, *lquery):

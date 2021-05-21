@@ -3,10 +3,8 @@ import requests,shutil
 from bs4 import BeautifulSoup
 import time
 
-def cartoonize(myfile):
-    filname = str(round(time.time()))
+def cartoonize(myfile,filname,none=None):
     downloadFileFromUrl(myfile,filname)
-    time.sleep(1)
     s = requests.Session()
     url = "https://cartoonize-lkqov62dia-de.a.run.app/cartoonize"
     with open(str(filname + '.png'), 'rb') as f:

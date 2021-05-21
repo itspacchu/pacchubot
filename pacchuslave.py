@@ -6,7 +6,7 @@ jsonfile = io.open("perks.json", mode="r", encoding="utf-8")
 perks = json.load(jsonfile)
 
 # Mongo DB Content
-client = MongoClient('')
+client = MongoClient('') 
 db = client['PacchuSlave']
 serverstat = db['serverstat']
 bruhs = db['bruh']
@@ -319,9 +319,13 @@ async def gpt(ctx, *lquery):
 
 @client.command()
 async def cartoonize(ctx):
-    attachment_url = ctx.message.attachments[0].url
-    filname = await cartoonize(attachment_url)
-    await ctx.send(file=discord.File(f'{filname}.png'))
+    pool = ThreadPool(processes=1)
+    attachment_url = ctx.message.attachments[0].url    
+    waited = pool.apply_async(cartoonize,(attachment_url))
+    time.sleep(0.5)
+    res = waited.get()
+    print(res)
+    await ctx.send(file=discord.File(res + '.png'))
     
 @client.command(pass_context=True, aliases=['q', 'que'])
 async def question(ctx, *lquery):
@@ -705,7 +709,7 @@ class Music(commands.Cog):
     async def stop(self, ctx ):
         if(ctx.author.voice.channel):
             await ctx.message.add_reaction('👍')
-            embed = discord.Embed( title=f"Exiting", description=f"played for {int(TotalPlayed/60)} Minutes" ,colour=discord.Colour(0xff5065))
+            embed = discord.Embed(title=f"Exiting",colour=discord.Colour(0xff5065))
             embed.set_author(name=ctx.message.author.name,icon_url=ctx.message.author.avatar_url)
             embed.set_footer(text=client.user.name,icon_url=client.user.avatar_url)
             await ctx.voice_client.disconnect()

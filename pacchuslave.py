@@ -1,12 +1,11 @@
 from __imports__ import *
-import gpt2api as g2a
 
 # File Imports
 jsonfile = io.open("perks.json", mode="r", encoding="utf-8")
 perks = json.load(jsonfile)
 
 # Mongo DB Content
-client = MongoClient('')
+client = MongoClient('mongodb+srv://pacchu:kiminonawa@pslave.da85h.mongodb.net/test')
 db = client['PacchuSlave']
 serverstat = db['serverstat']
 bruhs = db['bruh']
@@ -29,7 +28,7 @@ command_prefix = '.'
 # Discord bot
 client = commands.Bot(command_prefix=command_prefix, intents=discord.Intents.all())
 client.remove_command('help')
-slash = SlashCommand(client, sync_commands=True)
+# slash = SlashCommand(client, sync_commands=True)
 guild_ids = [685469328929587268,705682250460823602]
 
 
@@ -458,7 +457,7 @@ async def spotify(ctx, user:discord.Member = None):
         pass
     if user.activities:
         for activity in user.activities:
-            if isinstance(activity, Spotify):
+            if isinstance(activity, discord.Spotify):
                 embed = discord.Embed(title = f"{user.name}'s Spotify",description = "Listening to {}".format(activity.title),color = 0x1DB954)
                 embed.set_thumbnail(url=activity.album_cover_url)
                 embed.add_field(name="Artist", value=activity.artist)
@@ -705,7 +704,7 @@ class Music(commands.Cog):
     async def stop(self, ctx ):
         if(ctx.author.voice.channel):
             await ctx.message.add_reaction('👍')
-            embed = discord.Embed( title=f"Exiting", description=f"played for {int(TotalPlayed/60)} Minutes" ,colour=discord.Colour(0xff5065))
+            embed = discord.Embed( title=f"Exiting", description=f"played" ,colour=discord.Colour(0xff5065))
             embed.set_author(name=ctx.message.author.name,icon_url=ctx.message.author.avatar_url)
             embed.set_footer(text=client.user.name,icon_url=client.user.avatar_url)
             await ctx.voice_client.disconnect()

@@ -22,7 +22,11 @@
 
 > _spotify spotify yeet
 
+> _cartoonize [mention/image upload]
+
 ![image](https://user-images.githubusercontent.com/37984032/116567942-b629aa00-a925-11eb-802d-47b25c63f8a6.png)
+
+![image](https://user-images.githubusercontent.com/37984032/119216569-009be200-baf2-11eb-83c4-3e4d4f5af0a0.png)
 
 ![image](https://user-images.githubusercontent.com/37984032/116387756-be57eb80-a838-11eb-8121-31f3c23bd668.png)
 

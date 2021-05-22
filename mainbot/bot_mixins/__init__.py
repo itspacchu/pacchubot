@@ -1,4 +1,4 @@
-from .discord_init import DiscordInit, BaseBot
+from .discord_init import *
 from .addfeaturebot import AdditionalFeatureMixin, EventMixins
 from .animebot import AnimeMixin
 from .interactionsbot import InteractionsMixin

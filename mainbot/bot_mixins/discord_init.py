@@ -1,13 +1,13 @@
 from ..__imports__ import *
 from ..settings import *
-
+from ..perks import perkdict
 
 class DiscordInit:
     VERSION = version
 
     def __init__(self, client):
         self.pre = command_prefix
-        # self.perks = json.load(jsonfile)
+        self.perks = perkdict
         if not hasattr(self, 'client'):
             self.client = client
         # self.client.remove_command('help')
@@ -18,9 +18,9 @@ class DiscordInit:
 
     async def on_ready(self):
         print('We have logged in as {0.user}'.format(self.client))
-        self.name = self.client.user
+        self.name = self.client.user.nick
         self.avatar = self.client.user.avatar_url
-        statustxt = "Questioning Everything now 🧠"
+        statustxt = "Questioning Everything now 🧠" #adding loop changing statuses
         activity = discord.Game(name=statustxt)
         if(self.client):
             print("Connected to Database")
@@ -50,7 +50,8 @@ class BaseBot(DiscordInit, commands.Cog):
                               description="Invite link for this bot", color=0xff2429)
         embed.set_thumbnail(url=self_avatar)
         await ctx.reply(embed=embed)
-
+    
+    # add pagination to this
     @commands.command(aliases=['h', 'halp', 'hel'])
     async def help(self, ctx):
         embed = discord.Embed(color=0xae00ff, description=f"Created by Pacchu \n well Leo helped too.. I guess..!!")
@@ -135,8 +136,6 @@ class BaseBot(DiscordInit, commands.Cog):
         embed.set_footer(text=f"{self.client.user.name}",
                          icon_url=self.client.user.avatar_url)
         await ctx.reply(embed=embed)
-
-
 
 def setup(bot):
     bot.add_cog(BaseBot(bot))

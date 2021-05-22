@@ -1,6 +1,6 @@
 from mainbot.utils import bcolors
 from discord.ext.commands.errors import NoEntryPointError
-from mainbot import DiscordInit
+from mainbot import *
 from mainbot.__imports__ import *
 from mainbot import settings
 

@@ -17,7 +17,7 @@ class InteractionsMixin(DiscordInit, commands.Cog):
         embed.set_footer(text=f"{self_name}", icon_url=self_avatar)
         await ctx.reply(embed=embed)
 
-
+    
     @commands.command()
     async def kiss(self, ctx, member: discord.Member):
         hgp = member

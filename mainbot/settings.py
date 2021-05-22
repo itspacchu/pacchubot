@@ -1,20 +1,20 @@
 from .__imports__ import *
 from pprint import pprint
 
-
+env_var = os.environ()
 # file imports
-jsonfile = io.open("mainbot/perks.json", mode="r", encoding="utf-8")
+#jsonfile = io.open("mainbot/perks.json", mode="r", encoding="utf-8")
 
 # db init
-# mongo_url = f"mongodb+srv://{env_var['MONGO_INITDB_ROOT_USERNAME']}:{env_var['MONGO_INITDB_ROOT_PASSWORD']}@{env_var['MONGO_HOST']}"
-mongo_url = "mongodb+srv://pacchu:kiminonawa@pslave.da85h.mongodb.net/test"
+mongo_url = f"mongodb+srv://{env_var['MONGO_INITDB_ROOT_USERNAME']}:{env_var['MONGO_INITDB_ROOT_PASSWORD']}@{env_var['MONGO_HOST']}"
+#mongo_url = ""
 mongo_client = MongoClient(mongo_url)
 
 # global variables
-version = "v0.5.2"
+version = "v1.0 beta"
 http = urllib3.PoolManager()
 ani = Jikan()
-self_name = "Pacchu's Slave"
+self_name = "Pacchu's Bot"
 self_avatar = "https://raw.githubusercontent.com/itspacchu/Pacchu-s-Slave/master/Screenshot%202021-04-09%20225421.png"
 command_prefix = '.'
 
@@ -41,7 +41,6 @@ __all__ = [
     'self_name',
     'self_avatar',
     'command_prefix',
-    'jsonfile',
     'guild_ids',
     'mongo_client',
     'ytdl_format_options',

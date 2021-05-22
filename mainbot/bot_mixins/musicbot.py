@@ -40,7 +40,7 @@ class MusicMixin(DiscordInit, commands.Cog):
         self.StartTime += ttime.time()
         if ("youtube.com" in str(url) or "youtu.be"):
             async with ctx.typing():
-                player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
+                player = await YTDLSource.from_url(url, loop=self.client.loop, stream=True)
                 ctx.voice_client.play(player, after=None)
                 if(str(url) == "https://youtu.be/dQw4w9WgXcQ"):
                     embed = discord.Embed(title="You need to give a url!", colour=discord.Colour(0xff5065), url=url, description=player.title)
@@ -55,7 +55,7 @@ class MusicMixin(DiscordInit, commands.Cog):
         else:
             embed = discord.Embed(title=f"Searching : {str(url)}", colour=discord.Colour(0xff5065))
             async with ctx.typing():
-                player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
+                player = await YTDLSource.from_url(url, loop=self.client.loop, stream=True)
                 ctx.voice_client.play(player, after=None)
 
         embed.set_author(name=ctx.message.author.name,icon_url=ctx.message.author.avatar_url)
@@ -67,7 +67,7 @@ class MusicMixin(DiscordInit, commands.Cog):
         self.StartTime += ttime.time()
         await ctx.message.add_reaction('🎧')
         async with ctx.typing():
-            player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
+            player = await YTDLSource.from_url(url, loop=self.client.loop, stream=True)
             ctx.voice_client.play(player, after=None)
             embed = discord.Embed(title="Playing from Youtube", colour=discord.Colour(0xff5065), url=url, description=player.title)
             embed.set_image(url="https://i.ytimg.com/vi/5qap5aO4i9A/maxresdefault.jpg")
@@ -196,7 +196,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                 await context.author.voice.channel.connect()
 
         guild = context.guild
-        voice_client: discord.VoiceClient = discord.utils.get(self.bot.voice_clients, guild=guild)
+        voice_client: discord.VoiceClient = discord.utils.get(self.client.voice_clients, guild=guild)
         _source_ = currentpod.GetEpisodeMp3(podepi)
         audio_source = discord.FFmpegPCMAudio(_source_)
         if not voice_client.is_playing():
@@ -234,3 +234,6 @@ class MusicMixin(DiscordInit, commands.Cog):
 
         elif ctx.voice_client.is_playing():
             ctx.voice_client.stop()
+
+def setup(bot):
+    bot.add_cog(MusicMixin(bot))

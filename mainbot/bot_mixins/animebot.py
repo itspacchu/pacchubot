@@ -46,7 +46,7 @@ class AnimeMixin(DiscordInit, commands.Cog):
             embed.add_field(name="Character Not Found",
                             value="That Character is not found ", inline=False)
             embed.set_footer(
-                text=f" {self_name} {version}", icon_url=self_avatar)
+                text=f" {self.name} {version}", icon_url=self.avatar)
             try:
                 await ctx.reply(embed=embed)
             except AttributeError:
@@ -79,7 +79,7 @@ class AnimeMixin(DiscordInit, commands.Cog):
             embed.add_field(name="Images Not Found",
                             value=" Coudn't find any images on given Query ", inline=False)
             embed.set_footer(
-                text=f" {self_name} {version}", icon_url=self_avatar)
+                text=f" {self.name} {version}", icon_url=self.avatar)
             await ctx.reply(embed=embed)
 
     @commands.command(aliases=['ani', 'anim'])
@@ -120,7 +120,7 @@ class AnimeMixin(DiscordInit, commands.Cog):
             embed.add_field(name="Rated", value=str(asrc['rated']), inline=True)
             embed.add_field(name="Openings", value=list_to_string(more_info['opening_themes'], 4), inline=False)
             embed.add_field(name="Endings", value=list_to_string(more_info['ending_themes'], 4), inline=False)
-            embed.set_footer(text=f"Try typing full name if its incorrect :D", icon_url=self_avatar)
+            embed.set_footer(text=f"Try typing full name if its incorrect :D", icon_url=self.avatar)
             await ctx.send(embed=embed)
         except:
             try:
@@ -147,13 +147,13 @@ class AnimeMixin(DiscordInit, commands.Cog):
                 embed.add_field(name="Rated", value=str(asrc['rated']), inline=True)
                 embed.add_field(name="Openings", value=list_to_string(more_info['opening_themes'], 4), inline=False)
                 embed.add_field(name="Endings", value=list_to_string(more_info['ending_themes'], 4), inline=False)
-                embed.set_footer(text=f"Check the spelling or Try typing full name if its incorrect :D", icon_url=self_avatar)
+                embed.set_footer(text=f"Check the spelling or Try typing full name if its incorrect :D", icon_url=self.avatar)
                 await ctx.send(embed=embed)
             except:
                 await ctx.message.add_reaction('😭')
                 embed = discord.Embed(color=0xff0000)
                 embed.add_field(name="Anime Not Found", value="That Anime is not found on MyAnimeList", inline=False)
-                embed.set_footer(text=self_name, icon_url=self_avatar)
+                embed.set_footer(text=self.name, icon_url=self.avatar)
                 await ctx.send(embed=embed)
 
 

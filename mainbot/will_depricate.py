@@ -1,9 +1,10 @@
 from .__imports__ import *
 from .settings import *
+from .perks import perkdict
 
 
 # File Imports
-perks = json.load(jsonfile)
+perks = perkdict
 
 
 # Mongo DB Content

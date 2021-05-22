@@ -1,12 +1,21 @@
 from .__imports__ import *
 from pprint import pprint
 
-env_var = os.environ()
+
+# The full path to the repository root.
+PROJECT_PACKAGE = Path(__file__).resolve().parent.parent
+
+load_dotenv(PROJECT_PACKAGE.joinpath('.env'))
+print(PROJECT_PACKAGE)
+def env_to_bool(env, default):
+    str_val = os.environ.get(env)
+    return default if str_val is None else str_val == 'True'
+
 # file imports
 #jsonfile = io.open("mainbot/perks.json", mode="r", encoding="utf-8")
 
 # db init
-mongo_url = f"mongodb+srv://{env_var['MONGO_INITDB_ROOT_USERNAME']}:{env_var['MONGO_INITDB_ROOT_PASSWORD']}@{env_var['MONGO_HOST']}"
+mongo_url = f"mongodb+srv://{os.environ.get('MONGO_INITDB_ROOT_USERNAME')}:{os.environ.get('MONGO_INITDB_ROOT_PASSWORD')}@{os.environ.get('MONGO_HOST')}"
 #mongo_url = ""
 mongo_client = MongoClient(mongo_url)
 
@@ -22,17 +31,22 @@ guild_ids = [685469328929587268,705682250460823602]
 
 ytdl_format_options = {
     'format': 'bestaudio/best',
-    'restrictfilenames': True,
-    'noplaylist': False,
-    'nocheckcertificate': True,
-    'ignoreerrors': True,
-    'logtostderr': False,
-    'quiet': True,
-    'no_warnings': True,
-    'default_search': 'auto',
-    'source_address': '0.0.0.0'
+        'extractaudio': True,
+        'audioformat': 'mp3',
+        'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
+        'restrictfilenames': True,
+        'noplaylist': True,
+        'nocheckcertificate': True,
+        'ignoreerrors': False,
+        'logtostderr': False,
+        'quiet': True,
+        'no_warnings': True,
+        'default_search': 'auto',
+        'source_address': '0.0.0.0',
 }
-ffmpeg_options = {'options': '-vn'}
+ffmpeg_options = {
+        'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
+        'options': '-vn',}
 
 __all__ = [
     'version',

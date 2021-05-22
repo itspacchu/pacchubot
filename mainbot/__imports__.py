@@ -23,7 +23,9 @@ __all__ = [
     'queryToName',
     'list_to_string',
     'getmembers',
+    'load_dotenv',
     'ABC',
+    'Path',
 
 ]
 
@@ -39,12 +41,13 @@ import youtube_dl
 import discord
 import asyncio
 from random import choice
+from pathlib import Path
 import feedparser as fp
-import podcasthandler as ph
-from .core import g2a, cartoonize
+from .core import g2a, cartoonize, ph
 import time as ttime
 from discord.utils import get
 from inspect import getmembers
+from dotenv import load_dotenv
 from pymongo import MongoClient
 from jikanpy import Jikan
 from discord.ext import commands

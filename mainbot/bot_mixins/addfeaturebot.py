@@ -51,13 +51,13 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
             embed.add_field(name="Anime images delivered for simps", value=str(
                 self.animePics.count_documents({"guild": ctx.message.guild.id})), inline=True)
             embed.set_footer(
-                text=f"MongoDB Connection Active 🟢", icon_url=self_avatar)
+                text=f"MongoDB Connection Active 🟢", icon_url=self.avatar)
             await ctx.send(embed=embed)
         except KeyError:
             embed.add_field(name="Database API cannot be reachable 🔴",
                             value="404?", inline=True)
             embed.set_footer(
-                text=f"Facebook doesnt sponser this btw", icon_url=self_avatar)
+                text=f"Facebook doesnt sponser this btw", icon_url=self.avatar)
             await ctx.send(embed=embed)
 
     @commands.command()

@@ -10,6 +10,8 @@ class DiscordInit:
         self.perks = perkdict
         if not hasattr(self, 'client'):
             self.client = client
+        self.avatar = self_avatar
+        self.name = self_name
         # self.client.remove_command('help')
         self.client.event(self.on_ready)
 
@@ -18,8 +20,10 @@ class DiscordInit:
 
     async def on_ready(self):
         print('We have logged in as {0.user}'.format(self.client))
-        self.name = self.client.user.nick
-        self.avatar = self.client.user.avatar_url
+        if not hasattr(self,'name'):
+            self.name = self.client.user.name
+        if not hasattr(self, 'avatar'):
+            self.avatar = self.client.user.avatar_url
         statustxt = "Questioning Everything now 🧠" #adding loop changing statuses
         activity = discord.Game(name=statustxt)
         if(self.client):
@@ -48,15 +52,15 @@ class BaseBot(DiscordInit, commands.Cog):
         await ctx.message.add_reaction('♥')
         embed = discord.Embed(title="Click here", url="https://discord.com/api/oauth2/authorize?client_id=709426015759368282&permissions=8&scope=bot",
                               description="Invite link for this bot", color=0xff2429)
-        embed.set_thumbnail(url=self_avatar)
+        embed.set_thumbnail(url=self.avatar)
         await ctx.reply(embed=embed)
-    
+
     # add pagination to this
     @commands.command(aliases=['h', 'halp', 'hel'])
     async def help(self, ctx):
         embed = discord.Embed(color=0xae00ff, description=f"Created by Pacchu \n well Leo helped too.. I guess..!!")
-        embed.set_author(name=self_name, icon_url=self_avatar)
-        embed.set_thumbnail(url=self_avatar)
+        embed.set_author(name=self.name, icon_url=self.avatar)
+        embed.set_thumbnail(url=self.avatar)
         embed.add_field(name=f"{self.pre}perk",
                         value="Cool awesome stuff in this", inline=False)
         embed.add_field(name=f"{self.pre}anime/ani",
@@ -78,7 +82,7 @@ class BaseBot(DiscordInit, commands.Cog):
         embed.add_field(name=f"{self.pre}help",
                         value="isnt it obvious :o", inline=False)
         embed.set_footer(
-            text=f"{self_name} {self.VERSION}", icon_url=self_avatar)
+            text=f"{self.name} {self.VERSION}", icon_url=self.avatar)
         try:
             await ctx.reply(embed=embed)
         except AttributeError:
@@ -87,7 +91,7 @@ class BaseBot(DiscordInit, commands.Cog):
     @commands.command(aliases=['per', 'perks'])
     async def perk(self, ctx):
         embed = discord.Embed(title=self.client.user.name.title(
-        ), description=f"{self_name} Perks", color=0xff9500)
+        ), description=f"{self.name} Perks", color=0xff9500)
         embed.set_author(name=self.client.user.name,
                          icon_url=self.client.user.avatar_url)
         embed.set_thumbnail(url=self.client.user.avatar_url)

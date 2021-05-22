@@ -14,10 +14,10 @@ class InteractionsMixin(DiscordInit, commands.Cog):
             embed = discord.Embed(title=" ", description=f"{ctx.message.author.mention} hugs {hgp.mention}", colour=discord.Colour(0x00ffb7))
             embed.set_image(url=choice(self.perks['links']['hugs']))
         embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
-        embed.set_footer(text=f"{self_name}", icon_url=self_avatar)
+        embed.set_footer(text=f"{self.name}", icon_url=self.avatar)
         await ctx.reply(embed=embed)
 
-    
+
     @commands.command()
     async def kiss(self, ctx, member: discord.Member):
         hgp = member
@@ -70,48 +70,51 @@ class InteractionsMixin(DiscordInit, commands.Cog):
 
 
     @commands.command()
-    async def bruh(self, ctx, *qlink):
-        link = queryToName(qlink)
+    async def sike(self, ctx, *qlink):
+        try:
+            link = ctx.message.attachments[0].url
+        except:
+            link = queryToName(qlink)
         if(ctx.message.guild == None):
             await ctx.reply("This is a dm tho? try it in a server m8")
         else:
             if(link == ""):
                 try:
-                    await ctx.reply(str(self.bruhs.find_one({"guild": ctx.message.guild.id})['link']))
+                    await ctx.reply(str(self.bruhs.find_one({"guild": ctx.message.author.id})['link']))
                 except:
                     embed = discord.Embed(color=0x00ff00)
-                    embed.add_field(name="No Bruh found",
-                                    value=f"Consider adding Bruh using {command_prefix}Bruh <value> ; Value can be Link , Text  ...", inline=False)
+                    embed.add_field(name="No Sike! found",
+                                    value=f"add sike {command_prefix}sike <value> ; Value can be Link , Text  ...", inline=False)
                     embed.set_footer(text=f" {self_name} {version}", icon_url=self_avatar)
                     await ctx.message.channel.send(embed=embed)
             else:
-                if(self.bruhs.find_one({"guild": ctx.message.guild.id}) == None):
+                if(self.bruhs.find_one({"guild": ctx.message.author.id}) == None):
                     dbStore = {
-                        "guild": ctx.message.guild.id,
+                        "guild": ctx.message.author.id,
                         "link": link
                     }
-                    self.bruhs.insert_one({"guild": ctx.message.guild.id}, dbStore)
+                    self.bruhs.insert_one({"guild": ctx.message.author.id}, dbStore)
                 else:
                     dbStore = {
-                        "guild": ctx.message.guild.id,
+                        "guild": ctx.message.author.id,
                         "link": link
                     }
-                    self.bruhs.replace_one({"guild": ctx.message.guild.id}, dbStore)
-                if(self.bruhs.find_one({"guild": ctx.message.guild.id}) == None):
+                    self.bruhs.replace_one({"guild": ctx.message.author.id}, dbStore)
+                if(self.bruhs.find_one({"guild": ctx.message.author.id}) == None):
                     dbStore = {
-                        "guild": ctx.message.guild.id,
+                        "guild": ctx.message.author.id,
                         "link": link
                     }
-                    self.bruhs.insert_one({"guild": ctx.message.guild.id}, dbStore)
+                    self.bruhs.insert_one({"guild": ctx.message.author.id}, dbStore)
                 else:
                     dbStore = {
-                        "guild": ctx.message.guild.id,
+                        "guild": ctx.message.author.id,
                         "link": link
                     }
-                    self.bruhs.replace_one({"guild": ctx.message.guild.id}, dbStore)
+                    self.bruhs.replace_one({"guild": ctx.message.author.id}, dbStore)
                 embed = discord.Embed(color=0x00ff00)
-                embed.add_field(name="Bruh Updated",
-                                value="Bruh has been sucessfully updated", inline=False)
+                embed.add_field(name="Sike! Updated",
+                                value="Sike! has been sucessfully updated", inline=False)
                 embed.set_footer(text=f" {self_name} {version}", icon_url=self_avatar)
                 await ctx.message.channel.send(embed=embed)
 

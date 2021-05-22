@@ -40,7 +40,7 @@ class MusicMixin(DiscordInit, commands.Cog):
         self.StartTime += ttime.time()
         if ("youtube.com" in str(url) or "youtu.be"):
             async with ctx.typing():
-                player = await YTDLSource.from_url(url, loop=self.client.loop, stream=True)
+                player = await YTDLSource.from_url(url=url, loop=self.client.loop, stream=True)
                 ctx.voice_client.play(player, after=None)
                 if(str(url) == "https://youtu.be/dQw4w9WgXcQ"):
                     embed = discord.Embed(title="You need to give a url!", colour=discord.Colour(0xff5065), url=url, description=player.title)
@@ -59,7 +59,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                 ctx.voice_client.play(player, after=None)
 
         embed.set_author(name=ctx.message.author.name,icon_url=ctx.message.author.avatar_url)
-        embed.set_footer(text=self_name, icon_url=self_avatar)
+        embed.set_footer(text=self.name, icon_url=self.avatar)
         await ctx.reply(embed=embed)
 
     @commands.command(pass_context=True, aliases=['pl'])
@@ -72,7 +72,7 @@ class MusicMixin(DiscordInit, commands.Cog):
             embed = discord.Embed(title="Playing from Youtube", colour=discord.Colour(0xff5065), url=url, description=player.title)
             embed.set_image(url="https://i.ytimg.com/vi/5qap5aO4i9A/maxresdefault.jpg")
         embed.set_author(name=ctx.message.author.name,icon_url=ctx.message.author.avatar_url)
-        embed.set_footer(text=self_name, icon_url=self_avatar)
+        embed.set_footer(text=self.name, icon_url=self.avatar)
         await ctx.reply(embed=embed)
 
     @commands.command(aliases=['podp'])
@@ -81,10 +81,10 @@ class MusicMixin(DiscordInit, commands.Cog):
         if(self.lastPod == None):
             embed = discord.Embed(colour=discord.Colour(
                 0xbd10e0), description=" ")
-            embed.set_thumbnail(url=self_avatar)
-            embed.set_author(name=self_name, url=self_avatar,icon_url=self_avatar)
+            embed.set_thumbnail(url=self.avatar)
+            embed.set_author(name=self.name, url=self.avatar,icon_url=self.avatar)
             embed.add_field(name=f"No Recent Podcast Searches",value=f"search for podcast using {self.pre}pod",inline=False)
-            embed.set_thumbnail(url=self_avatar)
+            embed.set_thumbnail(url=self.avatar)
             await ctx.send(embed=embed)
         else:
             currentpod = self.lastPod
@@ -95,8 +95,8 @@ class MusicMixin(DiscordInit, commands.Cog):
                                       description=currentpod.GetEpisodeDetails(podepi)['summary'],
                                       inline=False)
                 embed.set_thumbnail(url=currentpod.PodcastImage(podepi))
-                embed.set_author(name=self_name,icon_url=self_avatar)
-                embed.set_footer(text=currentpod.GetEpisodeDetails(podepi)['title'],icon_url=self_avatar)
+                embed.set_author(name=self.name,icon_url=self.avatar)
+                embed.set_footer(text=currentpod.GetEpisodeDetails(podepi)['title'],icon_url=self.avatar)
                 await ctx.send(embed=embed)
             except AttributeError:
                 await ctx.send("You aren't in voice channel m8")
@@ -125,8 +125,8 @@ class MusicMixin(DiscordInit, commands.Cog):
 
         if(podname == " "):
             embed = discord.Embed(colour=discord.Colour(0x91ff), description="Podcast Section")
-            embed.set_thumbnail(url=self_avatar)
-            embed.set_author(name=self_name, icon_url=self_avatar)
+            embed.set_thumbnail(url=self.avatar)
+            embed.set_author(name=self.name, icon_url=self.avatar)
             embed.add_field(name=f"{self.pre}pod", value="This very command you ran",inline=False)
             embed.add_field(name=f"{self.pre}pod [Name of Podcast]",value="Searches for the Podcast and shows Episodes related to it.", inline=False)
             embed.add_field(name=f"{self.pre}pod [Name of Podcast] : [Selection Number] or {self.pre}podp [Selection No]", value="Play the podcast selection , default 0 plays the latest available episode",inline=False)
@@ -135,9 +135,9 @@ class MusicMixin(DiscordInit, commands.Cog):
             await ctx.send(f'Searching 🔍')
             embed = discord.Embed(colour=discord.Colour(
                 0xbd10e0), description=" ")
-            embed.set_thumbnail(url=self_avatar)
-            embed.set_author(name=self_name, url=self_avatar,
-                             icon_url=self_avatar)
+            embed.set_thumbnail(url=self.avatar)
+            embed.set_author(name=self.name, url=self.avatar,
+                             icon_url=self.avatar)
             try:
                 k = ph.PodSearch(podname)
             except json.JSONDecodeError:
@@ -158,14 +158,14 @@ class MusicMixin(DiscordInit, commands.Cog):
                     ind += 1
                 if(paginationsize > 1):
                     embed.add_field(name="Change Page",value=f"```{self.pre}pod {podname} - [Page_Number]```")
-                embed.set_footer(text=f"Page {start}/{paginationsize}", icon_url=self_avatar)
+                embed.set_footer(text=f"Page {start}/{paginationsize}", icon_url=self.avatar)
                 try:
                     embed.set_thumbnail(url=k['image'])
                 except:
-                    embed.set_thumbnail(url=self_avatar)
+                    embed.set_thumbnail(url=self.avatar)
             else:
                 embed.add_field(name=f"No Podcasts Found",value="itunes returned no results",inline=False)
-                embed.set_thumbnail(url=self_avatar)
+                embed.set_thumbnail(url=self.avatar)
 
         if(not podepi == None and not podname == " "):
             if(self.lastPod == None):
@@ -181,8 +181,8 @@ class MusicMixin(DiscordInit, commands.Cog):
                                   inline=False)
 
             embed.set_thumbnail(url=currentpod.PodcastImage(podepi))
-            embed.set_author(name=self_name,icon_url=self_avatar)
-            embed.set_footer(text=k['name'],icon_url=self_avatar)
+            embed.set_author(name=self.name,icon_url=self.avatar)
+            embed.set_footer(text=k['name'],icon_url=self.avatar)
 
         await ctx.send(embed=embed)
 
@@ -235,5 +235,5 @@ class MusicMixin(DiscordInit, commands.Cog):
         elif ctx.voice_client.is_playing():
             ctx.voice_client.stop()
 
-def setup(bot):
-    bot.add_cog(MusicMixin(bot))
+# def setup(bot):
+#     bot.add_cog(MusicMixin(bot))

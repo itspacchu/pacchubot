@@ -19,7 +19,7 @@ PodcastSuggest = db['PodSuggest']
 VoiceUsage = db['VoiceActivity']
 
 # global variables
-version = "v0.5.2"
+version = "v0.5.2.1"
 http = urllib3.PoolManager()
 ani = Jikan()
 self_name = "Pacchu's Slave"
@@ -54,6 +54,7 @@ async def help(ctx):
     embed.set_author(name=self_name, icon_url=self_avatar)
     embed.set_thumbnail(url=self_avatar)
     embed.add_field(name=f"{command_prefix}perk",value="Cool awesome stuff in this", inline=False)
+    embed.add_field(name=f"{command_prefix}cartoonize/c imagefile/@mention",value="Cartoonizes image , profile pic", inline=False)
     embed.add_field(name=f"{command_prefix}anime/ani",value="Searches for given anime", inline=True)
     embed.add_field(name=f"{command_prefix}manga/m",value="Searches for give Manga", inline=True)
     embed.add_field(name=f"{command_prefix}anichar/ac",value="Searches for given Anime Charactor ", inline=True)
@@ -62,6 +63,7 @@ async def help(ctx):
     embed.add_field(name=f"{command_prefix}pod",value="Podcast playback section", inline=False)
     embed.add_field(name=f"{command_prefix}play/p  , {command_prefix}lofi/pl",value="Youtube Playback and Lofi music", inline=False)
     embed.add_field(name=f"{command_prefix}invite",value="Invite link for this bot", inline=False)
+    embed.add_field(name=f"{command_prefix}l/latex latexQuery",value="LatexQuery", inline=False)
     embed.add_field(name=f"{command_prefix}help",value="isnt it obvious :o", inline=False)
     embed.set_footer(text=f"{self_name} {version}", icon_url=self_avatar)
     try:
@@ -76,6 +78,7 @@ async def perk(ctx):
     embed.set_thumbnail(url=client.user.avatar_url)
     embed.add_field(name=f"{command_prefix}avatar @Pacchu / {command_prefix}av @Pacchu",value=f"Something of use atleast", inline=False)
     embed.add_field(name=f"{command_prefix}bruh [emote,link,text message]",value=f"Something to be saved? idk why it an option", inline=False)
+    embed.add_field(name=f"{command_prefix}sike [emote,link,text message]",value=f"Something to be saved? @voidptr wanted user", inline=False)
     embed.add_field(name=f"{command_prefix}gpt \"Today is a wonderful..\"",value="gpt neo text completion", inline=True)
     embed.add_field(name=f"{command_prefix}q \"Why is chocolate beautiful?\"",value="gpt neo answering", inline=True)
     embed.add_field(name=f"{command_prefix}spotify @mention",value="Gets the user's Spotify activity", inline=False)
@@ -323,15 +326,22 @@ async def cartoonize(ctx, member: discord.Member = None):
     await ctx.message.add_reaction('⏳')
     try:
         attachment_url = ctx.message.attachments[0].url
-        await ctx.reply("Processing will take a few moments...")
+        await ctx.send("Processing will take a few moments...")
     except:
-        hgp = member
-        await ctx.message.add_reaction('🙄')
-        if(ctx.message.author == hgp or hgp == None):
-            attachment_url = ctx.message.author.avatar_url
-        else:
-            attachment_url = hgp.avatar_url
-        await ctx.reply("Fetching user's Avatar")
+        try:
+            hgp = member
+            await ctx.message.add_reaction('🙄')
+            if(ctx.message.author == hgp or hgp == None):
+                attachment_url = ctx.message.author.avatar_url
+            else:
+                attachment_url = hgp.avatar_url
+            try:
+                await ctx.reply("Fetching user's Avatar")
+            except:
+                await ctx.send("Fetching user's Avatar")
+        except:
+            await ctx.reply("oi the thing you sent ain't supported")
+            return None
             
     downloadFileFromUrl(attachment_url,filname)
     s = requests.Session()
@@ -342,7 +352,10 @@ async def cartoonize(ctx, member: discord.Member = None):
     dlink = soup.find_all('a')[0]['href']
     downloadFileFromUrl(dlink,filname)
     s.close()
-    await ctx.reply(file=discord.File(filname + '.png'))
+    try:
+        await ctx.reply(file=discord.File(filname + '.png'))
+    except:
+        await ctx.send(file=discord.File(filname + '.png'))
     await asyncio.sleep(3)
     os.remove(filname + '.png')
     
@@ -391,6 +404,12 @@ async def kill(ctx, member: discord.Member):
     embed.set_footer(text=f"{client.user.name}",icon_url=client.user.avatar_url)
     await ctx.reply(embed=embed)
 
+@client.command(aliases=['l', '$$'])
+async def latex(ctx,*Query):
+    await ctx.message.add_reaction('👊')
+    lstr = queryToName(Query).replace(" ","&space;").replace(R"\\",R"\\\\")
+    await ctx.reply(r"https://latex.codecogs.com/png.latex?\dpi{300}&space;\LARGE&space;{\color{white}" + lstr + "}")
+
 
 @client.command()
 async def pat(ctx, member: discord.Member):
@@ -412,7 +431,10 @@ async def pat(ctx, member: discord.Member):
 
 @client.command()
 async def bruh(ctx, *qlink):
-    link = queryToName(qlink)
+    try:
+        link = ctx.message.attachments[0].url
+    except:
+        link = queryToName(qlink)
     if(ctx.message.guild == None):
         await ctx.reply("This is a dm tho? try it in a server m8")
     else:
@@ -456,6 +478,58 @@ async def bruh(ctx, *qlink):
             embed.set_footer(text=f" {self_name} {version}", icon_url=self_avatar)
             await ctx.message.channel.send(embed=embed)
 
+
+@client.command()
+async def sike(ctx, *qlink):
+    try:
+        link = ctx.message.attachments[0].url
+    except:
+        link = queryToName(qlink)
+    if(ctx.message.guild == None):
+        await ctx.reply("This is a dm tho? try it in a server m8")
+    else:
+        if(link == ""):
+            try:
+                await ctx.reply(str(bruhs.find_one({"guild": ctx.message.author.id})['link']))
+            except:
+                embed = discord.Embed(color=0x00ff00)
+                embed.add_field(name="No Sike! found",
+                                value=f"add sike {command_prefix}sike <value> ; Value can be Link , Text  ...", inline=False)
+                embed.set_footer(text=f" {self_name} {version}", icon_url=self_avatar)
+                await ctx.message.channel.send(embed=embed)
+        else:
+            if(bruhs.find_one({"guild": ctx.message.author.id}) == None):
+                dbStore = {
+                    "guild": ctx.message.author.id,
+                    "link": link
+                }
+                bruhs.insert_one({"guild": ctx.message.author.id}, dbStore)
+            else:
+                dbStore = {
+                    "guild": ctx.message.author.id,
+                    "link": link
+                }
+                bruhs.replace_one({"guild": ctx.message.author.id}, dbStore)
+            if(bruhs.find_one({"guild": ctx.message.author.id}) == None):
+                dbStore = {
+                    "guild": ctx.message.author.id,
+                    "link": link
+                }
+                bruhs.insert_one({"guild": ctx.message.author.id}, dbStore)
+            else:
+                dbStore = {
+                    "guild": ctx.message.author.id,
+                    "link": link
+                }
+                bruhs.replace_one({"guild": ctx.message.author.id}, dbStore)
+            embed = discord.Embed(color=0x00ff00)
+            embed.add_field(name="Sike! Updated",
+                            value="Sike! has been sucessfully updated", inline=False)
+            embed.set_footer(text=f" {self_name} {version}", icon_url=self_avatar)
+            await ctx.message.channel.send(embed=embed)
+
+
+
 @client.command()
 async def stats(ctx):
     embed = discord.Embed(color=0xf3d599)
@@ -476,22 +550,25 @@ async def stats(ctx):
 @client.command()
 async def spotify(ctx, user:discord.Member = None):
     await ctx.message.add_reaction('🎵')
+    flag = False
     if user == None:
         user = ctx.author
         pass
     if user.activities:
         for activity in user.activities:
             if isinstance(activity, Spotify):
+                flag = True
                 embed = discord.Embed(title = f"{user.name}'s Spotify",description = "Listening to {}".format(activity.title),color = 0x1DB954)
                 embed.set_thumbnail(url=activity.album_cover_url)
                 embed.add_field(name="Artist", value=activity.artist)
                 await ctx.reply(embed=embed)
-            else:
-                embed = discord.Embed(
-                            title = f"{user.name}'s Spotify",
-                            description = "Not Listening to anything",
-                            color = 0x1DB954)
-                await ctx.reply(embed=embed)    
+    if(not flag):
+        embed = discord.Embed(
+                    title = f"{user.name}'s Spotify",
+                    description = "Not Listening to anything",
+                    color = 0x1DB954)
+        await ctx.reply(embed=embed)    
+
 @client.event
 async def on_message(message):
     global client, botcount, currentcount, http, command_prefix

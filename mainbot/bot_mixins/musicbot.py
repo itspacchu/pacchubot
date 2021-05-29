@@ -37,9 +37,8 @@ class MusicMixin(DiscordInit, commands.Cog):
 
     @commands.command(pass_context=True, aliases=['p', 's'])
     async def play(self, ctx, *, url="https://youtu.be/dQw4w9WgXcQ"):
+        
         # DISABLED
-        await ctx.message.add_reaction('❕')
-        await ctx.message.reply("This feature is currently disabled")
         return
         #await ctx.message.add_reaction('🎧') 
         if ("youtube.com" in str(url) or "youtu.be"):
@@ -69,8 +68,6 @@ class MusicMixin(DiscordInit, commands.Cog):
     @commands.command(pass_context=True, aliases=['pl'])
     async def lofi(self, ctx, *, url="https://youtu.be/5qap5aO4i9A"):
         # DISABLED
-        await ctx.message.add_reaction('❕')
-        await ctx.message.reply("This feature is currently disabled")
         return
         #await ctx.message.add_reaction('🎧')
         async with ctx.typing():
@@ -86,8 +83,6 @@ class MusicMixin(DiscordInit, commands.Cog):
     async def podplay(self,ctx,epno=0):   
         
         # DISABLED
-        await ctx.message.add_reaction('❕')
-        await ctx.message.reply("This feature is currently disabled")
         return
          
         podepi = epno
@@ -105,7 +100,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                 await self.playPodcast(ctx,podepi=podepi,currentpod=currentpod)
                 embed = discord.Embed(title=currentpod.GetEpisodeDetails(podepi)['title'],
                                       colour=discord.Colour(0xb8e986), url=currentpod.GetEpisodeDetails(podepi)['link'],
-                                      description=currentpod.GetEpisodeDetails(podepi)['summary'],
+                                      description=currentpod.GetEpisodeDetails(podepi)['summsary'],
                                       inline=False)
                 embed.set_thumbnail(url=currentpod.PodcastImage(podepi))
                 embed.set_author(name=self.name,icon_url=self.avatar)

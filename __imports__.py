@@ -2,13 +2,8 @@
 from time import *
 from random import *
 import time
-import re
 import subprocess
-import requests
 import discord
-from multiprocessing.pool import ThreadPool
-from discord.utils import get
-from injectPayload import downloadFileFromUrl
 import os
 import json
 import io
@@ -21,16 +16,3 @@ from jikanpy import Jikan
 import numpy as np
 from discord.ext import commands
 from pacchufunctions import __initiate_default_stats__, mentionToId, queryToName, list_to_string
-import feedparser
-from discord_slash import SlashCommand, SlashContext
-import podcasthandler as ph
-from discord import Spotify
-import asyncio
-from gpt2api import *
-import time as ttime
-
-# later in sep module pls
-from io import FileIO
-import requests,shutil
-from bs4 import BeautifulSoup
-import time

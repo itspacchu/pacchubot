@@ -13,7 +13,7 @@ class BotStore(DiscordInit):
 
     def add_cogs(self):
         directory = os.listdir('./mainbot/bot_mixins')
-        ignore_files = ["__init__.py"]
+        ignore_files = ["__init__.py","musicbottest.py"]
         filtered_directory = [x for x in directory if x not in ignore_files]
         for filename in filtered_directory:
             if filename.endswith('.py'):
@@ -26,7 +26,7 @@ class BotStore(DiscordInit):
 
     def __call__(self):
         self.client.run(self.db['discordToken'].find_one(
-            {"botname": "tracebot"})['token'])
+            {"botname": "pacchuslave"})['token'])
 
 if __name__ == '__main__':
     Bot = BotStore()

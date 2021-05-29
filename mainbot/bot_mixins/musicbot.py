@@ -1,3 +1,4 @@
+from discord.errors import DiscordException
 from ..__imports__ import *
 from ..settings import *
 from .discord_init import DiscordInit
@@ -36,8 +37,11 @@ class MusicMixin(DiscordInit, commands.Cog):
 
     @commands.command(pass_context=True, aliases=['p', 's'])
     async def play(self, ctx, *, url="https://youtu.be/dQw4w9WgXcQ"):
-        await ctx.message.add_reaction('🎧')
-        self.StartTime += ttime.time()
+        # DISABLED
+        await ctx.message.add_reaction('❕')
+        await ctx.message.reply("This feature is currently disabled")
+        return
+        #await ctx.message.add_reaction('🎧') 
         if ("youtube.com" in str(url) or "youtu.be"):
             async with ctx.typing():
                 player = await YTDLSource.from_url(url=url, loop=self.client.loop, stream=True)
@@ -64,8 +68,11 @@ class MusicMixin(DiscordInit, commands.Cog):
 
     @commands.command(pass_context=True, aliases=['pl'])
     async def lofi(self, ctx, *, url="https://youtu.be/5qap5aO4i9A"):
-        self.StartTime += ttime.time()
-        await ctx.message.add_reaction('🎧')
+        # DISABLED
+        await ctx.message.add_reaction('❕')
+        await ctx.message.reply("This feature is currently disabled")
+        return
+        #await ctx.message.add_reaction('🎧')
         async with ctx.typing():
             player = await YTDLSource.from_url(url, loop=self.client.loop, stream=True)
             ctx.voice_client.play(player, after=None)
@@ -76,7 +83,13 @@ class MusicMixin(DiscordInit, commands.Cog):
         await ctx.reply(embed=embed)
 
     @commands.command(aliases=['podp'])
-    async def podplay(self,ctx,epno=0):
+    async def podplay(self,ctx,epno=0):   
+        
+        # DISABLED
+        await ctx.message.add_reaction('❕')
+        await ctx.message.reply("This feature is currently disabled")
+        return
+         
         podepi = epno
         if(self.lastPod == None):
             embed = discord.Embed(colour=discord.Colour(
@@ -101,10 +114,8 @@ class MusicMixin(DiscordInit, commands.Cog):
             except AttributeError:
                 await ctx.send("You aren't in voice channel m8")
 
-
     @commands.command(aliases=['podcast'])
-    async def pod(self,ctx , * , strparse = " "):
-        await ctx.message.add_reaction('🔎')
+    async def pod(self,ctx , * , strparse = " "):    
         if(':' in strparse):
             podname_,num = strparse.replace(' ','').split(':')
             podepi = int(num)
@@ -121,8 +132,6 @@ class MusicMixin(DiscordInit, commands.Cog):
         except:
             start = 0
             podname = podname_
-
-
         if(podname == " "):
             embed = discord.Embed(colour=discord.Colour(0x91ff), description="Podcast Section")
             embed.set_thumbnail(url=self.avatar)
@@ -167,19 +176,6 @@ class MusicMixin(DiscordInit, commands.Cog):
                 embed.add_field(name=f"No Podcasts Found",value="itunes returned no results",inline=False)
                 embed.set_thumbnail(url=self.avatar)
 
-        if(not podepi == None and not podname == " "):
-            if(self.lastPod == None):
-                k = ph.PodSearch(podname)
-                currentpod = ph.Podcast(k['name'], k['rss'])
-                self.lastPod = currentpod
-            else:
-                currentpod = self.lastPod
-            await self.playPodcast(ctx,podepi=podepi,currentpod=currentpod)
-            embed = discord.Embed(title=currentpod.GetEpisodeDetails(podepi)['title'],
-                                  colour=discord.Colour(0xb8e986), url=currentpod.GetEpisodeDetails(podepi)['link'],
-                                  description=currentpod.GetEpisodeDetails(podepi)['summary'],
-                                  inline=False)
-
             embed.set_thumbnail(url=currentpod.PodcastImage(podepi))
             embed.set_author(name=self.name,icon_url=self.avatar)
             embed.set_footer(text=k['name'],icon_url=self.avatar)
@@ -221,6 +217,12 @@ class MusicMixin(DiscordInit, commands.Cog):
     @lofi.before_invoke
     @play.before_invoke
     async def ensure_voice(self, ctx):
+        
+        # DISABLED
+        await ctx.message.add_reaction('❕')
+        await ctx.message.reply("This feature is currently disabled")
+        return
+    
         if ctx.voice_client is None:
             if ctx.author.voice.channel:
                 self.StartTime = ttime.time()
@@ -235,5 +237,5 @@ class MusicMixin(DiscordInit, commands.Cog):
         elif ctx.voice_client.is_playing():
             ctx.voice_client.stop()
 
-# def setup(bot):
-#     bot.add_cog(MusicMixin(bot))
+def setup(bot):
+    bot.add_cog(MusicMixin(bot))

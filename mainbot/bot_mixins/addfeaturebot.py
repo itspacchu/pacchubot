@@ -82,22 +82,6 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
                     await ctx.reply(embed=embed)
 
 
-class EventMixins(DiscordInit, commands.Cog):
-
-    async def on_message(self, message):
-        global client, botcount, currentcount, http, command_prefix
-        if(message.author == self.client.user or message.author.bot):
-            return
-
-        for x in message.mentions:
-            if(x == self.client.user):
-                await message.channel.send(choice(self.perks['replies']['pings']))
-        # try:
-        if("pacchu" in message.content.lower()):
-            await message.channel.send('**Hail Pacchu**')
-        await self.client.process_commands(message)
-
 def setup(bot):
     bot.add_cog(AdditionalFeatureMixin(bot))
-    # bot.add_cog(EventMixins(bot))
 

@@ -14,6 +14,7 @@ class DiscordInit:
         self.name = self_name
         # self.client.remove_command('help')
         self.client.event(self.on_ready)
+        self.client.event(self.on_message)
 
         self.db = mongo_client['PacchuSlave']
         self.init_db()
@@ -30,6 +31,24 @@ class DiscordInit:
             print("Connected to Database")
         print(self.db.list_collection_names())
         await self.client.change_presence(status=discord.Status.online, activity=activity)
+    
+    async def on_message(self, message):
+        global client, botcount, currentcount, http, command_prefix
+        if(message.author == self.client.user or message.author.bot):
+            return
+
+        for x in message.mentions:
+            if(x == self.client.user):
+                await message.channel.send(choice(self.perks['replies']['pings']))
+        # try:
+        qq = message.content.lower().split(' ')[0]
+        query = {'search': {'$regex': qq, '$options': 'i'}}
+        try:
+            match = self.MemberTaunt.find_one(query)['taunt']
+            await message.channel.send(match)
+        except:
+            pass
+        await self.client.process_commands(message)
 
     def init_db(self):
         self.serverstat = self.db['serverstat']
@@ -41,9 +60,7 @@ class DiscordInit:
         self.gptDb = self.db['gptQuery']
         self.PodcastSuggest = self.db['PodSuggest']
         self.VoiceUsage = self.db['VoiceActivity']
-
-
-
+        self.MemberTaunt = self.db['memberTaunt']
 
 class BaseBot(DiscordInit, commands.Cog):
 
@@ -73,10 +90,12 @@ class BaseBot(DiscordInit, commands.Cog):
                         value="Searches for Images of given Anime Charactor", inline=True)
         embed.add_field(
             name=f"{self.pre}stats", value="partially implemented **bugs**", inline=False)
+        """
         embed.add_field(name=f"{self.pre}pod",
                         value="Podcast playback section", inline=False)
         embed.add_field(name=f"{self.pre}play/p  , {self.pre}lofi/pl",
                         value="Youtube Playback and Lofi music", inline=False)
+        """
         embed.add_field(name=f"{self.pre}invite",
                         value="Invite link for this bot", inline=False)
         embed.add_field(name=f"{self.pre}help",

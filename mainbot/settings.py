@@ -15,7 +15,7 @@ def env_to_bool(env, default):
 #jsonfile = io.open("mainbot/perks.json", mode="r", encoding="utf-8")
 
 # db init
-mongo_url = f"mongodb+srv://{os.environ.get('MONGO_INITDB_ROOT_USERNAME')}:{os.environ.get('MONGO_INITDB_ROOT_PASSWORD')}@{os.environ.get('MONGO_HOST')}"
+mongo_url = f"mongodb+srv://{os.environ['MONGO_INITDB_ROOT_USERNAME']}:{os.environ['MONGO_INITDB_ROOT_PASSWORD']}@{os.environ['MONGO_HOST']}"
 #mongo_url = ""
 mongo_client = MongoClient(mongo_url)
 

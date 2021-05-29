@@ -37,7 +37,6 @@ class InteractionsMixin(DiscordInit, commands.Cog):
 
     @commands.command()
     async def kill(self, ctx, member: discord.Member):
-
         hgp = member
         await ctx.message.add_reaction('🔪')
         if(ctx.message.author == hgp or hgp == None):
@@ -54,7 +53,7 @@ class InteractionsMixin(DiscordInit, commands.Cog):
     @commands.command()
     async def pat(self, ctx, member: discord.Member):
         hgp = member
-        await ctx.message.add_reaction('👊')
+        await ctx.message.add_reaction('👋')
         print(hgp)
         if(ctx.message.author == hgp or hgp == None):
             embed = discord.Embed(title=" ", description=f"{ctx.message.author.mention} pats themselves", colour=discord.Colour(0x00ffb7))
@@ -116,7 +115,37 @@ class InteractionsMixin(DiscordInit, commands.Cog):
                 embed.add_field(name="Sike! Updated",
                                 value="Sike! has been sucessfully updated", inline=False)
                 embed.set_footer(text=f" {self_name} {version}", icon_url=self_avatar)
-                await ctx.message.channel.send(embed=embed)
-
+                await ctx.message.channel.send(embed=embed)  
+    
+        """
+        TODO:
+            
+        use mongodb.collections.update() instead of line 136 stuff
+        
+        """
+    
+    @commands.command()
+    async def taunt(self, ctx, *qlink):
+        txt = queryToName(qlink) 
+        try:
+            search, taunt = txt.split(',')
+            query = {'search': {'$regex': search, '$options': 'i'}}
+            gen_document = {
+                "search":search,
+                "taunt":taunt
+            }
+            alreadyExists = self.MemberTaunt.find_one(query)
+            if(alreadyExists == None):
+                self.MemberTaunt.insert_one(gen_document)
+                ctx.reply("Added Taunt")
+            else:
+                rfilter = {"search": alreadyExists["search"]}
+                self.MemberTaunt.replace_one(rfilter,gen_document)
+                ctx.reply("Updated Taunt")
+              
+        except ValueError:
+            ctx.reply(f"Proper usage ```{self.pre}taunt name , Taunt goes here :D```")
+        
+    
 def setup(bot):
     bot.add_cog(InteractionsMixin(bot))

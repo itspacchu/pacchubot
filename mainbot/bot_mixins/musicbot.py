@@ -111,6 +111,11 @@ class MusicMixin(DiscordInit, commands.Cog):
 
     @commands.command(aliases=['podcast'])
     async def pod(self,ctx , * , strparse = " "):    
+        
+        #DISABLED
+        return
+    
+    
         if(':' in strparse):
             podname_,num = strparse.replace(' ','').split(':')
             podepi = int(num)

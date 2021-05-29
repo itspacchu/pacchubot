@@ -42,7 +42,7 @@ class DiscordInit:
                 await message.channel.send(choice(self.perks['replies']['pings']))
         # try:
         qq = message.content.lower().split(' ')[0]
-        query = {'search': {'$regex': qq, '$options': 'i'}}
+        query = {'search': {'$regex': f"(?:^|\W){qq}(?:$|\W)", '$options': 'i'}} #REGEX query for exact string math
         try:
             match = self.MemberTaunt.find_one(query)['taunt']
             await message.channel.send(match)

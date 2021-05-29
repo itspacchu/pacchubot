@@ -123,16 +123,16 @@ class InteractionsMixin(DiscordInit, commands.Cog):
         use mongodb.collections.update() instead of line 136 stuff
         
         """
-    
+        
     @commands.command()
     async def taunt(self, ctx, *qlink):
-        txt = queryToName(qlink) 
+        txt = queryToName(qlink)
         try:
             search, taunt = txt.split(',')
             query = {'search': {'$regex': search, '$options': 'i'}}
             gen_document = {
-                "search":search,
-                "taunt":taunt
+                "search": search,
+                "taunt": taunt
             }
             alreadyExists = self.MemberTaunt.find_one(query)
             if(alreadyExists == None):
@@ -140,9 +140,9 @@ class InteractionsMixin(DiscordInit, commands.Cog):
                 await ctx.reply("Added Taunt")
             else:
                 rfilter = {"search": alreadyExists["search"]}
-                self.MemberTaunt.replace_one(rfilter,gen_document)
+                self.MemberTaunt.replace_one(rfilter, gen_document)
                 await ctx.reply("Updated Taunt")
-              
+
         except ValueError:
             await ctx.reply(f"Proper usage ```{self.pre}taunt name , Taunt goes here :D```")
         

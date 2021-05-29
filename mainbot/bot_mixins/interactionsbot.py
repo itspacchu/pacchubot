@@ -137,14 +137,14 @@ class InteractionsMixin(DiscordInit, commands.Cog):
             alreadyExists = self.MemberTaunt.find_one(query)
             if(alreadyExists == None):
                 self.MemberTaunt.insert_one(gen_document)
-                ctx.reply("Added Taunt")
+                await ctx.reply("Added Taunt")
             else:
                 rfilter = {"search": alreadyExists["search"]}
                 self.MemberTaunt.replace_one(rfilter,gen_document)
-                ctx.reply("Updated Taunt")
+                await ctx.reply("Updated Taunt")
               
         except ValueError:
-            ctx.reply(f"Proper usage ```{self.pre}taunt name , Taunt goes here :D```")
+            await ctx.reply(f"Proper usage ```{self.pre}taunt name , Taunt goes here :D```")
         
     
 def setup(bot):

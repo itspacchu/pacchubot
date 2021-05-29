@@ -112,7 +112,9 @@ class MusicMixin(DiscordInit, commands.Cog):
     @commands.command(aliases=['podcast'])
     async def pod(self,ctx , * , strparse = " "):    
         
-        #DISABLED
+        # DISABLED
+        await ctx.message.add_reaction('❕')
+        await ctx.message.reply("This feature is currently disabled")
         return
     
     

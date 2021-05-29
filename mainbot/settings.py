@@ -25,7 +25,7 @@ http = urllib3.PoolManager()
 ani = Jikan()
 self_name = "Pacchu's Bot"
 self_avatar = "https://raw.githubusercontent.com/itspacchu/Pacchu-s-Slave/master/Screenshot%202021-04-09%20225421.png"
-command_prefix = '.'
+command_prefix = '_'
 
 guild_ids = [685469328929587268,705682250460823602]
 

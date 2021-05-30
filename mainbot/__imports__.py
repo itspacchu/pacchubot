@@ -44,13 +44,14 @@ import asyncio
 from random import choice
 from pathlib import Path
 import feedparser as fp
-from .core import g2a, cartoonize, ph
+from .core import g2a, cartoonize, ph,wikipedia_api
 import time as ttime
 from discord.utils import get
 from inspect import getmembers
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from jikanpy import Jikan
+import datetime
 from discord.ext import commands
 from discord.ext.commands import CommandError , CommandNotFound
 from .utils import __initiate_default_stats__, mentionToId, queryToName, list_to_string

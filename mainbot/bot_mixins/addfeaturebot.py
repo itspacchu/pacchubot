@@ -1,3 +1,5 @@
+from datetime import datetime
+from mainbot.core import wikipedia_api
 from ..__imports__ import *
 from ..settings import *
 from .discord_init import DiscordInit
@@ -22,6 +24,18 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
         attachment_url = ctx.message.attachments[0].url
         filname = await cartoonize(attachment_url)
         await ctx.send(file=discord.File(f'{filname}.png'))
+        
+    @commands.command(aliases=['wpotd', 'potd'])
+    async def wikipediapotd(self, ctx):
+        today_date = datetime.today()
+        print(today_date)
+        response = await wikipedia_api.fetch_potd(today_date)
+        embed = discord.Embed(title="Wikipedia Picture of the Day", colour=discord.Colour(0x6a5651), url=response['image_page'], description=response['filename'][6:])
+        embed.set_image(url=response['image_src'])
+        embed.set_thumbnail(url="https://cdn.discordapp.com/embed/avatars/0.png")
+        embed.set_author(name=self.name, icon_url=self.avatar)
+        embed.set_footer(text="Wikipedia API", icon_url="https://upload.wikimedia.org/wikipedia/en/thumb/8/80/Wikipedia-logo-v2.svg/220px-Wikipedia-logo-v2.svg.png")
+        await ctx.send(embed=embed)
 
     @commands.command(pass_context=True, aliases=['q', 'que'])
     async def question(self, ctx, *lquery):

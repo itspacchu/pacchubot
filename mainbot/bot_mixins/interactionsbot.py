@@ -68,7 +68,7 @@ class InteractionsMixin(DiscordInit, commands.Cog):
         await ctx.reply(embed=embed)
 
 
-    @commands.command()
+    @commands.command(aliases=['sk'])
     async def sike(self, ctx, *qlink):
         try:
             link = ctx.message.attachments[0].url
@@ -117,34 +117,56 @@ class InteractionsMixin(DiscordInit, commands.Cog):
                 embed.set_footer(text=f" {self_name} {version}", icon_url=self_avatar)
                 await ctx.message.channel.send(embed=embed)  
     
-        """
-        TODO:
-            
-        use mongodb.collections.update() instead of line 136 stuff
-        
-        """
-    
-    @commands.command()
-    async def taunt(self, ctx, *qlink):
-        txt = queryToName(qlink) 
-        try:
-            search, taunt = txt.split(',')
-            query = {'search': {'$regex': search, '$options': 'i'}}
-            gen_document = {
-                "search":search,
-                "taunt":taunt
-            }
-            alreadyExists = self.MemberTaunt.find_one(query)
-            if(alreadyExists == None):
-                self.MemberTaunt.insert_one(gen_document)
-                await ctx.reply("Added Taunt")
+    @commands.command(aliases=['br'])
+    async def bruh(self,ctx, *qlink):
+        link = queryToName(qlink)
+        if(ctx.message.guild == None):
+            await ctx.reply("This is a dm tho? try it in a server m8")
+        else:
+            if(link == ""):
+                try:
+                    await ctx.reply(str(self.bruhs.find_one({"guild": ctx.message.guild.id})['link']))
+                except:
+                    embed = discord.Embed(color=0x00ff00)
+                    embed.add_field(name="No Bruh found",
+                                    value=f"Consider adding Bruh using {command_prefix}Bruh <value> ; Value can be Link , Text  ...", inline=False)
+                    embed.set_footer(text=f" {self_name} {version}", icon_url=self_avatar)
+                    await ctx.message.channel.send(embed=embed)
             else:
-                rfilter = {"search": alreadyExists["search"]}
-                self.MemberTaunt.replace_one(rfilter,gen_document)
-                await ctx.reply("Updated Taunt")
-              
-        except ValueError:
-            await ctx.reply(f"Proper usage ```{self.pre}taunt name , Taunt goes here :D```")
+                if(self.bruhs.find_one({"guild": ctx.message.guild.id}) == None):
+                    dbStore = {
+                        "guild": ctx.message.guild.id,
+                        "link": link
+                    }
+                    self.bruhs.insert_one(
+                        {"guild": ctx.message.guild.id}, dbStore)
+                else:
+                    dbStore = {
+                        "guild": ctx.message.guild.id,
+                        "link": link
+                    }
+                    self.bruhs.replace_one(
+                        {"guild": ctx.message.guild.id}, dbStore)
+                if(self.bruhs.find_one({"guild": ctx.message.guild.id}) == None):
+                    dbStore = {
+                        "guild": ctx.message.guild.id,
+                        "link": link
+                    }
+                    self.bruhs.insert_one(
+                        {"guild": ctx.message.guild.id}, dbStore)
+                else:
+                    dbStore = {
+                        "guild": ctx.message.guild.id,
+                        "link": link
+                    }
+                    self.bruhs.replace_one(
+                        {"guild": ctx.message.guild.id}, dbStore)
+                embed = discord.Embed(color=0x00ff00)
+                embed.add_field(name="Bruh Updated",
+                                value="Bruh has been sucessfully updated", inline=False)
+                embed.set_footer(text=f" {self_name} {version}", icon_url=self_avatar)
+                await ctx.message.channel.send(embed=embed)
+
         
     
 def setup(bot):

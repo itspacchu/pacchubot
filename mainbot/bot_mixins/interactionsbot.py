@@ -68,7 +68,7 @@ class InteractionsMixin(DiscordInit, commands.Cog):
         await ctx.reply(embed=embed)
 
 
-    @commands.command()
+    @commands.command(aliases=['sk'])
     async def sike(self, ctx, *qlink):
         try:
             link = ctx.message.attachments[0].url
@@ -117,7 +117,7 @@ class InteractionsMixin(DiscordInit, commands.Cog):
                 embed.set_footer(text=f" {self_name} {version}", icon_url=self_avatar)
                 await ctx.message.channel.send(embed=embed)  
     
-    @commands.command()
+    @commands.command(aliases=['br'])
     async def bruh(self,ctx, *qlink):
         link = queryToName(qlink)
         if(ctx.message.guild == None):

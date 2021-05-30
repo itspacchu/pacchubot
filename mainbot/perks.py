@@ -101,6 +101,17 @@ perkdict = {
                 "No",
                 "Nope","How about ...no!"
             ],
+            
+            "command_not_found_error" : [
+                "I've searched in all my code ... coudn't find that command :(",
+                "am I supposed to know what that is?",
+                "you know pacchu is too lazy to work on stuff",
+                "That doesnt look like something I know?",
+                "that took suspicious hmmm",
+                "https://i.imgur.com/Bp9u8Ps.png",
+                "ay I cant do that ...yet once pacchu stops procrastinating :|"
+            ],
+              
             "sadhugs": [
                 "You'll find someone you love",
                 "Just ping everyone and someone will hug you :D",
@@ -108,10 +119,10 @@ perkdict = {
                 "Just ping someone randomly ;)"
             ],
             "pings": [
-                "Hewllo ","Bonjour ","Yeah?.. ","Wot?.. ","huh!? ","Eyy ","Owo","ay ", " Hewwo ", "Hello Hooman ","Wut? ","yeah m8 ","yes? "
+                "Hewwlo","Yeah?.. ","ye?","Eyy ","Owo","ay ", " Hewwo ", "Hello Hooman ","Wut? ","yeah m8 ","yes?","did someone ping me?","pong"
             ],
             "gpterror": [
-                "My brain isnt responding right now T_T","um... idk" , "I can't Understand that","Could you elaborate?" , "I have zero clue ._." , "Someone find my brain .. it seem to be afking in processes", "eeeeee idk"
+                "My brain isnt responding right now T_T","um... idk" , "I can't Understand that","Could you elaborate?" , "I have zero clue ._." , "Someone find my brain .. it seem to be afking in processes", "eeeeee idk","GPT model loading"
             ]
         }
 

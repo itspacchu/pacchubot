@@ -18,7 +18,7 @@ __all__ = [
     'MongoClient',
     'Jikan',
     'commands',
-    '__initiate_default_stats__',
+#    '__initiate_default_stats__', not needed anymore depricated by mongodb
     'mentionToId',
     'queryToName',
     'list_to_string',
@@ -26,6 +26,7 @@ __all__ = [
     'load_dotenv',
     'ABC',
     'Path',
+    'CommandNotFound'
 
 ]
 
@@ -51,6 +52,7 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 from jikanpy import Jikan
 from discord.ext import commands
+from discord.ext.commands import CommandError , CommandNotFound
 from .utils import __initiate_default_stats__, mentionToId, queryToName, list_to_string
 
 # import subprocess

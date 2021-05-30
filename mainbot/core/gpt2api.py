@@ -1,6 +1,9 @@
 import json
 import requests
 import time
+from .. import perks
+from random import choice
+
 
 API_URL = "https://api-inference.huggingface.co/models/EleutherAI/gpt-neo-125M"
 Q_URL = "https://api-inference.huggingface.co/models/google/t5-large-ssm-nq"
@@ -15,7 +18,7 @@ def gptquery(text_in:str):
         try:
             return json.loads(response.content.decode("utf-8"))[0]["generated_text"].replace("\n", ' ').replace('"', '').replace("  ", "")
         except:
-            return f"loading GPT neo query model ... ```{response}```"
+            return choice(perks['replies']['gpterror'])
 
 def codept(text_in:str):
     response = requests.request("POST", CPT_URL, headers=headers, data=text_in)
@@ -25,14 +28,14 @@ def codept(text_in:str):
         try:
             return json.loads(response.content.decode("utf-8"))[0]["generated_text"].replace("\n", ' ').replace('"', '').replace("  ", "")
         except:
-            return "loading Code GPT Model ..."
+            return choice(perks['replies']['gpterror'])
 
 def questionreply(text_in: str):
     response = requests.request("POST", Q_URL, headers=headers, data=text_in)
     try:
         return json.loads(response.content.decode("utf-8"))[0]["generated_text"]
     except:
-        return f"Please wait for sometime ... (GPT Loading!) \n```raw'{response}```"
+        return choice(perks['replies']['gpterror'])
 
 def rawgptquery(text_in:str):
     response = requests.request("POST", API_URL, headers=headers, data=text_in)

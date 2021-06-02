@@ -48,6 +48,10 @@ def list_to_string(the_list,no_of_items:int):
         returnstr += str(_ + "\n")
     return returnstr
 
+def embed_generator(embedContents,thumbUrl,imgUrl):
+    pass
+
+
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'

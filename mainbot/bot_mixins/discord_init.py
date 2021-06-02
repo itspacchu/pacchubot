@@ -18,7 +18,7 @@ class DiscordInit:
         # self.client.remove_command('help')
         self.client.event(self.on_ready)
         self.client.event(self.on_message)
-        self.client.event(self.on_command_error)
+        #self.client.event(self.on_command_error)
 
         self.db = mongo_client['PacchuSlave']
         self.init_db()

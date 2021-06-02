@@ -35,7 +35,7 @@ class MusicMixin(DiscordInit, commands.Cog):
         await channel.connect()
 
 
-    @commands.command(pass_context=True, aliases=['p', 's'])
+    @commands.command(pass_context=True, aliases=['oldp', 'olds'])
     async def play(self, ctx, *, url="https://youtu.be/dQw4w9WgXcQ"):
         
         # DISABLED
@@ -65,7 +65,7 @@ class MusicMixin(DiscordInit, commands.Cog):
         embed.set_footer(text=self.name, icon_url=self.avatar)
         await ctx.reply(embed=embed)
 
-    @commands.command(pass_context=True, aliases=['pl'])
+    @commands.command(pass_context=True, aliases=['oldpl'])
     async def lofi(self, ctx, *, url="https://youtu.be/5qap5aO4i9A"):
         # DISABLED
         return
@@ -79,7 +79,7 @@ class MusicMixin(DiscordInit, commands.Cog):
         embed.set_footer(text=self.name, icon_url=self.avatar)
         await ctx.reply(embed=embed)
 
-    @commands.command(aliases=['podp'])
+    @commands.command(aliases=['oldpodp'])
     async def podplay(self,ctx,epno=0):   
         
         # DISABLED
@@ -109,7 +109,7 @@ class MusicMixin(DiscordInit, commands.Cog):
             except AttributeError:
                 await ctx.send("You aren't in voice channel m8")
 
-    @commands.command(aliases=['podcast'])
+    @commands.command(aliases=['oldpodcast'])
     async def pod(self,ctx , * , strparse = " "):    
         
         # DISABLED
@@ -200,7 +200,7 @@ class MusicMixin(DiscordInit, commands.Cog):
         if not voice_client.is_playing():
             voice_client.play(audio_source, after=None)
 
-    @commands.command(aliases=['fuckoff', 'dc' , 'disconnect'])
+    @commands.command(aliases=['oldfuckoff', 'olddc' , 'olddisconnect'])
     async def stop(self, ctx ):
         if(ctx.author.voice.channel):
             await ctx.message.add_reaction('👍')

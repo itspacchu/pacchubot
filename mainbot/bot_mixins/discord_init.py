@@ -46,8 +46,8 @@ class DiscordInit:
                 await message.channel.send(choice(self.perks['replies']['pings']))
         # try:
         qq = message.content.lower().split(' ')[0]
-        if(len(qq) >= 4 and qq != None):
-            query = {'search': {'$regex': f"(?:^|\W){qq}(?:$|\W)", '$options': 'i'}} #REGEX query for exact string math
+        if(len(qq) >= 3 and qq != None):
+            query = {'search': qq} # exact math here
             try:
                 match = self.MemberTaunt.find_one(query)['taunt']
                 await message.channel.send(match)

@@ -1,13 +1,16 @@
+# some cool self made api stuff
+
 import requests
 import json
 from datetime import datetime
+
 
 SESSION = requests.Session()
 ENDPOINT = "https://en.wikipedia.org/w/api.php"
 
 def fetch_potd(cur_date):
 	date_iso = cur_date.isoformat()
-	title = "Template:POTD_protected/" + date_iso
+	title = "Template:POTD_protected/" + date_iso[:10]
 
 	params = {
 	  "action": "query",
@@ -44,3 +47,5 @@ def fetch_image_src(filename):
 	image_info = page["imageinfo"][0]
 	image_url = image_info["url"]	
 	return image_url
+
+

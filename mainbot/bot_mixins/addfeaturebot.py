@@ -1,9 +1,9 @@
-from datetime import datetime
-from mainbot.core import wikipedia_api
+from datetime import datetime as dt
+from datetime import date
+from mainbot.core import wikipedia_api,nasabirthday_api
 from ..__imports__ import *
 from ..settings import *
 from .discord_init import DiscordInit
-
 
 class AdditionalFeatureMixin(DiscordInit, commands.Cog):
     @commands.command(aliases=['g'])
@@ -18,24 +18,42 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
             "reply": reply
         }
         self.gptDb.insert_one(dbStore)
-
-    @commands.command()
-    async def cartoonize(self, ctx):
-        attachment_url = ctx.message.attachments[0].url
-        filname = await cartoonize(attachment_url)
-        await ctx.send(file=discord.File(f'{filname}.png'))
         
-    @commands.command(aliases=['wpotd', 'potd'])
+    @commands.command(aliases=['wpotd', 'potd','wikipic'])
     async def wikipediapotd(self, ctx):
-        today_date = datetime.today()
-        print(today_date)
-        response = await wikipedia_api.fetch_potd(today_date)
-        embed = discord.Embed(title="Wikipedia Picture of the Day", colour=discord.Colour(0x6a5651), url=response['image_page'], description=response['filename'][6:])
+        today_date = dt.today()
+        await ctx.message.add_reaction('☀')
+        response = wikipedia_api.fetch_potd(today_date)
+        await asyncio.sleep(1)
+        embed = discord.Embed(title="Wikipedia Picture of the Day", colour=discord.Colour(0x6a5651), url=response['image_page_url'], description=response['filename'][6:])
         embed.set_image(url=response['image_src'])
-        embed.set_thumbnail(url="https://cdn.discordapp.com/embed/avatars/0.png")
-        embed.set_author(name=self.name, icon_url=self.avatar)
+        embed.set_author(name=self.name, icon_url=bot_avatar_url)
         embed.set_footer(text="Wikipedia API", icon_url="https://upload.wikimedia.org/wikipedia/en/thumb/8/80/Wikipedia-logo-v2.svg/220px-Wikipedia-logo-v2.svg.png")
         await ctx.send(embed=embed)
+
+    @commands.command(aliases=['hb', 'hubbleday'])
+    async def hubblebirthday(self, ctx , *date_ish):
+        await ctx.message.add_reaction('🔭')
+        if(len(date_ish) != 0):
+            date_ish = queryToName(date_ish)
+            try:
+                month,day = date_ish.split('-')
+                img = nasabirthday_api.get_birthday_image(month[1:].lower(), day)
+            except:
+                await ctx.reply("Is the date in proper format? ```MM-DD \n>> September-15```")
+                return None
+        else:
+            month, day = date.today().strftime("%B %d").lower().split(' ')
+            img = nasabirthday_api.get_birthday_image(month,day)
+        
+        embed = discord.Embed(colour=discord.Colour(0x4287f5))
+        embed.set_image(url=img["image-url"])
+        embed.set_author(name=self.name, icon_url=bot_avatar_url)
+        embed.set_footer(
+            text="NASA", icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/NASA_logo.svg/300px-NASA_logo.svg.png")
+        await ctx.send(embed=embed)
+
+
 
     @commands.command(pass_context=True, aliases=['q', 'que'])
     async def question(self, ctx, *lquery):

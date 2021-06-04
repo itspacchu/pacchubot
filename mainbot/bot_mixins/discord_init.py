@@ -15,7 +15,7 @@ class DiscordInit:
             self.client = client
         self.avatar = self_avatar
         self.name = self_name
-        # self.client.remove_command('help')
+        self.client.remove_command('help')
         self.client.event(self.on_ready)
         self.client.event(self.on_message)
         #self.client.event(self.on_command_error)
@@ -28,7 +28,7 @@ class DiscordInit:
         if not hasattr(self,'name'):
             self.name = self.client.user.name
         if not hasattr(self, 'avatar'):
-            self.avatar = self.client.user.avatar_url
+            self.avatar = "https://cdn.discordapp.com/attachments/715107506187272234/850379532459573288/pacslav.png"
         statustxt = "Questioning Universe now 🧠💥" #adding loop changing statuses
         activity = discord.Game(name=statustxt)
         if(self.client):
@@ -104,8 +104,14 @@ class BaseBot(DiscordInit, commands.Cog):
                         value="Searches for given Anime Charactor ", inline=True)
         embed.add_field(name=f"{self.pre}anipics/ap",
                         value="Searches for Images of given Anime Charactor", inline=True)
-        embed.add_field(
-            name=f"{self.pre}stats", value="partially implemented **bugs**", inline=False)
+        embed.add_field(name=f"{self.pre}cartoonize/ic @mention/file",
+                        value="Image Processing Cartoonize AI", inline=False)
+        embed.add_field(name=f"{self.pre}wikipic/wpotd",
+                        value="Fetches Wikipedia Picture of the Day", inline=False)
+        embed.add_field(name=f"{self.pre}hubbleday/hb",
+                        value="What Hubble saw on your birthday", inline=False)
+        
+        embed.add_field( name=f"{self.pre}stats", value="partially implemented **bugs**", inline=False)
         """
         embed.add_field(name=f"{self.pre}pod",
                         value="Podcast playback section", inline=False)
@@ -117,7 +123,7 @@ class BaseBot(DiscordInit, commands.Cog):
         
         embed.add_field(name=f"{self.pre}avatar @Pacchu / {self.pre}av @Pacchu",
                         value=f"Something of use atleast", inline=False)
-        embed.add_field(name=f"{self.pre}bruh [emote,link,text message]",
+        embed.add_field(name=f"{self.pre}bruh/sike [emote,link,text message]",
                         value=f"Something to be saved? idk why it an option", inline=False)
         embed.add_field(name=f"{self.pre}gpt \"Today is a wonderful..\"",
                         value="gpt neo text completion", inline=True)
@@ -175,29 +181,6 @@ class BaseBot(DiscordInit, commands.Cog):
             text=f" {self.client.user.name} {version}", icon_url=self.client.user.avatar_url)
         await ctx.reply(embed=embed)
 
-    @commands.command(aliases=['av', 'pic', 'dp'])
-    async def avatar(self, ctx, member: discord.Member = None):
-        """
-
-        """
-        hgp = member
-        await ctx.message.add_reaction('🙄')
-        if(ctx.message.author == hgp or hgp == None):
-            embed = discord.Embed(
-                title="OwO", description=f"{ctx.message.author.mention} steals ...wait thats your OWN", colour=discord.Colour(Discord_init_Color))
-            embed.set_image(url=ctx.message.author.avatar_url)
-        else:
-            embed = discord.Embed(
-                title="Swong..!", description=f"{ctx.message.author.mention} yeets {hgp.mention}'s profile pic 👀'", colour=discord.Colour(Discord_init_Color))
-            embed.set_image(url=hgp.avatar_url)
-        try:
-            embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
-        except:
-            embed.set_author(name=ctx.message.author.name,
-                             icon_url=ctx.message.author.avatar_url)
-        embed.set_footer(text=f"{self.client.user.name}",
-                         icon_url=self.client.user.avatar_url)
-        await ctx.reply(embed=embed)
 
 def setup(bot):
     bot.add_cog(BaseBot(bot))

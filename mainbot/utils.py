@@ -21,6 +21,11 @@ def __initiate_default_stats__(serverlist:dict,serverid:str):
         }
         }
 
+def hasNumbers(inputString):
+    return any(char.isdigit() for char in inputString)
+
+bot_avatar_url = "https://cdn.discordapp.com/attachments/715107506187272234/850379532459573288/pacslav.png"
+
 def __count_statistics__(serverlist:dict,serverid:str,stattitle:str):
     try:
         serverlist[serverid]['stats'][stattitle] += 1
@@ -51,6 +56,21 @@ def list_to_string(the_list,no_of_items:int):
 def embed_generator(embedContents,thumbUrl,imgUrl):
     pass
 
+def get_file_or_link(ctx,qlink=None):
+    try:
+        return ctx.message.attachments[0].url
+    except:
+        return queryToName(qlink)
+
+def better_send(ctx,content=None,embed=None,file=None):
+    try:
+        try:
+            return ctx.reply(content, embed=embed, file=file)
+        except:
+            return ctx.send(content, embed=embed, file=file)
+    except:
+        return ctx.send("Coudn't send the message.. something went wrong!!")
+        
 
 class bcolors:
     HEADER = '\033[95m'

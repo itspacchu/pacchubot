@@ -15,7 +15,7 @@ class DiscordInit:
             self.client = client
         self.avatar = self_avatar
         self.name = self_name
-        # self.client.remove_command('help')
+        self.client.remove_command('help')
         self.client.event(self.on_ready)
         self.client.event(self.on_message)
         self.client.event(self.on_command_error)
@@ -28,7 +28,7 @@ class DiscordInit:
         if not hasattr(self,'name'):
             self.name = self.client.user.name
         if not hasattr(self, 'avatar'):
-            self.avatar = self.client.user.avatar_url
+            self.avatar = "https://cdn.discordapp.com/attachments/715107506187272234/850379532459573288/pacslav.png"
         statustxt = "Questioning Universe now 🧠💥" #adding loop changing statuses
         activity = discord.Game(name=statustxt)
         if(self.client):
@@ -42,12 +42,12 @@ class DiscordInit:
             return
 
         for x in message.mentions:
-            if(x == self.client.user):
+            if(x == self.client.user and len(message.content) > 10):
                 await message.channel.send(choice(self.perks['replies']['pings']))
         # try:
         qq = message.content.lower().split(' ')[0]
-        if(len(qq) >= 4 and qq != None):
-            query = {'search': {'$regex': f"(?:^|\W){qq}(?:$|\W)", '$options': 'i'}} #REGEX query for exact string math
+        if(len(qq) >= 3 and qq != None):
+            query = {'search': qq} # exact math here
             try:
                 match = self.MemberTaunt.find_one(query)['taunt']
                 await message.channel.send(match)
@@ -77,6 +77,17 @@ class DiscordInit:
 class BaseBot(DiscordInit, commands.Cog):
 
     @commands.command()
+    async def ping(self,ctx):
+        await ctx.message.add_reaction('⌚')
+        embed = discord.Embed(colour=discord.Colour(0x27ce89))
+        embed.add_field(name="Latency", value=f"{round(self.client.latency,2)} ms")
+        embed.add_field(name="CPU", value=f"{round(psutil.cpu_freq().current/1024,2)}Ghz -- {round(psutil.cpu_percent(interval=0.1),2)}%")
+        embed.add_field(name="Memory", value=f'{round(psutil.virtual_memory().available/1024**2,2)} MB')
+        embed.add_field(name="Servers", value=f"Active in {str(len(self.client.guilds))} Servers", inline=True)
+        await better_send(ctx,embed=embed)
+        
+    
+    @commands.command()
     async def invite(self, ctx):
         await ctx.message.add_reaction('♥')
         embed = discord.Embed(title="Click here", url="https://discord.com/api/oauth2/authorize?client_id=709426015759368282&permissions=8&scope=bot",
@@ -104,8 +115,14 @@ class BaseBot(DiscordInit, commands.Cog):
                         value="Searches for given Anime Charactor ", inline=True)
         embed.add_field(name=f"{self.pre}anipics/ap",
                         value="Searches for Images of given Anime Charactor", inline=True)
-        embed.add_field(
-            name=f"{self.pre}stats", value="partially implemented **bugs**", inline=False)
+        embed.add_field(name=f"{self.pre}cartoonize/ic @mention/file",
+                        value="Image Processing Cartoonize AI", inline=False)
+        embed.add_field(name=f"{self.pre}wikipic/wpotd",
+                        value="Fetches Wikipedia Picture of the Day", inline=False)
+        embed.add_field(name=f"{self.pre}hubbleday/hb",
+                        value="What Hubble saw on your birthday", inline=False)
+        
+        embed.add_field( name=f"{self.pre}stats", value="partially implemented **bugs**", inline=False)
         """
         embed.add_field(name=f"{self.pre}pod",
                         value="Podcast playback section", inline=False)
@@ -117,7 +134,7 @@ class BaseBot(DiscordInit, commands.Cog):
         
         embed.add_field(name=f"{self.pre}avatar @Pacchu / {self.pre}av @Pacchu",
                         value=f"Something of use atleast", inline=False)
-        embed.add_field(name=f"{self.pre}bruh [emote,link,text message]",
+        embed.add_field(name=f"{self.pre}bruh/sike [emote,link,text message]",
                         value=f"Something to be saved? idk why it an option", inline=False)
         embed.add_field(name=f"{self.pre}gpt \"Today is a wonderful..\"",
                         value="gpt neo text completion", inline=True)
@@ -175,29 +192,6 @@ class BaseBot(DiscordInit, commands.Cog):
             text=f" {self.client.user.name} {version}", icon_url=self.client.user.avatar_url)
         await ctx.reply(embed=embed)
 
-    @commands.command(aliases=['av', 'pic', 'dp'])
-    async def avatar(self, ctx, member: discord.Member = None):
-        """
-
-        """
-        hgp = member
-        await ctx.message.add_reaction('🙄')
-        if(ctx.message.author == hgp or hgp == None):
-            embed = discord.Embed(
-                title="OwO", description=f"{ctx.message.author.mention} steals ...wait thats your OWN", colour=discord.Colour(Discord_init_Color))
-            embed.set_image(url=ctx.message.author.avatar_url)
-        else:
-            embed = discord.Embed(
-                title="Swong..!", description=f"{ctx.message.author.mention} yeets {hgp.mention}'s profile pic 👀'", colour=discord.Colour(Discord_init_Color))
-            embed.set_image(url=hgp.avatar_url)
-        try:
-            embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
-        except:
-            embed.set_author(name=ctx.message.author.name,
-                             icon_url=ctx.message.author.avatar_url)
-        embed.set_footer(text=f"{self.client.user.name}",
-                         icon_url=self.client.user.avatar_url)
-        await ctx.reply(embed=embed)
 
 def setup(bot):
     bot.add_cog(BaseBot(bot))

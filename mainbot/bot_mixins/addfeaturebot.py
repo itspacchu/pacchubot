@@ -1,7 +1,10 @@
+from datetime import datetime as dt
+from datetime import date
+#from typing_extensions import Unpack
+from mainbot.core import wikipedia_api,nasabirthday_api
 from ..__imports__ import *
 from ..settings import *
 from .discord_init import DiscordInit
-
 
 class AdditionalFeatureMixin(DiscordInit, commands.Cog):
     @commands.command(aliases=['g'])
@@ -16,12 +19,58 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
             "reply": reply
         }
         self.gptDb.insert_one(dbStore)
+        
+    @commands.command(aliases=['wpotd', 'potd','wikipic'])
+    async def wikipediapotd(self, ctx , *qdate):
+        try:
+            qdate = queryToName(qdate)
+            if(qdate):
+                qdate = list(map(int,qdate.split('-'))) ## DD-MM-YY
+                today_date = dt(qdate[2],qdate[1],qdate[0])
+            else:
+                today_date = dt.today()
+            try:
+                await ctx.message.add_reaction('☀')
+                response = wikipedia_api.fetch_potd(today_date)
+                color = find_dominant_color(response['image_src'])
+                embed = discord.Embed(title="Wikipedia Picture of the Day", colour=color, url=response['image_page_url'], description=response['filename'][6:])
+                embed.set_image(url=response['image_src'])
+            except:
+                embed = discord.Embed(title="No Image Found", colour=discord.Colour(
+                    0x6a5651), description=f"Wikipedia Doesn't have an image of the day on {qdate[0]} - {qdate[1]} - {qdate[2]}")
+            
+            embed.set_author(name=self.name, icon_url=bot_avatar_url)
+            embed.set_footer(
+                text="Wikipedia", icon_url="https://upload.wikimedia.org/wikipedia/en/thumb/8/80/Wikipedia-logo-v2.svg/220px-Wikipedia-logo-v2.svg.png")
+            await ctx.send(embed=embed)
+        except ValueError:
+            await ctx.message.add_reaction('‼')
+            await ctx.reply("Is the date in proper format? ```DD-MM-YYYY \n>> 15-09-2001```")
 
-    @commands.command()
-    async def cartoonize(self, ctx):
-        attachment_url = ctx.message.attachments[0].url
-        filname = await cartoonize(attachment_url)
-        await ctx.send(file=discord.File(f'{filname}.png'))
+    @commands.command(aliases=['hb', 'hubbleday'])
+    async def hubblebirthday(self, ctx , *date_ish):
+        await ctx.message.add_reaction('🔭')
+        if(len(date_ish) != 0):
+            date_ish = queryToName(date_ish)
+            try:
+                month,day = date_ish.split('-')
+                img = nasabirthday_api.get_birthday_image(month[1:].lower(), day)
+            except:
+                await ctx.message.add_reaction('‼')
+                await ctx.reply("Is the date in proper format? ```\n>> September-15```")
+                return None
+        else:
+            month, day = date.today().strftime("%B %d").lower().split(' ')
+            img = nasabirthday_api.get_birthday_image(month,day)
+        color = find_dominant_color(img["image-url"])
+        embed = discord.Embed(colour=color)
+        embed.set_image(url=img["image-url"])
+        embed.set_author(name=self.name, icon_url=bot_avatar_url)
+        embed.set_footer(
+            text="NASA", icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/NASA_logo.svg/300px-NASA_logo.svg.png")
+        await ctx.send(embed=embed)
+
+
 
     @commands.command(pass_context=True, aliases=['q', 'que'])
     async def question(self, ctx, *lquery):
@@ -70,7 +119,7 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
             for activity in user.activities:
                 if isinstance(activity, discord.Spotify):
                     embed = discord.Embed(title=f"{user.name}'s Spotify", description="Listening to {}".format(
-                        activity.title), color=0x1DB954)
+                        activity.title), color=find_dominant_color(activity.album_cover_url))
                     embed.set_thumbnail(url=activity.album_cover_url)
                     embed.add_field(name="Artist", value=activity.artist)
                     await ctx.reply(embed=embed)

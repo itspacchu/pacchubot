@@ -18,7 +18,7 @@ def gptquery(text_in:str):
         try:
             return json.loads(response.content.decode("utf-8"))[0]["generated_text"].replace("\n", ' ').replace('"', '').replace("  ", "")
         except:
-            return choice(perks['replies']['gpterror'])
+            return choice(perks.perkdict['replies']['gpterror'])
 
 def codept(text_in:str):
     response = requests.request("POST", CPT_URL, headers=headers, data=text_in)
@@ -28,18 +28,22 @@ def codept(text_in:str):
         try:
             return json.loads(response.content.decode("utf-8"))[0]["generated_text"].replace("\n", ' ').replace('"', '').replace("  ", "")
         except:
-            return choice(perks['replies']['gpterror'])
+            return choice(perks.perkdict['replies']['gpterror'])
 
 def questionreply(text_in: str):
     response = requests.request("POST", Q_URL, headers=headers, data=text_in)
     try:
         return json.loads(response.content.decode("utf-8"))[0]["generated_text"]
     except:
-        return choice(perks['replies']['gpterror'])
+        return choice(perks.perkdict['replies']['gpterror'])
 
 def rawgptquery(text_in:str):
     response = requests.request("POST", API_URL, headers=headers, data=text_in)
     return json.loads(response.content.decode("utf-8"))[0]
 
-gptquery('ogga')
-questionreply('ogga')
+def sanitize(text_in:str):
+    return text_in.replace(',',' ').replace("\n",' ').replace("[",' ').replace(']',' ')
+
+
+"""gptquery('ogga')
+questionreply('ogga')"""

@@ -117,15 +117,10 @@ class Song:
         self.requester = source.requester
 
     def create_embed(self):
-        embed = (discord.Embed(title='Now playing',
-                               description='```css\n{0.source.title}\n```'.format(self),
-                               color=discord.Color.blurple())
-                 .add_field(name='Duration', value=self.source.duration)
-                 .add_field(name='Requested by', value=self.requester.mention)
-                 .add_field(name='Uploader', value='[{0.source.uploader}]({0.source.uploader_url})'.format(self))
-                 .add_field(name='URL', value='[Click]({0.source.url})'.format(self))
-                 .set_thumbnail(url=self.source.thumbnail))
-
+        embed = discord.Embed(title="{0.source.title}".format(self), colour=discord.Colour(0x30ff93), url="{0.source.url}".format(self), description=f"Now playing {self.source.duration}")
+        embed.set_thumbnail(url=self.source.thumbnail)
+        embed.set_author(name=self.requester.nick,icon_url=self.requester.avatar_url)
+        embed.add_field(name="By", value="{0.source.uploader}".format(self))
         return embed
 
 
@@ -290,7 +285,7 @@ class Music(commands.Cog):
 
         ctx.voice_state.voice = await destination.connect()
 
-    @commands.command(name='leave', aliases=['disconnect'])
+    @commands.command(name='leave', aliases=['lv', 'sudofuckoff'])
     @commands.has_permissions(manage_guild=True)
     async def _leave(self, ctx: commands.Context):
         """Clears the queue and leaves the voice channel."""
@@ -301,7 +296,7 @@ class Music(commands.Cog):
         await ctx.voice_state.stop()
         del self.voice_states[ctx.guild.id]
 
-    @commands.command(name='volume')
+    @commands.command(name='volume',aliases=['vol'])
     async def _volume(self, ctx: commands.Context, *, volume: int):
         """Sets the volume of the player."""
 
@@ -314,14 +309,13 @@ class Music(commands.Cog):
         ctx.voice_state.volume = volume / 100
         await ctx.send('Volume of the player set to {}%'.format(volume))
 
-    @commands.command(name='now', aliases=['current', 'playing'])
+    @commands.command(name='now', aliases=['np', 'nowplaying'])
     async def _now(self, ctx: commands.Context):
         """Displays the currently playing song."""
 
         await ctx.send(embed=ctx.voice_state.current.create_embed())
 
-    @commands.command(name='pause')
-    @commands.has_permissions(manage_guild=True)
+    @commands.command(name='ppa',aliases=['pause'])
     async def _pause(self, ctx: commands.Context):
         """Pauses the currently playing song."""
 
@@ -329,8 +323,7 @@ class Music(commands.Cog):
             ctx.voice_state.voice.pause()
             await ctx.message.add_reaction('⏯')
 
-    @commands.command(name='resume')
-    @commands.has_permissions(manage_guild=True)
+    @commands.command(name='pr',aliases=['resume'])
     async def _resume(self, ctx: commands.Context):
         """Resumes a currently paused song."""
 
@@ -338,8 +331,7 @@ class Music(commands.Cog):
             ctx.voice_state.voice.resume()
             await ctx.message.add_reaction('⏯')
 
-    @commands.command(name='stop', aliases=['fuckoff', 'dc' , 'disconnect'])
-    @commands.has_permissions(manage_guild=True)
+    @commands.command(name='stop', aliases=['dc','disconnect'])
     async def _stop(self, ctx: commands.Context):
         """Stops playing song and clears the queue."""
 
@@ -349,7 +341,7 @@ class Music(commands.Cog):
             ctx.voice_state.voice.stop()
             await ctx.message.add_reaction('⏹')
 
-    @commands.command(name='skip')
+    @commands.command(name='skip',aliases=['psk'])
     async def _skip(self, ctx: commands.Context):
         """Vote to skip a song. The requester can automatically skip.
         3 skip votes are needed for the song to be skipped.
@@ -365,18 +357,12 @@ class Music(commands.Cog):
 
         elif voter.id not in ctx.voice_state.skip_votes:
             ctx.voice_state.skip_votes.add(voter.id)
-            total_votes = len(ctx.voice_state.skip_votes)
+            total_votes = len(ctx.voice_state.skip_votes) 
+            await ctx.message.add_reaction('⏭')
+            ctx.voice_state.skip()
 
-            if total_votes >= 3:
-                await ctx.message.add_reaction('⏭')
-                ctx.voice_state.skip()
-            else:
-                await ctx.send('Skip vote added, currently at **{}/3**'.format(total_votes))
 
-        else:
-            await ctx.send('You have already voted to skip this song.')
-
-    @commands.command(name='queue')
+    @commands.command(name='queue',aliases=['pq'])
     async def _queue(self, ctx: commands.Context, *, page: int = 1):
         """Shows the player's queue.
         You can optionally specify the page to show. Each page contains 10 elements.
@@ -399,7 +385,7 @@ class Music(commands.Cog):
                  .set_footer(text='Viewing page {}/{}'.format(page, pages)))
         await ctx.send(embed=embed)
 
-    @commands.command(name='shuffle')
+    @commands.command(name='shuffle',aliases=['psh'])
     async def _shuffle(self, ctx: commands.Context):
         """Shuffles the queue."""
 
@@ -409,7 +395,7 @@ class Music(commands.Cog):
         ctx.voice_state.songs.shuffle()
         await ctx.message.add_reaction('✅')
 
-    @commands.command(name='remove')
+    @commands.command(name='remove',aliases=['rm'])
     async def _remove(self, ctx: commands.Context, index: int):
         """Removes a song from the queue at a given index."""
 
@@ -419,28 +405,33 @@ class Music(commands.Cog):
         ctx.voice_state.songs.remove(index - 1)
         await ctx.message.add_reaction('✅')
 
-    @commands.command(name='loop')
+    @commands.command(name='loop',aliases=['plp'])
     async def _loop(self, ctx: commands.Context):
         """Loops the currently playing song.
         Invoke this command again to unloop the song.
         """
 
         if not ctx.voice_state.is_playing:
-            return await ctx.send('Nothing being played at the moment.')
+            return await ctx.send('Nothin\'s playin right now')
 
         # Inverse boolean value to loop and unloop.
         ctx.voice_state.loop = not ctx.voice_state.loop
         await ctx.message.add_reaction('✅')
 
     @commands.command(name='play',  aliases=['p', 's'])
-    async def _play(self, ctx: commands.Context, *, search: str):
+    async def _play(self, ctx: commands.Context, *, search="https://youtu.be/dQw4w9WgXcQ"):
         """Plays a song.
         If there are songs in the queue, this will be queued until the
         other songs finished playing.
         This command automatically searches from various sites if no URL is provided.
         A list of these sites can be found here: https://rg3.github.io/youtube-dl/supportedsites.html
         """
-
+        if(str(search) == "https://youtu.be/dQw4w9WgXcQ"):
+            embed = discord.Embed(title="You need to give a url!", colour=discord.Colour(
+                0xff5065), url="https://youtu.be/dQw4w9WgXcQ", description="Get Rolled")
+            embed.set_image(url="https://i.imgur.com/xrBXtFh.png")
+            await ctx.send(embed=embed)
+                    
         if not ctx.voice_state.voice:
             await ctx.invoke(self._join)
 
@@ -448,15 +439,34 @@ class Music(commands.Cog):
             try:
                 source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
             except YTDLError as e:
-                await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
+                await ctx.send('Something somewhere somehow went wrong processing >> {}'.format(str(e)))
+            else:
+                song = Song(source)
+                await ctx.voice_state.songs.put(song)
+                await ctx.send('Added {}'.format(str(source)))
+    
+    @commands.command(name='playlofi',  aliases=['plf'])
+    async def _playlofi(self, ctx: commands.Context, *, search="https://www.youtube.com/watch?v=5qap5aO4i9A"):
+        """Lofi baby
+        """
+        search = "https://www.youtube.com/watch?v=5qap5aO4i9A"
+        if not ctx.voice_state.voice:
+            await ctx.invoke(self._join)
+
+        async with ctx.typing():
+            try:
+                source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
+            except YTDLError as e:
+                await ctx.send('Something somewhere somehow went wrong processing >> {}'.format(str(e)))
             else:
                 song = Song(source)
 
                 await ctx.voice_state.songs.put(song)
-                await ctx.send('Enqueued {}'.format(str(source)))
+                await ctx.send('Added {}'.format(str(source)))
 
     @_join.before_invoke
     @_play.before_invoke
+    @_playlofi.before_invoke
     async def ensure_voice_state(self, ctx: commands.Context):
         if not ctx.author.voice or not ctx.author.voice.channel:
             raise commands.CommandError('You are not connected to any voice channel.')

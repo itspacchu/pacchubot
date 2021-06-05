@@ -2,7 +2,34 @@ from ..__imports__ import *
 from ..settings import *
 from .discord_init import DiscordInit
 
+Discord_init_Color = 0xffbb54
+
 class InteractionsMixin(DiscordInit, commands.Cog):
+    
+    @commands.command(aliases=['av', 'pic', 'dp'])
+    async def avatar(self, ctx, member: discord.Member = None):
+        """
+
+        """
+        hgp = member
+        await ctx.message.add_reaction('🙄')
+        if(ctx.message.author == hgp or hgp == None):
+            embed = discord.Embed(
+                title="OwO", description=f"{ctx.message.author.mention} steals ...wait thats your OWN", colour=find_dominant_color(ctx.message.author.avatar_url))
+            embed.set_image(url=ctx.message.author.avatar_url)
+        else:
+            embed = discord.Embed(
+                title="Swong..!", description=f"{ctx.message.author.mention} yeets {hgp.mention}'s profile pic 👀'", colour=find_dominant_color(hgp.avatar_url))
+            embed.set_image(url=hgp.avatar_url)
+        try:
+            embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
+        except:
+            embed.set_author(name=ctx.message.author.name,
+                             icon_url=ctx.message.author.avatar_url)
+        embed.set_footer(text=f"{self.client.user.name}",
+                         icon_url=self.client.user.avatar_url)
+        await better_send(ctx,embed=embed)
+    
     @commands.command()
     async def hug(self,ctx, member: discord.Member):
         hgp = member
@@ -70,10 +97,7 @@ class InteractionsMixin(DiscordInit, commands.Cog):
 
     @commands.command(aliases=['sk'])
     async def sike(self, ctx, *qlink):
-        try:
-            link = ctx.message.attachments[0].url
-        except:
-            link = queryToName(qlink)
+        link = get_file_or_link(ctx, qlink)
         if(ctx.message.guild == None):
             await ctx.reply("This is a dm tho? try it in a server m8")
         else:
@@ -119,7 +143,7 @@ class InteractionsMixin(DiscordInit, commands.Cog):
     
     @commands.command(aliases=['br'])
     async def bruh(self,ctx, *qlink):
-        link = queryToName(qlink)
+        link = get_file_or_link(ctx,qlink)
         if(ctx.message.guild == None):
             await ctx.reply("This is a dm tho? try it in a server m8")
         else:

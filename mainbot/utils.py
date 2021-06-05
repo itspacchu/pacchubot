@@ -13,19 +13,24 @@ import urllib3,os
 import requests
 
 def find_dominant_color(imageurl:str):
-    NUM_CLUSTERS = 10
-    im = Image.open(requests.get(imageurl, stream=True).raw)
-    im = im.resize((20, 20))      # optional, to reduce time
-    ar = np.asarray(im)
-    shape = ar.shape
-    ar = ar.reshape(scipy.product(shape[:2]), shape[2]).astype(float)
-    codes, dist = scipy.cluster.vq.kmeans(ar, NUM_CLUSTERS)
-    vecs, dist = scipy.cluster.vq.vq(ar, codes)        
-    counts, bins = scipy.histogram(vecs, len(codes))   
-    index_max = scipy.argmax(counts)                   
-    peak = codes[index_max]
-    colour = binascii.hexlify(bytearray(int(c) for c in peak)).decode('ascii')
-    return int(hex(int(colour, 16)), 0)
+    try:
+        NUM_CLUSTERS = 10
+        im = Image.open(requests.get(imageurl, stream=True).raw)
+        im = im.resize((20, 20))      # optional, to reduce time
+        ar = np.asarray(im)
+        shape = ar.shape
+        ar = ar.reshape(scipy.product(shape[:2]), shape[2]).astype(float)
+        codes, dist = scipy.cluster.vq.kmeans(ar, NUM_CLUSTERS)
+        vecs, dist = scipy.cluster.vq.vq(ar, codes)        
+        counts, bins = scipy.histogram(vecs, len(codes))   
+        index_max = scipy.argmax(counts)                   
+        peak = codes[index_max]
+        colour = binascii.hexlify(bytearray(int(c) for c in peak)).decode('ascii')
+        if(int(colour) > 16777215):
+            return  0xff54f9
+        return int(hex(int(colour, 16)), 0)
+    except:
+        return 0xff54f9
 
 def __initiate_default_stats__(serverlist:dict,serverid:str):
     serverlist[serverid] = {

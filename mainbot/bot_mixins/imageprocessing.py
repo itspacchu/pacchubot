@@ -38,7 +38,7 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
         downloadFileFromUrl(dlink, filname)
         s.close()
         file = discord.File(filname + '.png',filename="cartoonized_img.png")
-        embed = discord.Embed()
+        embed = discord.Embed(color=find_dominant_color(dlink))
         embed.set_image(url="attachment://cartoonized_img.png")
         try:
             await ctx.send(file=file,embed=embed)

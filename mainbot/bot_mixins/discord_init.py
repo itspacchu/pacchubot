@@ -18,7 +18,7 @@ class DiscordInit:
         self.client.remove_command('help')
         self.client.event(self.on_ready)
         self.client.event(self.on_message)
-        #self.client.event(self.on_command_error)
+        self.client.event(self.on_command_error)
 
         self.db = mongo_client['PacchuSlave']
         self.init_db()
@@ -42,7 +42,7 @@ class DiscordInit:
             return
 
         for x in message.mentions:
-            if(x == self.client.user):
+            if(x == self.client.user and len(message.content) > 10):
                 await message.channel.send(choice(self.perks['replies']['pings']))
         # try:
         qq = message.content.lower().split(' ')[0]
@@ -76,6 +76,17 @@ class DiscordInit:
 
 class BaseBot(DiscordInit, commands.Cog):
 
+    @commands.command()
+    async def ping(self,ctx):
+        await ctx.message.add_reaction('⌚')
+        embed = discord.Embed(colour=discord.Colour(0x27ce89))
+        embed.add_field(name="Latency", value=f"{round(self.client.latency,2)} ms")
+        embed.add_field(name="CPU", value=f"{round(psutil.cpu_freq().current/1024,2)}Ghz -- {round(psutil.cpu_percent(interval=0.1),2)}%")
+        embed.add_field(name="Memory", value=f'{round(psutil.virtual_memory().available/1024**2,2)} MB')
+        embed.add_field(name="Servers", value=f"Active in {str(len(self.client.guilds))} Servers", inline=True)
+        await better_send(ctx,embed=embed)
+        
+    
     @commands.command()
     async def invite(self, ctx):
         await ctx.message.add_reaction('♥')

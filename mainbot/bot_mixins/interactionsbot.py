@@ -15,11 +15,11 @@ class InteractionsMixin(DiscordInit, commands.Cog):
         await ctx.message.add_reaction('🙄')
         if(ctx.message.author == hgp or hgp == None):
             embed = discord.Embed(
-                title="OwO", description=f"{ctx.message.author.mention} steals ...wait thats your OWN", colour=discord.Colour(Discord_init_Color))
+                title="OwO", description=f"{ctx.message.author.mention} steals ...wait thats your OWN", colour=find_dominant_color(ctx.message.author.avatar_url))
             embed.set_image(url=ctx.message.author.avatar_url)
         else:
             embed = discord.Embed(
-                title="Swong..!", description=f"{ctx.message.author.mention} yeets {hgp.mention}'s profile pic 👀'", colour=discord.Colour(Discord_init_Color))
+                title="Swong..!", description=f"{ctx.message.author.mention} yeets {hgp.mention}'s profile pic 👀'", colour=find_dominant_color(hgp.avatar_url))
             embed.set_image(url=hgp.avatar_url)
         try:
             embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)

@@ -1,4 +1,32 @@
 #deprecated by mongo db ill remove it later
+
+from __future__ import print_function
+import binascii
+import struct
+from PIL import Image
+from discord import colour
+import numpy as np
+import scipy
+import scipy.misc
+import scipy.cluster
+import urllib3,os
+import requests
+
+def find_dominant_color(imageurl:str):
+    NUM_CLUSTERS = 10
+    im = Image.open(requests.get(imageurl, stream=True).raw)
+    im = im.resize((20, 20))      # optional, to reduce time
+    ar = np.asarray(im)
+    shape = ar.shape
+    ar = ar.reshape(scipy.product(shape[:2]), shape[2]).astype(float)
+    codes, dist = scipy.cluster.vq.kmeans(ar, NUM_CLUSTERS)
+    vecs, dist = scipy.cluster.vq.vq(ar, codes)        
+    counts, bins = scipy.histogram(vecs, len(codes))   
+    index_max = scipy.argmax(counts)                   
+    peak = codes[index_max]
+    colour = binascii.hexlify(bytearray(int(c) for c in peak)).decode('ascii')
+    return int(hex(int(colour, 16)), 0)
+
 def __initiate_default_stats__(serverlist:dict,serverid:str):
     serverlist[serverid] = {
         'emoji':'🌊',

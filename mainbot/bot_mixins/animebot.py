@@ -1,3 +1,4 @@
+from discord.utils import find
 from ..__imports__ import *
 from ..settings import *
 
@@ -46,11 +47,13 @@ class AnimeMixin(DiscordInit, commands.Cog):
         global ani, http
         charQuery = queryToName(Query)
         try:
+            
             await ctx.message.add_reaction('🔍')
             charid = ani.search('character', charQuery)['results'][0]
             url = f"https://api.jikan.moe/v3/character/{charid['mal_id']}/pictures"
             picdat = json.loads(http.request('GET', url).data.decode())['pictures']
-            embed = discord.Embed(title=f"_{charid['name']}_", colour=discord.Colour(Anime_Embed_color), url=charid['url'])
+            color = find_dominant_color(choice(picdat)['large'])
+            embed = discord.Embed(title=f"_{charid['name']}_", colour=color, url=charid['url'])
             embed.set_image(url=choice(picdat)['large'])
             embed.set_footer(text=f"Search for full title for more accurate results",icon_url=self.client.user.avatar_url)
             await ctx.reply(embed=embed)
@@ -65,22 +68,27 @@ class AnimeMixin(DiscordInit, commands.Cog):
     @commands.command(aliases=['ani', 'anim'])
     async def anime(self,ctx, *Query):
         global  ani
-        animeQuery = queryToName(Query)
+        animeQuery = queryToName(Query).strip()
         dbStore = {
             "charname": animeQuery,
             "username": ctx.message.author.name,
         }
         self.animeSearch.insert_one(dbStore)
         try:
-            await ctx.message.add_reaction('🔍')
-            asrc = ani.search('anime', animeQuery)['results'][0]
+            try:
+                await ctx.message.add_reaction('🔍')
+                asrc = ani.search('anime', animeQuery)['results'][0]
+            except:
+                await ctx.message.add_reaction('🔍')
+                asrc = ani.search('anime', animeQuery)['results'][1]
             mal_id = asrc['mal_id']
             more_info = ani.anime(mal_id)
             trailer_url = more_info['trailer_url']
             if(not trailer_url == None):
                 embed = discord.Embed(title=more_info['title'], url=str(more_info['trailer_url']), description="Youtube", color=Anime_Embed_color)
             else:
-                embed = discord.Embed(title=more_info['title'], description="No Trailer available", color=Anime_Embed_color)
+                embed = discord.Embed(
+                    title=more_info['title'], description="No Trailer available", color=find_dominant_color(asrc['image_url']))
             try:
                 embed.set_author(name=more_info['title_japanese'], url=asrc['url'])
             except:
@@ -89,51 +97,55 @@ class AnimeMixin(DiscordInit, commands.Cog):
                 embed.set_image(url=asrc['image_url'])
             except:
                 pass
-            embed.set_thumbnail(url=asrc['image_url'])
-            embed.add_field(name="Studio", value=str(more_info['studios'][0]['name']), inline=True)
-            embed.add_field(name="Started Airing",value=f"{asrc['start_date'][:10]}", inline=True)
-            embed.add_field(name="Rating", value=f"{asrc['score']}/10", inline=True)
-            embed.add_field(name="Synopsis", value=str(more_info['synopsis'][:512])+'...', inline=False)
-            embed.add_field(name="Episodes", value=str(asrc['episodes']), inline=False)
-            embed.add_field(name="Views", value=str(asrc['members']), inline=True)
-            embed.add_field(name="Rated", value=str(asrc['rated']), inline=True)
-            embed.add_field(name="Openings", value=list_to_string(more_info['opening_themes'], 4), inline=False)
-            embed.add_field(name="Endings", value=list_to_string(more_info['ending_themes'], 4), inline=False)
+            try:
+                embed.add_field(name="Studio", value=str(more_info['studios'][0]['name']) + " ", inline=True)
+            except:
+                pass
+            try:
+                embed.add_field(name="Started Airing",value=f"{asrc['start_date'][:10]} ", inline=True)
+            except:
+                pass
+            try:
+                embed.add_field(name="Rating", value=f"{asrc['score']}/10 ", inline=True)
+            except:
+                pass
+            try:
+                embed.add_field(name="Synopsis", value=str(more_info['synopsis'][:512])+'...', inline=False)
+            except:
+                pass
+            try:
+                embed.add_field(name="Episodes", value=str(
+                    asrc['episodes']) + " ", inline=False)
+            except:
+                pass
+            try:
+                embed.add_field(name="Views", value=str(
+                    asrc['members']) + " ", inline=True)
+            except:
+                pass
+            try:
+                embed.add_field(name="Rated", value=str(
+                    asrc['rated']) + " ", inline=True)
+            except:
+                pass
+            try:
+                if(more_info['opening_themes']):
+                    embed.add_field(name="Openings", value=list_to_string(more_info['opening_themes'], 4) + " ", inline=False)
+            except:
+                pass
+            try:
+                if(more_info['ending_themes']):
+                    embed.add_field(name="Endings", value=list_to_string(more_info['ending_themes'], 4) + " ", inline=False)
+            except:
+                pass
             embed.set_footer(text=f"Search for full title for more accurate results", icon_url=self.avatar)
             await ctx.send(embed=embed)
-        except:
-            try:
-                await ctx.message.add_reaction('🔍')
-                asrc = ani.search('anime', animeQuery)['results'][1]
-                mal_id = asrc['mal_id']
-                more_info = ani.anime(mal_id)
-                trailer_url = more_info['trailer_url']
-                if(not trailer_url == None):
-                    embed = discord.Embed(title=more_info['title'], url=str(more_info['trailer_url']), description="Youtube", color=Anime_Embed_color)
-                else:
-                    embed = discord.Embed(title=more_info['title'], description="No Trailer available", color=0x6bffb8)
-                try:
-                    embed.set_author(name=more_info['title_japanese'], url=asrc['url'])
-                except:
-                    embed.set_author(name=asrc['title'], url=asrc['url'])
-                embed.set_thumbnail(url=asrc['image_url'])
-                embed.add_field(name="Studio", value=str(more_info['studios'][0]['name']), inline=True)
-                embed.add_field(name="Started Airing",value=f"{asrc['start_date'][:10]}", inline=True)
-                embed.add_field(name="Rating", value=f"{asrc['score']}/10", inline=True)
-                embed.add_field(name="Synopsis", value=str(more_info['synopsis'][:512])+'...', inline=False)
-                embed.add_field(name="Episodes", value=str(asrc['episodes']), inline=False)
-                embed.add_field(name="Views", value=str(asrc['members']), inline=True)
-                embed.add_field(name="Rated", value=str(asrc['rated']), inline=True)
-                embed.add_field(name="Openings", value=list_to_string(more_info['opening_themes'], 4), inline=False)
-                embed.add_field(name="Endings", value=list_to_string(more_info['ending_themes'], 4), inline=False)
-                embed.set_footer(text=f"Search for full title for more accurate results", icon_url=self.avatar)
-                await ctx.send(embed=embed)
-            except:
-                await ctx.message.add_reaction('😭')
-                embed = discord.Embed(color=0xff0000)
-                embed.add_field(name="Anime Not Found", value="That Anime is not found on MAL", inline=False)
-                embed.set_footer(text=self.name, icon_url=self.avatar)
-                await ctx.send(embed=embed)
+        except KeyError:
+            await ctx.message.add_reaction('😭')
+            embed = discord.Embed(color=0xff0000)
+            embed.add_field(name="Anime Not Found", value="That Anime is not found on MAL", inline=False)
+            embed.set_footer(text=self.name, icon_url=self.avatar)
+            await ctx.send(embed=embed)
 
 
     @commands.command(aliases=['man', 'm'])
@@ -148,10 +160,12 @@ class AnimeMixin(DiscordInit, commands.Cog):
         try:
             await ctx.message.add_reaction('🔍')
             asrc = ani.search('manga', mangaQuery)['results'][0]
-
+            try:
+                color = find_dominant_color(asrc['image_url'])
+            except:
+                color = Anime_Embed_color
             embed = discord.Embed(title="Manga Search result", description=asrc['mal_id'], color=Anime_Embed_color)
             embed.set_author(name=asrc['title'], url=asrc['url'])
-            embed.set_thumbnail(url=asrc['image_url'])
             embed.add_field(name="Publishing",value=f"{asrc['start_date'][:10]}", inline=False)
             embed.add_field(name="Rating", value=f"{int(asrc['score'])}/10", inline=False)
             embed.add_field(name="Summary", value=asrc['synopsis'], inline=False)

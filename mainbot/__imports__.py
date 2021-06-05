@@ -1,5 +1,6 @@
 # IMPORTS
 from abc import ABC
+import psutil
 import re
 import os
 import requests

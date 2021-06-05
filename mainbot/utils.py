@@ -16,7 +16,7 @@ def find_dominant_color(imageurl:str):
     try:
         NUM_CLUSTERS = 10
         im = Image.open(requests.get(imageurl, stream=True).raw)
-        im = im.resize((20, 20))      # optional, to reduce time
+        im = im.resize((25, 25))      # optional, to reduce time
         ar = np.asarray(im)
         shape = ar.shape
         ar = ar.reshape(scipy.product(shape[:2]), shape[2]).astype(float)
@@ -26,33 +26,12 @@ def find_dominant_color(imageurl:str):
         index_max = scipy.argmax(counts)                   
         peak = codes[index_max]
         colour = binascii.hexlify(bytearray(int(c) for c in peak)).decode('ascii')
-        if(int(colour) > 16777215):
-            return  0xff54f9
-        return int(hex(int(colour, 16)), 0)
-    except:
-        return 0xff54f9
-
-def __initiate_default_stats__(serverlist:dict,serverid:str):
-    serverlist[serverid] = {
-        'emoji':'🌊',
-        'debug':0,
-        'bruh':'https://media.discordapp.net/attachments/760741167876538419/760744075132534784/DeepFryer_20200930_113458.jpg?width=448&height=518',
-        'prefix' : '',
-        'stats': {
-            'bot_summons':0,
-            'ecchi_command':0,
-            'hugs':0,
-            'pats':0,
-            'kiss':0,
-            'kills':0,
-            'anipics':0,
-            'anime':0,
-            'manga':0,
-            'echos':0,
-            'bruhs':0,
-            'nice':0
-        }
-        }
+        try:
+            return int(hex(int(colour, 16))[:8], 0)
+        except:
+            return  0xffffff
+    except IndexError:
+        return 0xffffff
 
 def hasNumbers(inputString):
     return any(char.isdigit() for char in inputString)

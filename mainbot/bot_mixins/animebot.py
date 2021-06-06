@@ -47,13 +47,20 @@ class AnimeMixin(DiscordInit, commands.Cog):
         global ani, http
         charQuery = queryToName(Query)
         try:
-            
             await ctx.message.add_reaction('🔍')
-            charid = ani.search('character', charQuery)['results'][0]
-            url = f"https://api.jikan.moe/v3/character/{charid['mal_id']}/pictures"
+            try:
+                malID = int(charQuery)
+                url = f"https://api.jikan.moe/v3/character/{malID}/pictures"
+            except ValueError:
+                charid = ani.search('character', charQuery)['results'][0]
+                url = f"https://api.jikan.moe/v3/character/{charid['mal_id']}/pictures"
             picdat = json.loads(http.request('GET', url).data.decode())['pictures']
             color = find_dominant_color(choice(picdat)['large'])
-            embed = discord.Embed(title=f"_{charid['name']}_", colour=color, url=charid['url'])
+            try:
+                embed = discord.Embed(title=f"_{charid['name']}_", colour=color, url=charid['url'])
+            except:
+                embed = discord.Embed(
+                    title=f"_{charQuery}_", colour=color)
             embed.set_image(url=choice(picdat)['large'])
             embed.set_footer(text=f"Search for full title for more accurate results",icon_url=self.client.user.avatar_url)
             await ctx.reply(embed=embed)

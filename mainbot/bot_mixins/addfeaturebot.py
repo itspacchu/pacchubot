@@ -110,7 +110,7 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
             await ctx.send(embed=embed)
 
     @commands.command()
-    async def spotify(ctx, user: discord.Member = None):
+    async def spotify(self , ctx, user: discord.Member = None):
         await ctx.message.add_reaction('🎵')
         if user == None:
             user = ctx.author
@@ -123,12 +123,12 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
                     embed.set_thumbnail(url=activity.album_cover_url)
                     embed.add_field(name="Artist", value=activity.artist)
                     await ctx.reply(embed=embed)
-                else:
-                    embed = discord.Embed(
-                        title=f"{user.name}'s Spotify",
-                        description="Not Listening to anything",
-                        color=0x1DB954)
-                    await ctx.reply(embed=embed)
+        else:
+            embed = discord.Embed(
+                title=f"{user.name}'s Spotify",
+                description="Not Listening to anything",
+                color=0x1DB954)
+            await ctx.reply(embed=embed)
 
 
 def setup(bot):

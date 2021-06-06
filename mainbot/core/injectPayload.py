@@ -26,6 +26,35 @@ def downloadFileFromUrl(something:str,name:str):
 
 
 #very shitty implementation i know but well 512,512 is a small image
+def distortImage(theImage,fxn):
+    info = None
+    try:
+        theImage.seek(1)
+    except EOFError:
+        pass
+    else:
+        theImage = theImage.seek(0)
+    if(theImage.size[0] > 256 or theImage.size[1] > 256):
+        theImage = theImage.resize((256,256))
+        info = "Image has been Downsampled to 256x256 (Low on budget buddy)"
+    theImage = np.asarray(theImage)
+    bc,gc,rc = theImage[:,:,0] , theImage[:,:,1] ,theImage[:,:,2]
+    dc = []
+    for imgChannel in bc,gc,rc: 
+        dImg = np.zeros(imgChannel.shape)
+        Image.fromarray(dImg)
+        for i in range(theImage.shape[0]):
+            for j in range(theImage.shape[1]):
+                try:
+                    dImg[i][j] = imgChannel[i + int(fxn(i)[0])][j + int(fxn(j)[1])]
+                except IndexError:
+                    dImg[i][j] = imgChannel[i][j]
+        dc.append(dImg)   
+    imr = Image.fromarray(dc[0]).convert('L')
+    img = Image.fromarray(dc[1]).convert('L')
+    imb = Image.fromarray(dc[2]).convert('L')
+    merged=Image.merge("RGB",(imr,img,imb))
+    return merged,info
 
 
 async def instance_convolve(mainim, kernel):

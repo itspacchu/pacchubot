@@ -12,11 +12,26 @@ import scipy.cluster
 import urllib3,os
 import requests
 
-def find_dominant_color(imageurl:str):
+
+distortionTypes = [lambda i:[10*np.sin(i), 10*np.sin(i)],
+                   lambda i:[10*np.sin(i), 0],
+                   lambda i:[0, 10*np.sin(i)],
+                   lambda i:[np.tan(i),np.cos(i)],
+                   lambda i:[5*np.tan(i), 5*np.tan(i)],
+                   lambda i:[5*np.tan(i), 0],
+                   lambda i:[0, 5*np.tan(i)],
+                   lambda i:[(i**np.sin(i)) , (i**np.sin(i))],
+                   ]
+
+
+def find_dominant_color(imageurl:str,local=False):
     try:
         NUM_CLUSTERS = 10
-        im = Image.open(requests.get(imageurl, stream=True).raw)
-        im = im.resize((25, 25))      # optional, to reduce time
+        if(local):
+            im = Image.open(imageurl)
+        else:
+            im = Image.open(requests.get(imageurl, stream=True).raw)
+        im = im.resize((25, 25))    
         ar = np.asarray(im)
         shape = ar.shape
         ar = ar.reshape(scipy.product(shape[:2]), shape[2]).astype(float)
@@ -72,7 +87,10 @@ def get_file_or_link(ctx,qlink=None):
     try:
         return ctx.message.attachments[0].url
     except:
-        return queryToName(qlink)
+        if('http' in ctx.message.content or 'https' in ctx.message.content):
+            return queryToName(qlink)
+        else:
+            return ctx.message.author.avatar_url
 
 def better_send(ctx,content=None,embed=None,file=None):
     try:
@@ -82,7 +100,8 @@ def better_send(ctx,content=None,embed=None,file=None):
             return ctx.send(content, embed=embed, file=file)
     except:
         return ctx.send("Coudn't send the message.. something went wrong!!")
-        
+
+    
 
 class bcolors:
     HEADER = '\033[95m'

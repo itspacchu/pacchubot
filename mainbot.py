@@ -26,7 +26,7 @@ class BotStore(DiscordInit):
 
     def __call__(self):
         self.client.run(self.db['discordToken'].find_one(
-            {"botname": "tracebot"})['token'])
+            {"botname": "pacchuslave"})['token'])
 
 if __name__ == '__main__':
     Bot = BotStore()

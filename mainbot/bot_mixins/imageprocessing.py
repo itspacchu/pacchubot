@@ -49,7 +49,7 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
             pass
         os.remove(filname + '.png')
 
-    @commands.command(aliases=['idc', 'distort-help'])
+    @commands.command(aliases=['idh', 'distort-help'])
     async def distortion_help(self,ctx):
         embed = discord.Embed(title="Image Distortion", colour=discord.Colour(
             0xff7e2e), description=f"```{self.pre}.id [0-7]``` attach an image or @mention someone to get their dp\nLeave it blank for random function")
@@ -59,8 +59,7 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
     @commands.command(aliases=['ich', 'cartoonize-help'])
     async def cartoonize_help(self,ctx):
         embed = discord.Embed(title="Image Cartoonization", colour=discord.Colour(0xff67aa), description="```{self.pre}.ic @mention/file``` attach an image or @mention someone to get their dp")
-        embed.set_image(url="https://user-images.githubusercontent.com/37984032/120939915-00c5ef80-c738-11eb-9af7-067c9bc5dd62.png")
-
+        embed.set_image(url="https://raw.githubusercontent.com/itspacchu/pacchubot/master/helper.png")
         await ctx.send(embed=embed)
 
     @commands.command(aliases=['id', 'distort'])

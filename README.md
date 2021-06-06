@@ -18,13 +18,19 @@
 
 > _perk Extra stuff run the command for more commands
 
-> _pod Podcast support
+> _distort 
+
+> _pod Podcast support [disabled]
 
 > _spotify spotify yeet
 
 > _cartoonize [mention/image upload]
 
 ![image](https://user-images.githubusercontent.com/37984032/116567942-b629aa00-a925-11eb-802d-47b25c63f8a6.png)
+
+![image](https://user-images.githubusercontent.com/37984032/120939915-00c5ef80-c738-11eb-9af7-067c9bc5dd62.png)
+
+![image](https://user-images.githubusercontent.com/37984032/120939939-281cbc80-c738-11eb-8843-8719548f4531.png)
 
 ![image](https://user-images.githubusercontent.com/37984032/119216569-009be200-baf2-11eb-83c4-3e4d4f5af0a0.png)
 

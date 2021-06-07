@@ -20,7 +20,7 @@ mongo_url = f"mongodb+srv://{os.environ['MONGO_INITDB_ROOT_USERNAME']}:{os.envir
 mongo_client = MongoClient(mongo_url)
 
 # global variables
-version = "v1.1 beta"
+version = "v1.2 beta"
 http = urllib3.PoolManager()
 ani = Jikan()
 self_name = "Pacchu's Bot"

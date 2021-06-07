@@ -18,6 +18,7 @@ import time as ttime
 from discord.utils import get
 from inspect import getmembers
 from dotenv import load_dotenv
+from bson.objectid import ObjectId
 from pymongo import MongoClient
 from jikanpy import Jikan
 import datetime

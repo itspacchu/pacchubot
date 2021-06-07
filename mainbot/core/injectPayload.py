@@ -4,9 +4,10 @@ from io import FileIO
 import requests,shutil
 from bs4 import BeautifulSoup
 import time
+from tqdm import tqdm
 
-def cartoonize(myfile,filname,none=None):
-    downloadFileFromUrl(myfile,filname)
+def cartoonize(myfile,filname):
+    downloadFileFromUrl(myfile,filname,none=None)
     s = requests.Session()
     url = "https://cartoonize-lkqov62dia-de.a.run.app/cartoonize"
     with open(str(filname + '.png'), 'rb') as f:
@@ -26,7 +27,7 @@ def downloadFileFromUrl(something:str,name:str):
 
 
 #very shitty implementation i know but well 512,512 is a small image
-def distortImage(theImage,fxn):
+def distortImage(theImage,fxn,ctx=None,discordToken=None):
     info = None
     try:
         theImage.seek(1)
@@ -34,16 +35,17 @@ def distortImage(theImage,fxn):
         pass
     else:
         theImage = theImage.seek(0)
+    imRatio = theImage.size[0]/theImage.size[1]
     if(theImage.size[0] > 256 or theImage.size[1] > 256):
-        theImage = theImage.resize((256,256))
-        info = "Image has been Downsampled to 256x256 (Low on budget buddy)"
+        theImage = theImage.resize((256,int(256/imRatio)))
+        info = "Image has been Downsampled to 256p (Low on CPU budget buddy)"
     theImage = np.asarray(theImage)
     bc,gc,rc = theImage[:,:,0] , theImage[:,:,1] ,theImage[:,:,2]
     dc = []
     for imgChannel in bc,gc,rc: 
         dImg = np.zeros(imgChannel.shape)
         Image.fromarray(dImg)
-        for i in range(theImage.shape[0]):
+        for i in tqdm(range(theImage.shape[0])):
             for j in range(theImage.shape[1]):
                 try:
                     dImg[i][j] = imgChannel[i + int(fxn(i)[0])][j + int(fxn(j)[1])]

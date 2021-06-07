@@ -97,7 +97,10 @@ class InteractionsMixin(DiscordInit, commands.Cog):
 
     @commands.command(aliases=['sk'])
     async def sike(self, ctx, *qlink):
-        link = get_file_or_link(ctx, qlink)
+        try:
+            link = ctx.message.attachments[0].url
+        except:
+            link = queryToName(qlink)
         if(ctx.message.guild == None):
             await ctx.reply("This is a dm tho? try it in a server m8")
         else:
@@ -143,7 +146,11 @@ class InteractionsMixin(DiscordInit, commands.Cog):
     
     @commands.command(aliases=['br'])
     async def bruh(self,ctx, *qlink):
-        link = get_file_or_link(ctx,qlink)
+        try:
+            link = ctx.message.attachments[0].url
+        except:
+            link = queryToName(qlink)
+
         if(ctx.message.guild == None):
             await ctx.reply("This is a dm tho? try it in a server m8")
         else:
@@ -190,6 +197,8 @@ class InteractionsMixin(DiscordInit, commands.Cog):
                                 value="Bruh has been sucessfully updated", inline=False)
                 embed.set_footer(text=f" {self_name} {version}", icon_url=self_avatar)
                 await ctx.message.channel.send(embed=embed)
+        self.MiscCollection.find_one_and_update({'_id': ObjectId(
+            "60be497c826104950c8ea5d6")}, {'$inc': {'bruhs_delivered': 1}})
     
         
     

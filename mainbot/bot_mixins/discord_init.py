@@ -7,19 +7,19 @@ Discord_init_Color = 0xffbb54
 
 class DiscordInit:
     VERSION = version
-
     def __init__(self, client):
         self.pre = command_prefix
         self.perks = perkdict
         if not hasattr(self, 'client'):
             self.client = client
-        self.avatar = self_avatar
+        self.ddb = DiscordComponents(client)
+        self.avatar = "https://cdn.discordapp.com/attachments/715107506187272234/850379532459573288/pacslav.png"
         self.name = self_name
-        self.client.remove_command('help')
+        
         self.client.event(self.on_ready)
         self.client.event(self.on_message)
         self.client.event(self.on_command_error)
-
+        
         self.db = mongo_client['PacchuSlave']
         self.init_db()
 
@@ -42,7 +42,7 @@ class DiscordInit:
             return
 
         for x in message.mentions:
-            if(x == self.client.user and len(message.content) > 10):
+            if(x == self.client.user and len(message.content)==21):
                 await message.channel.send(choice(self.perks['replies']['pings']))
         # try:
         qq = message.content.lower().split(' ')[0]
@@ -98,30 +98,31 @@ class BaseBot(DiscordInit, commands.Cog):
     @commands.command(aliases=['gh'])
     async def github(self, ctx):
         await ctx.message.add_reaction('♥')
-        await ctx.send("https://github.com/itspacchu/pacchubot")
+        await ctx.send("https://github.com/itspacchu/pacchubot",components = [
+            Button(style=ButtonStyle.URL, label="Visit my Github",
+                   url="https://github.com/itspacchu/pacchubot")
+        ])
 
     # add pagination to this
     @commands.command(aliases=['h', 'halp', 'hel'])
     async def help(self, ctx):
         embed = discord.Embed(
-            color=Discord_init_Color, description=f"Created by Pacchu \n well Leo helped too.. I guess..!!")
-        embed.set_author(name=self.name, icon_url=self.avatar)
+            color=Discord_init_Color, description=f"Created by Pacchu & Leo")
         embed.set_thumbnail(url=self.avatar)
         embed.add_field(name=f"{self.pre}anime/ani",
                         value="Searches for given anime", inline=True)
         embed.add_field(name=f"{self.pre}manga/m",
                         value="Searches for give Manga", inline=True)
-        embed.add_field(name=f"{self.pre}anichar/ac",
-                        value="Searches for given Anime Charactor ", inline=True)
         embed.add_field(name=f"{self.pre}anipics/ap",
                         value="Searches for Images of given Anime Charactor", inline=True)
         embed.add_field(name=f"{self.pre}cartoonize/ic @mention/file",
-                        value="Image Processing Cartoonize AI", inline=False)
+                        value="Image Processing Cartoonize AI", inline=True)
+        embed.add_field(name=f"{self.pre}distort/id @mention/file",
+                        value="Image Processing Distort Image based on VectorField", inline=True)
         embed.add_field(name=f"{self.pre}wikipic/wpotd",
                         value="Fetches Wikipedia Picture of the Day", inline=False)
         embed.add_field(name=f"{self.pre}hubbleday/hb",
                         value="What Hubble saw on your birthday", inline=False)
-        
         embed.add_field( name=f"{self.pre}stats", value="partially implemented **bugs**", inline=False)
         """
         embed.add_field(name=f"{self.pre}pod",
@@ -130,8 +131,7 @@ class BaseBot(DiscordInit, commands.Cog):
                         value="Youtube Playback and Lofi music", inline=False)
         """
         embed.add_field(name=f"{self.pre}invite",
-                        value="Invite link for this bot", inline=False)
-        
+                        value="Invite link for this bot", inline=False)  
         embed.add_field(name=f"{self.pre}avatar @Pacchu / {self.pre}av @Pacchu",
                         value=f"Something of use atleast", inline=False)
         embed.add_field(name=f"{self.pre}bruh/sike [emote,link,text message]",
@@ -142,17 +142,8 @@ class BaseBot(DiscordInit, commands.Cog):
                         value="gpt neo answering", inline=True)
         embed.add_field(name=f"{self.pre}spotify @mention",
                         value="Gets the user's Spotify activity", inline=False)
-
-        embed.add_field(name=f"{self.pre}kill @mention",
-                        value=f"Kills the user ... well not really", inline=True)
-        embed.add_field(
-            name=f"{self.pre}kiss @mention", value=f"kiss?", inline=True)
-        embed.add_field(name=f"{self.pre}hug @mention",
-                        value=f"Hugs the user?", inline=True)
-
         embed.add_field(name=f"{self.pre}github",
                         value="Contribute to this bot", inline=False)
-
         embed.add_field(name=f"{self.pre}help",
                         value="isnt it obvious :o", inline=False)
         embed.set_footer(
@@ -161,36 +152,6 @@ class BaseBot(DiscordInit, commands.Cog):
             await ctx.reply(embed=embed)
         except AttributeError:
             await ctx.send(embed=embed)
-
-    @commands.command(aliases=['per', 'perks'])
-    async def perk(self, ctx):
-        embed = discord.Embed(title=self.client.user.name.title(
-        ), description=f"{self.name} Perks", color=Discord_init_Color)
-        
-        embed.set_author(name=self.client.user.name,
-                         icon_url=self.client.user.avatar_url)
-        embed.set_thumbnail(url=self.client.user.avatar_url)
-        embed.add_field(name=f"{self.pre}avatar @Pacchu / {self.pre}av @Pacchu",
-                        value=f"Something of use atleast", inline=False)
-        embed.add_field(name=f"{self.pre}bruh [emote,link,text message]",
-                        value=f"Something to be saved? idk why it an option", inline=False)
-        embed.add_field(name=f"{self.pre}gpt \"Today is a wonderful..\"",
-                        value="gpt neo text completion", inline=True)
-        embed.add_field(name=f"{self.pre}q \"Why is chocolate beautiful?\"",
-                        value="gpt neo answering", inline=True)
-        embed.add_field(name=f"{self.pre}spotify @mention",
-                        value="Gets the user's Spotify activity", inline=False)
-
-        embed.add_field(name=f"{self.pre}kill @mention",
-                        value=f"Kills the user ... well not really", inline=True)
-        embed.add_field(
-            name=f"{self.pre}kiss @mention", value=f"kiss?", inline=True)
-        embed.add_field(name=f"{self.pre}hug @mention",
-                        value=f"Hugs the user?", inline=True)
-
-        embed.set_footer(
-            text=f" {self.client.user.name} {version}", icon_url=self.client.user.avatar_url)
-        await ctx.reply(embed=embed)
 
 
 def setup(bot):

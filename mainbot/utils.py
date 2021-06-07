@@ -12,53 +12,47 @@ import scipy.cluster
 import urllib3,os
 import requests
 
-def find_dominant_color(imageurl:str):
-    NUM_CLUSTERS = 10
-    im = Image.open(requests.get(imageurl, stream=True).raw)
-    im = im.resize((20, 20))      # optional, to reduce time
-    ar = np.asarray(im)
-    shape = ar.shape
-    ar = ar.reshape(scipy.product(shape[:2]), shape[2]).astype(float)
-    codes, dist = scipy.cluster.vq.kmeans(ar, NUM_CLUSTERS)
-    vecs, dist = scipy.cluster.vq.vq(ar, codes)        
-    counts, bins = scipy.histogram(vecs, len(codes))   
-    index_max = scipy.argmax(counts)                   
-    peak = codes[index_max]
-    colour = binascii.hexlify(bytearray(int(c) for c in peak)).decode('ascii')
-    return int(hex(int(colour, 16)), 0)
 
-def __initiate_default_stats__(serverlist:dict,serverid:str):
-    serverlist[serverid] = {
-        'emoji':'🌊',
-        'debug':0,
-        'bruh':'https://media.discordapp.net/attachments/760741167876538419/760744075132534784/DeepFryer_20200930_113458.jpg?width=448&height=518',
-        'prefix' : '',
-        'stats': {
-            'bot_summons':0,
-            'ecchi_command':0,
-            'hugs':0,
-            'pats':0,
-            'kiss':0,
-            'kills':0,
-            'anipics':0,
-            'anime':0,
-            'manga':0,
-            'echos':0,
-            'bruhs':0,
-            'nice':0
-        }
-        }
+distortionTypes = [lambda i:[10*np.sin(i), 10*np.sin(i)],
+                   lambda i:[10*np.sin(i), 0],
+                   lambda i:[0, 10*np.sin(i)],
+                   lambda i:[np.tan(i),np.cos(i)],
+                   lambda i:[5*np.tan(i), 5*np.tan(i)],
+                   lambda i:[5*np.tan(i), 0],
+                   lambda i:[0, 5*np.tan(i)],
+                   lambda i:[(i**np.sin(i)) , (i**np.sin(i))],
+                   ]
+
+
+def find_dominant_color(imageurl:str,local=False):
+    try:
+        NUM_CLUSTERS = 10
+        if(local):
+            im = Image.open(imageurl)
+        else:
+            im = Image.open(requests.get(imageurl, stream=True).raw)
+        im = im.resize((25, 25))    
+        ar = np.asarray(im)
+        shape = ar.shape
+        ar = ar.reshape(scipy.product(shape[:2]), shape[2]).astype(float)
+        codes, dist = scipy.cluster.vq.kmeans(ar, NUM_CLUSTERS)
+        vecs, dist = scipy.cluster.vq.vq(ar, codes)        
+        counts, bins = scipy.histogram(vecs, len(codes))   
+        index_max = scipy.argmax(counts)                   
+        peak = codes[index_max]
+        colour = binascii.hexlify(bytearray(int(c) for c in peak)).decode('ascii')
+        try:
+            return int(hex(int(colour, 16))[:8], 0)
+        except:
+            return  0xffffff
+    except IndexError:
+        return 0xffffff
 
 def hasNumbers(inputString):
     return any(char.isdigit() for char in inputString)
 
 bot_avatar_url = "https://cdn.discordapp.com/attachments/715107506187272234/850379532459573288/pacslav.png"
 
-def __count_statistics__(serverlist:dict,serverid:str,stattitle:str):
-    try:
-        serverlist[serverid]['stats'][stattitle] += 1
-    except KeyError:
-        __initiate_default_stats__(serverlist,serverid)
 
 def mentionToId(mention:str):
     print(mention)
@@ -88,7 +82,10 @@ def get_file_or_link(ctx,qlink=None):
     try:
         return ctx.message.attachments[0].url
     except:
-        return queryToName(qlink)
+        if('http' in ctx.message.content or 'https' in ctx.message.content):
+            return queryToName(qlink)
+        else:
+            return ctx.message.author.avatar_url
 
 def better_send(ctx,content=None,embed=None,file=None):
     try:
@@ -98,7 +95,8 @@ def better_send(ctx,content=None,embed=None,file=None):
             return ctx.send(content, embed=embed, file=file)
     except:
         return ctx.send("Coudn't send the message.. something went wrong!!")
-        
+
+    
 
 class bcolors:
     HEADER = '\033[95m'

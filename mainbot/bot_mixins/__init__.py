@@ -8,7 +8,6 @@ __all__=[
     'DiscordInit',
     'BaseBot',
     'AdditionalFeatureMixin',
-    #'EventMixins', should be in init
     'AnimeMixin',
     'InteractionsMixin',
     'MusicMixin',

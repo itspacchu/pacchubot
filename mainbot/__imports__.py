@@ -23,6 +23,7 @@ from jikanpy import Jikan
 import datetime
 from discord.ext import commands
 from discord.ext.commands import CommandError , CommandNotFound
+from discord_components import DiscordComponents, Button , ButtonStyle,component,InteractionType
 from .utils import *
 
 # import subprocess

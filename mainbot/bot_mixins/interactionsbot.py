@@ -190,7 +190,7 @@ class InteractionsMixin(DiscordInit, commands.Cog):
                                 value="Bruh has been sucessfully updated", inline=False)
                 embed.set_footer(text=f" {self_name} {version}", icon_url=self_avatar)
                 await ctx.message.channel.send(embed=embed)
-
+    
         
     
 def setup(bot):

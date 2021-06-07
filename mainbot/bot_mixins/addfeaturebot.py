@@ -33,7 +33,7 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
                 await ctx.message.add_reaction('☀')
                 response = wikipedia_api.fetch_potd(today_date)
                 color = find_dominant_color(response['image_src'])
-                embed = discord.Embed(title="Wikipedia Picture of the Day", colour=color, url=response['image_page_url'], description=response['filename'][6:])
+                embed = discord.Embed(title="Wikipedia Picture of the Day", colour=color, description=response['filename'][6:])
                 embed.set_image(url=response['image_src'])
             except:
                 embed = discord.Embed(title="No Image Found", colour=discord.Colour(
@@ -42,7 +42,9 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
             embed.set_author(name=self.name, icon_url=bot_avatar_url)
             embed.set_footer(
                 text="Wikipedia", icon_url="https://upload.wikimedia.org/wikipedia/en/thumb/8/80/Wikipedia-logo-v2.svg/220px-Wikipedia-logo-v2.svg.png")
-            await ctx.send(embed=embed)
+            await ctx.send(embed=embed , components = [
+                Button(style=ButtonStyle.URL, label="Visit wiki",url=response['image_page_url']),
+            ])
         except ValueError:
             await ctx.message.add_reaction('‼')
             await ctx.reply("Is the date in proper format? ```DD-MM-YYYY \n>> 15-09-2001```")
@@ -68,7 +70,10 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
         embed.set_author(name=self.name, icon_url=bot_avatar_url)
         embed.set_footer(
             text="NASA", icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/NASA_logo.svg/300px-NASA_logo.svg.png")
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, components=[
+            Button(style=ButtonStyle.URL, label="Visit Source",
+                   url=img["hubble-url"]),
+        ])
 
 
 
@@ -110,25 +115,26 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
             await ctx.send(embed=embed)
 
     @commands.command()
-    async def spotify(ctx, user: discord.Member = None):
+    async def spotify(self , ctx, user:discord.Member = None):
         await ctx.message.add_reaction('🎵')
+        flag = 0
         if user == None:
-            user = ctx.author
-            pass
+            user = ctx.message.author
         if user.activities:
             for activity in user.activities:
                 if isinstance(activity, discord.Spotify):
+                    flag = 1
                     embed = discord.Embed(title=f"{user.name}'s Spotify", description="Listening to {}".format(
                         activity.title), color=find_dominant_color(activity.album_cover_url))
                     embed.set_thumbnail(url=activity.album_cover_url)
                     embed.add_field(name="Artist", value=activity.artist)
                     await ctx.reply(embed=embed)
-                else:
-                    embed = discord.Embed(
-                        title=f"{user.name}'s Spotify",
-                        description="Not Listening to anything",
-                        color=0x1DB954)
-                    await ctx.reply(embed=embed)
+        if(flag == 0):
+            embed = discord.Embed(
+                title=f"{user.name}'s Spotify",
+                description="Not Listening to anything",
+                color=0x1DB954)
+            await ctx.reply(embed=embed)
 
 
 def setup(bot):

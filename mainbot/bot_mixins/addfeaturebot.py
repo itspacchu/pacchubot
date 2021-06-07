@@ -12,7 +12,7 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
         await ctx.message.add_reaction('💡')
         query = queryToName(lquery)
         reply = g2a.gptquery(query)
-        await ctx.reply(reply)
+        await ctx.reply(g2a.sanitize(reply))
         dbStore = {
             "query": query,
             "username": ctx.message.author.name,
@@ -45,6 +45,8 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
             await ctx.send(embed=embed , components = [
                 Button(style=ButtonStyle.URL, label="Visit wiki",url=response['image_page_url']),
             ])
+            self.MiscCollection.find_one_and_update({'_id': ObjectId(
+                "60be497c826104950c8ea5d6")}, {'$inc': {'wikipedia_fetches': 1}})
         except ValueError:
             await ctx.message.add_reaction('‼')
             await ctx.reply("Is the date in proper format? ```DD-MM-YYYY \n>> 15-09-2001```")
@@ -74,6 +76,8 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
             Button(style=ButtonStyle.URL, label="Visit Source",
                    url=img["hubble-url"]),
         ])
+        self.MiscCollection.find_one_and_update({'_id': ObjectId(
+            "60be497c826104950c8ea5d6")}, {'$inc': {'nasa_fetches': 1}})
 
 
 
@@ -96,6 +100,8 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
         embed.set_author(name=self.client.user.name,
                          icon_url=self.client.user.avatar_url)
         try:
+            #60be497c826104950c8ea5d6
+            misc_collection = self.MiscCollection.find_one({'_id':ObjectId("60be497c826104950c8ea5d6")})
             embed.add_field(name="Pacchu's Slave stat counter",
                             value="shows all the statistics of the bot", inline=False)
             embed.add_field(name="Weebo Anime searches", value=str(
@@ -104,8 +110,12 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
                 self.mangaSearch.count_documents({"guild": ctx.message.guild.id})), inline=True)
             embed.add_field(name="Anime images delivered for simps", value=str(
                 self.animePics.count_documents({"guild": ctx.message.guild.id})), inline=True)
+            embed.add_field(name="Images Cartoonized",value=misc_collection['images_cartoonized'],inline=True)
+            embed.add_field(name="Images Distorted",value=misc_collection['images_distorted'], inline=True)
+            embed.add_field(name="Bruh's Delivered", value=misc_collection['bruhs_delivered'], inline=True)
+
             embed.set_footer(
-                text=f"MongoDB Connection Active 🟢", icon_url=self.avatar)
+                text=f"i'm Alive 🟢", icon_url=self.avatar)
             await ctx.send(embed=embed)
         except KeyError:
             embed.add_field(name="Database API cannot be reachable 🔴",

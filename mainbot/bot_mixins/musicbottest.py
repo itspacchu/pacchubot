@@ -117,7 +117,8 @@ class Song:
         self.requester = source.requester
 
     def create_embed(self):
-        embed = discord.Embed(title="{0.source.title}".format(self), colour=discord.Colour(0x30ff93), url="{0.source.url}".format(self), description=f"Now playing {self.source.duration}")
+        embed = discord.Embed(title="{0.source.title}".format(self), colour=find_dominant_color(self.source.thumbnail),
+                              url="{0.source.url}".format(self), description=f"Now playing {self.source.duration}")
         embed.set_thumbnail(url=self.source.thumbnail)
         embed.set_author(name=self.requester.nick,icon_url=self.requester.avatar_url)
         embed.add_field(name="By", value="{0.source.uploader}".format(self))
@@ -285,7 +286,6 @@ class Music(commands.Cog):
         ctx.voice_state.voice = await destination.connect()
 
     @commands.command(name='leave', aliases=['lv', 'sudofuckoff'])
-    @commands.has_permissions(manage_guild=True)
     async def _leave(self, ctx: commands.Context):
         """Clears the queue and leaves the voice channel."""
 
@@ -317,7 +317,6 @@ class Music(commands.Cog):
     @commands.command(name='ppa',aliases=['pause'])
     async def _pause(self, ctx: commands.Context):
         """Pauses the currently playing song."""
-
         if not ctx.voice_state.is_playing and ctx.voice_state.voice.is_playing():
             ctx.voice_state.voice.pause()
             await ctx.message.add_reaction('⏯')
@@ -343,7 +342,6 @@ class Music(commands.Cog):
     @commands.command(name='skip',aliases=['psk'])
     async def _skip(self, ctx: commands.Context):
         """Vote to skip a song. The requester can automatically skip.
-        3 skip votes are needed for the song to be skipped.
         """
 
         if not ctx.voice_state.is_playing:
@@ -366,7 +364,6 @@ class Music(commands.Cog):
         """Shows the player's queue.
         You can optionally specify the page to show. Each page contains 10 elements.
         """
-
         if len(ctx.voice_state.songs) == 0:
             return await ctx.send('Empty queue.')
 

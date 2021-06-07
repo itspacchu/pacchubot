@@ -36,18 +36,20 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
             r = s.post(url, files={'image': f})
         soup = BeautifulSoup(r.text, 'html.parser')
         dlink = soup.find_all('a')[0]['href']
-        
         downloadFileFromUrl(dlink, filname)
         s.close()
-        file = discord.File(filname + '.png',filename="cartoonized_img.png")
-        embed = discord.Embed(color=find_dominant_color(dlink))
-        embed.set_image(url="attachment://cartoonized_img.png")
+        file = discord.File(filname + '.png', filename="cartoonize.png")
+        embed = discord.Embed(color=find_dominant_color(filname + '.png',local=True))
+        embed.set_image(url="attachment://cartoonize.png")
+        embed.set_footer(text=" ")
         try:
-            await ctx.send(file=file,embed=embed)
+            await ctx.send(file=file, embed=embed)
             await asyncio.sleep(1)
         except:
             pass
+        await asyncio.sleep(1)
         os.remove(filname + '.png')
+        self.MiscCollection.find_one_and_update({'_id': ObjectId("60be497c826104950c8ea5d6")}, {'$inc': {'images_cartoonized': 1}})
 
     @commands.command(aliases=['idh', 'distort-help'])
     async def distortion_help(self,ctx):
@@ -95,14 +97,18 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
             embed.set_image(url="attachment://distortedImage.png")
             if(dimg[1] != None):
                 embed.set_footer(text=dimg[1])
+            else:
+                embed.set_footer(text=" ")
             try:
                 await ctx.send(file=file, embed=embed)
                 await asyncio.sleep(1)
             except:
                 pass
             os.remove(filname + '.png')
+            self.MiscCollection.find_one_and_update({'_id': ObjectId("60be497c826104950c8ea5d6")}, {'$inc': {'images_distorted': 1}})
         except IndexError:
             await ctx.send(f"Something seemed to be wrong \n use help```{self.pre}idh```")
+            
         
         
 

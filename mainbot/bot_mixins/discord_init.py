@@ -30,7 +30,7 @@ class DiscordInit:
             self.name = self.client.user.name
         if not hasattr(self, 'avatar'):
             self.avatar = "https://cdn.discordapp.com/attachments/715107506187272234/850379532459573288/pacslav.png"
-        statustxt = "Questioning Universe now 🧠💥" #adding loop changing statuses
+        statustxt = "Questioning Insanity now" #adding loop changing statuses
         activity = discord.Game(name=statustxt)
         if(self.client):
             print("Connected to Database...")
@@ -74,6 +74,7 @@ class DiscordInit:
         self.PodcastSuggest = self.db['PodSuggest']
         self.VoiceUsage = self.db['VoiceActivity']
         self.MemberTaunt = self.db['memberTaunt']
+        self.MiscCollection = self.db['miscCollection']
 
 class BaseBot(DiscordInit, commands.Cog):
 
@@ -94,7 +95,10 @@ class BaseBot(DiscordInit, commands.Cog):
         embed = discord.Embed(title="Click here", url="https://discord.com/api/oauth2/authorize?client_id=709426015759368282&permissions=8&scope=bot",
                               description="Invite link for this bot", color=Discord_init_Color)
         embed.set_thumbnail(url=self.avatar)
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, components=[
+            Button(style=ButtonStyle.URL, label="Add me to your server",
+                   url="https://discord.com/api/oauth2/authorize?client_id=709426015759368282&permissions=8&scope=bot")
+        ])
         
     @commands.command(aliases=['gh'])
     async def github(self, ctx):

@@ -165,7 +165,7 @@ class AnimeMixin(DiscordInit, commands.Cog):
             except:
                 pass
             embed.set_footer(text=f"Search for full title for more accurate results", icon_url=self.client.user.avatar_url)
-            await ctx.reply(embed=embed,components=[
+            await ctx.send(embed=embed,components=[
                 Button(style=ButtonStyle.URL, label="Visit MAL", url=asrc['url'])
             ])
         except:

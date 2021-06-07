@@ -7,7 +7,6 @@ from mainbot import settings
 class BotStore(DiscordInit):
     def __init__(self):
         self.client = commands.Bot(command_prefix=settings.command_prefix_use, intents=discord.Intents.all())
-        
         self.client.remove_command('help')
         super().__init__(self)
         self.add_cogs()

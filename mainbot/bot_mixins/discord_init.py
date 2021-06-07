@@ -13,8 +13,7 @@ class DiscordInit:
         if not hasattr(self, 'client'):
             self.client = client
         self.ddb = DiscordComponents(client)
-        self.client.remove_command('help')
-        self.avatar = None
+        self.avatar = "https://cdn.discordapp.com/attachments/715107506187272234/850379532459573288/pacslav.png"
         self.name = self_name
         
         self.client.event(self.on_ready)

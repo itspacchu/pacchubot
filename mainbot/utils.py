@@ -53,11 +53,6 @@ def hasNumbers(inputString):
 
 bot_avatar_url = "https://cdn.discordapp.com/attachments/715107506187272234/850379532459573288/pacslav.png"
 
-def __count_statistics__(serverlist:dict,serverid:str,stattitle:str):
-    try:
-        serverlist[serverid]['stats'][stattitle] += 1
-    except KeyError:
-        __initiate_default_stats__(serverlist,serverid)
 
 def mentionToId(mention:str):
     print(mention)

@@ -51,30 +51,25 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
 
     @commands.command(aliases=['idh', 'distort-help'])
     async def distortion_help(self,ctx):
-        embed = discord.Embed(title="Image Distortion", colour=discord.Colour(
-            0xff7e2e), description=f"```{self.pre}.id [0-7]``` attach an image or @mention someone to get their dp\nLeave it blank for random function")
-        embed.set_image(url="https://i.imgur.com/7N3KONw.png")
+        embed = discord.Embed(title="Image Distortion", colour=discord.Colour(0xff7e2e), description=f"```{self.pre}id @mention/file``` attach an image or @mention someone to get their dp")
+        embed.set_image(url="https://raw.githubusercontent.com/itspacchu/pacchubot/master/images/cartoonizehelp.png")
         await ctx.send(embed=embed)
     
     @commands.command(aliases=['ich', 'cartoonize-help'])
     async def cartoonize_help(self,ctx):
         embed = discord.Embed(title="Image Cartoonization", colour=discord.Colour(0xff67aa), description="```{self.pre}.ic @mention/file``` attach an image or @mention someone to get their dp")
-        embed.set_image(url="https://raw.githubusercontent.com/itspacchu/pacchubot/master/helper.png")
+        embed.set_image(url="https://raw.githubusercontent.com/itspacchu/pacchubot/master/images/helper.png")
         await ctx.send(embed=embed)
 
     @commands.command(aliases=['id', 'distort'])
-    async def distortion(self,ctx,arg=None):
+    async def distortion(self,ctx,member:discord.Member==None,choix):
+        if(choix == None):
+            choix = choice(distortionTypes)
+        else:
+            choix = int(choix,10)
         try:
-            member,choix = None,choice(distortionTypes)
-            if(type(arg) == discord.Member):
-                member = arg
-                choix = choice(distortionTypes)
-            elif(type(arg) == str):
-                member = None
-                try:
-                    choix = int(arg)
-                except:
-                    pass
+            if(member == None):
+                ctx.message.author
             filname = str(round(time.time()))
             await ctx.message.add_reaction('🔨')
             try:
@@ -93,9 +88,10 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
                 except:
                     await better_send(ctx, "I think something went wrong!")
                     return None
+
             downloadFileFromUrl(attachment_url, filname)
             img2distort = Image.open(filname + '.png')
-            dimg = distortImage(img2distort,choix)
+            dimg = distortImage(img2distort,int(choix))
             dimg[0].save(filname + '.png')
             file = discord.File(filname + '.png', filename="distortedImage.png")
             embed = discord.Embed(color=find_dominant_color(filname + '.png',local=True))
@@ -108,8 +104,8 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
             except:
                 pass
             os.remove(filname + '.png')
-        except:
-            ctx.send(f"Something seemed to be wrong \n use help```{self.pre}idh```")
+        except IndexError:
+            await ctx.send(f"Something seemed to be wrong \n use help```{self.pre}idh```")
         
         
 

@@ -10,7 +10,7 @@ ENDPOINT = "https://en.wikipedia.org/w/api.php"
 
 def fetch_potd(cur_date):
 	date_iso = cur_date.isoformat()
-	title = "Template:POTD_protected/" + date_iso[:10]
+	title = "Template:POTD/" + date_iso[:10]
 
 	params = {
 	  "action": "query",

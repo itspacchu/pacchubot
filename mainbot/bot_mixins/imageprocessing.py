@@ -54,13 +54,15 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
     @commands.command(aliases=['idh', 'distort-help'])
     async def distortion_help(self,ctx):
         embed = discord.Embed(title="Image Distortion", colour=discord.Colour(0xff7e2e), description=f"```{self.pre}id @mention/file``` attach an image or @mention someone to get their dp")
-        embed.set_image(url="https://raw.githubusercontent.com/itspacchu/pacchubot/master/images/cartoonizehelp.png")
+        embed.set_image(
+            url="https://raw.githubusercontent.com/itspacchu/pacchubot/master/images/helper.png")
         await ctx.send(embed=embed)
     
     @commands.command(aliases=['ich', 'cartoonize-help'])
     async def cartoonize_help(self,ctx):
-        embed = discord.Embed(title="Image Cartoonization", colour=discord.Colour(0xff67aa), description="```{self.pre}.ic @mention/file``` attach an image or @mention someone to get their dp")
-        embed.set_image(url="https://raw.githubusercontent.com/itspacchu/pacchubot/master/images/helper.png")
+        embed = discord.Embed(title="Image Cartoonization", colour=discord.Colour(0xff67aa), description=f"```{self.pre}.ic @mention/file``` attach an image or @mention someone to get their dp")
+        
+        embed.set_image(url="https://raw.githubusercontent.com/itspacchu/pacchubot/master/images/cartoonizehelp.png")
         await ctx.send(embed=embed)
 
     @commands.command(aliases=['id', 'distort'])
@@ -74,7 +76,7 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
             try:
                 attachment_url = ctx.message.attachments[0].url
                 await ctx.message.add_reaction('⏬')
-                await better_send(ctx, "Processing will take few seconds..")
+                await better_send(ctx, "> Processing will take few seconds..")
             except:
                 try:
                     hgp = member
@@ -83,7 +85,7 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
                         attachment_url = ctx.message.author.avatar_url
                     else:
                         attachment_url = hgp.avatar_url
-                    await better_send(ctx, "Getting User's avatar")
+                    await better_send(ctx, "> Getting User's avatar")
                 except:
                     await better_send(ctx, "I think something went wrong!")
                     return None

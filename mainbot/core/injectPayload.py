@@ -36,9 +36,9 @@ def distortImage(theImage,fxn,ctx=None,discordToken=None):
     else:
         theImage = theImage.seek(0)
     imRatio = theImage.size[0]/theImage.size[1]
-    if(theImage.size[0] > 256 or theImage.size[1] > 256):
-        theImage = theImage.resize((256,int(256/imRatio)))
-        info = "Image has been Downsampled to 256p (Low on CPU budget buddy)"
+    if(theImage.size[0] > 512 or theImage.size[1] > 512):
+        theImage = theImage.resize((512,int(512/imRatio)))
+        info = "Image has been Downsampled to 512p (Low on CPU budget ;--;)"
     theImage = np.asarray(theImage)
     bc,gc,rc = theImage[:,:,0] , theImage[:,:,1] ,theImage[:,:,2]
     dc = []

@@ -97,7 +97,10 @@ class InteractionsMixin(DiscordInit, commands.Cog):
 
     @commands.command(aliases=['sk'])
     async def sike(self, ctx, *qlink):
-        link = get_file_or_link(ctx, qlink)
+        try:
+            link = ctx.message.attachments[0].url
+        except:
+            link = queryToName(qlink)
         if(ctx.message.guild == None):
             await ctx.reply("This is a dm tho? try it in a server m8")
         else:
@@ -143,7 +146,11 @@ class InteractionsMixin(DiscordInit, commands.Cog):
     
     @commands.command(aliases=['br'])
     async def bruh(self,ctx, *qlink):
-        link = get_file_or_link(ctx,qlink)
+        try:
+            link = ctx.message.attachments[0].url
+        except:
+            link = queryToName(qlink)
+
         if(ctx.message.guild == None):
             await ctx.reply("This is a dm tho? try it in a server m8")
         else:

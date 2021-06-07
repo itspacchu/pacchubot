@@ -6,6 +6,7 @@ from ..perks import perkdict
 Discord_init_Color = 0xffbb54
 
 class DiscordInit:
+    DISCORD_BOT_TOKEN = ""
     VERSION = version
     def __init__(self, client):
         self.pre = command_prefix

@@ -11,6 +11,7 @@ import scipy.misc
 import scipy.cluster
 import urllib3,os
 import requests
+from tqdm import tqdm
 
 
 distortionTypes = [lambda i:[10*np.sin(i), 10*np.sin(i)],

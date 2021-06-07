@@ -62,14 +62,11 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(aliases=['id', 'distort'])
-    async def distortion(self,ctx,member:discord.Member==None,choix):
-        if(choix == None):
-            choix = choice(distortionTypes)
-        else:
-            choix = int(choix,10)
+    async def distortion(self,ctx,member:discord.Member=None):
+        choix = choice(range(len(distortionTypes)))
         try:
             if(member == None):
-                ctx.message.author
+                member = ctx.message.author
             filname = str(round(time.time()))
             await ctx.message.add_reaction('🔨')
             try:
@@ -91,7 +88,7 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
 
             downloadFileFromUrl(attachment_url, filname)
             img2distort = Image.open(filname + '.png')
-            dimg = distortImage(img2distort,int(choix))
+            dimg = distortImage(img2distort,distortionTypes[choix])
             dimg[0].save(filname + '.png')
             file = discord.File(filname + '.png', filename="distortedImage.png")
             embed = discord.Embed(color=find_dominant_color(filname + '.png',local=True))

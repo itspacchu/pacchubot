@@ -4,6 +4,7 @@ from io import FileIO
 import requests,shutil
 from bs4 import BeautifulSoup
 import time
+from tqdm import tqdm
 
 def cartoonize(myfile,filname,none=None):
     downloadFileFromUrl(myfile,filname)
@@ -26,7 +27,7 @@ def downloadFileFromUrl(something:str,name:str):
 
 
 #very shitty implementation i know but well 512,512 is a small image
-def distortImage(theImage,fxn):
+def distortImage(theImage,fxn,ctx=None,discordToken=None):
     info = None
     try:
         theImage.seek(1)
@@ -43,7 +44,7 @@ def distortImage(theImage,fxn):
     for imgChannel in bc,gc,rc: 
         dImg = np.zeros(imgChannel.shape)
         Image.fromarray(dImg)
-        for i in range(theImage.shape[0]):
+        for i in tqdm(range(theImage.shape[0])):
             for j in range(theImage.shape[1]):
                 try:
                     dImg[i][j] = imgChannel[i + int(fxn(i)[0])][j + int(fxn(j)[1])]

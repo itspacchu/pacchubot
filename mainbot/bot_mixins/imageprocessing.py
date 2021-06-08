@@ -60,7 +60,7 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
     
     @commands.command(aliases=['ich', 'cartoonize-help'])
     async def cartoonize_help(self,ctx):
-        embed = discord.Embed(title="Image Cartoonization", colour=discord.Colour(0xff67aa), description=f"```{self.pre}.ic @mention/file``` attach an image or @mention someone to get their dp")
+        embed = discord.Embed(title="Image Cartoonization", colour=discord.Colour(0xff67aa), description=f"```{self.pre}ic @mention/file``` attach an image or @mention someone to get their dp")
         
         embed.set_image(url="https://raw.githubusercontent.com/itspacchu/pacchubot/master/images/cartoonizehelp.png")
         await ctx.send(embed=embed)

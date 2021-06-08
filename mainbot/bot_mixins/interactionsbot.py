@@ -200,7 +200,25 @@ class InteractionsMixin(DiscordInit, commands.Cog):
         self.MiscCollection.find_one_and_update({'_id': ObjectId(
             "60be497c826104950c8ea5d6")}, {'$inc': {'bruhs_delivered': 1}})
     
+    @commands.command(aliases=['vs','vemb'])
+    async def vidembed(self, ctx, *qlink):
+        try:
+            if(len(qlink) <= 1):
+                raise IndexError("There should be a string url")
+            await ctx.message.add_reaction('🎥')
+            link_encoded_safe = quote(queryToName(qlink[:1]), safe='')
+            title = quote(queryToName(qlink[1:]), safe='')
+            full_url = "http://api.itspacchu.tk/vidembed?vsrc="+link_encoded_safe + "&title=" + title
+            await ctx.message.channel.send(full_url)
+        except IndexError:
+            await ctx.message.add_reaction('💭')
+            embed = discord.Embed(title="Video URL to Discord Embed", colour=discord.Colour(
+                0x365eff), description=f"```{self.pre}vs [link to .mp4/.webm video]``` send an embed with .mp4 or .webm videos unrestricted \n Want to upload video > 8MB use the buttons below (FOSS)")
+            await ctx.send(embed=embed, components=[[
+                Button(style=ButtonStyle.URL,label="Transfer.sh [Free and OpenSource]", url="https://transfer.sh/"),
+                Button(style=ButtonStyle.URL, label="Mediafire [Account Needed]",url="https://www.mediafire.com/")
+            ],])
         
-    
+ 
 def setup(bot):
     bot.add_cog(InteractionsMixin(bot))

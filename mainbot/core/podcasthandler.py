@@ -73,6 +73,7 @@ class Podcast:
         return link
     
     def PodcastImage(self,arg = 0):
+        arg = 0
         entry = self.entries[arg]
         try:
             return entry['image']['href']

@@ -5,8 +5,8 @@ from .. import perks
 from random import choice
 
 
-API_URL = "https://api-inference.huggingface.co/models/EleutherAI/gpt-neo-125M"
-Q_URL = "https://api-inference.huggingface.co/models/google/t5-large-ssm-nq"
+API_URL = "https://api-inference.huggingface.co/models/gpt2"
+Q_URL = "https://api-inference.huggingface.co/models/google/t5-small-ssm-nq"
 CPT_URL = "https://api-inference.huggingface.co/models/microsoft/CodeGPT-small-py"
 headers = {"Authorization": f"Bearer api_yLZWmlkhOxJRODrXzDFnIFihYulbnXkUUP"}
 

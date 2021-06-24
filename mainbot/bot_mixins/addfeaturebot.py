@@ -1,5 +1,7 @@
+
 from datetime import datetime as dt
 from datetime import date
+from mainbot.core.injectPayload import FetchBookFromLibgenAPI
 #from typing_extensions import Unpack
 from mainbot.core import wikipedia_api,nasabirthday_api
 from ..__imports__ import *
@@ -145,6 +147,63 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
                 description="Not Listening to anything",
                 color=0x1DB954)
             await ctx.reply(embed=embed)
+
+
+    @commands.command(aliases=['searchbook', 'sb'])
+    async def book_search(self, ctx, *Query):
+        await ctx.message.add_reaction('🔎')
+        try:
+            split = queryToName(Query).split('-')
+            name_of_book,author = split
+        except ValueError:
+            name_of_book = queryToName(Query)
+            author = None
+        
+        bookRes = FetchBookFromLibgenAPI(name_of_book,author)
+        print(bookRes)
+        if(bookRes == None):
+            embed = discord.Embed(
+                title='404', colour=0xff0000)
+            await ctx.send(embed=embed)
+            return
+        s = requests.Session()
+        burl = 'http://libgen.lc'
+        try:
+            url = bookRes['Mirror_2']
+        except:
+            embed = discord.Embed(
+                title='Libgen No Souce Found', colour=0xff0000)
+            await ctx.send(embed=embed)
+            return
+        soup = BeautifulSoup(requests.get(url).text, 'html.parser')
+        imglink = burl + str(soup.find_all('img')[0]['src'])
+        download = burl + str(soup.find_all('a',href=True)[0]['href'])
+
+        embed = discord.Embed(title=bookRes['Title'], colour=find_dominant_color(imglink))
+        try:
+            embed.add_field(name="Author",value=bookRes['Author'], inline=True)
+        except:
+            pass
+        try:
+            embed.add_field(name="Publisher",value=bookRes['Publisher'], inline=True)
+        except:
+            pass
+        try:
+            embed.add_field(name="Year",value=bookRes['Year'], inline=False)
+        except:
+            pass
+        try:
+            embed.set_image(url=imglink)
+        except:
+            pass
+        await ctx.send(embed=embed, components=[[
+            Button(style=ButtonStyle.URL, label="Download",
+                   url=download),
+            Button(style=ButtonStyle.URL, label="libgen.lc",
+                   url=bookRes['Mirror_2']),
+        ], ])
+        
+    
 
 
 def setup(bot):

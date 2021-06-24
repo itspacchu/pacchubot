@@ -42,7 +42,7 @@ class InteractionsMixin(DiscordInit, commands.Cog):
             embed.set_image(url=choice(self.perks['links']['hugs']))
         embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
         embed.set_footer(text=f"{self.name}", icon_url=self.avatar)
-        await ctx.reply(embed=embed)
+        await ctx.send(embed=embed)
 
 
     @commands.command()
@@ -60,7 +60,7 @@ class InteractionsMixin(DiscordInit, commands.Cog):
         embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
         embed.set_footer(text=f"{self.client.user.name}",
                         icon_url=self.client.user.avatar_url)
-        await ctx.reply(embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command()
     async def kill(self, ctx, member: discord.Member):
@@ -74,7 +74,7 @@ class InteractionsMixin(DiscordInit, commands.Cog):
             embed.set_image(url=choice(self.perks['links']['kill']))
         embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
         embed.set_footer(text=f"{self.client.user.name}",icon_url=self.client.user.avatar_url)
-        await ctx.reply(embed=embed)
+        await ctx.send(embed=embed)
 
 
     @commands.command()
@@ -92,7 +92,7 @@ class InteractionsMixin(DiscordInit, commands.Cog):
         embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
         embed.set_footer(text=f"{self.client.user.name}",
                         icon_url=self.client.user.avatar_url)
-        await ctx.reply(embed=embed)
+        await ctx.send(embed=embed)
 
 
     @commands.command(aliases=['sk'])
@@ -207,7 +207,10 @@ class InteractionsMixin(DiscordInit, commands.Cog):
                 raise IndexError("There should be a string url")
             await ctx.message.add_reaction('🎥')
             link_encoded_safe = quote(queryToName(qlink[:1]), safe='')
-            title = quote(queryToName(qlink[1:]), safe='')
+            try:
+                title = quote(queryToName(qlink[1:]), safe='')
+            except:
+                title = f"Video by {ctx.message.author.mention}"
             full_url = "http://api.itspacchu.tk/vidembed?vsrc="+link_encoded_safe + "&title=" + title
             await ctx.message.channel.send(full_url)
         except IndexError:
@@ -215,8 +218,7 @@ class InteractionsMixin(DiscordInit, commands.Cog):
             embed = discord.Embed(title="Video URL to Discord Embed", colour=discord.Colour(
                 0x365eff), description=f"```{self.pre}vs [link to .mp4/.webm video]``` send an embed with .mp4 or .webm videos unrestricted \n Want to upload video > 8MB use the buttons below (FOSS)")
             await ctx.send(embed=embed, components=[[
-                Button(style=ButtonStyle.URL,label="Transfer.sh [Free and OpenSource]", url="https://transfer.sh/"),
-                Button(style=ButtonStyle.URL, label="Mediafire [Account Needed]",url="https://www.mediafire.com/")
+                Button(style=ButtonStyle.URL,label="Transfer.sh", url="https://transfer.sh/"),
             ],])
         
  

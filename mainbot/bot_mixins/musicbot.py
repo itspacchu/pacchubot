@@ -35,12 +35,10 @@ class MusicMixin(DiscordInit, commands.Cog):
         await channel.connect()
 
 
-    @commands.command(pass_context=True, aliases=['oldp', 'olds'])
+    @commands.command(pass_context=True, aliases=['p', 's'])
     async def play(self, ctx, *, url="https://youtu.be/dQw4w9WgXcQ"):
         
-        # DISABLED
-        return
-        #await ctx.message.add_reaction('🎧') 
+        await ctx.message.add_reaction('🎧') 
         if ("youtube.com" in str(url) or "youtu.be"):
             async with ctx.typing():
                 player = await YTDLSource.from_url(url=url, loop=self.client.loop, stream=True)
@@ -67,9 +65,6 @@ class MusicMixin(DiscordInit, commands.Cog):
 
     @commands.command(pass_context=True, aliases=['oldpl'])
     async def lofi(self, ctx, *, url="https://youtu.be/5qap5aO4i9A"):
-        # DISABLED
-        return
-        #await ctx.message.add_reaction('🎧')
         async with ctx.typing():
             player = await YTDLSource.from_url(url, loop=self.client.loop, stream=True)
             ctx.voice_client.play(player, after=None)
@@ -79,11 +74,8 @@ class MusicMixin(DiscordInit, commands.Cog):
         embed.set_footer(text=self.name, icon_url=self.avatar)
         await ctx.reply(embed=embed)
 
-    @commands.command(aliases=['oldpodp'])
+    @commands.command(aliases=['oldpodp','podp'])
     async def podplay(self,ctx,epno=0):   
-        
-        # DISABLED
-        return
          
         podepi = epno
         if(self.lastPod == None):
@@ -99,8 +91,8 @@ class MusicMixin(DiscordInit, commands.Cog):
             try:
                 await self.playPodcast(ctx,podepi=podepi,currentpod=currentpod)
                 embed = discord.Embed(title=currentpod.GetEpisodeDetails(podepi)['title'],
-                                      colour=discord.Colour(0xb8e986), url=currentpod.GetEpisodeDetails(podepi)['link'],
-                                      description=currentpod.GetEpisodeDetails(podepi)['summsary'],
+                                      colour=find_dominant_color(currentpod.PodcastImage(podepi)), url=currentpod.GetEpisodeDetails(podepi)['link'],
+                                      description=currentpod.GetEpisodeDetails(podepi)['summary'],
                                       inline=False)
                 embed.set_thumbnail(url=currentpod.PodcastImage(podepi))
                 embed.set_author(name=self.name,icon_url=self.avatar)
@@ -109,14 +101,9 @@ class MusicMixin(DiscordInit, commands.Cog):
             except AttributeError:
                 await ctx.send("You aren't in voice channel m8")
 
-    @commands.command(aliases=['oldpodcast'])
+    @commands.command(aliases=['oldpodcast','podcast'])
     async def pod(self,ctx , * , strparse = " "):    
-        
-        # DISABLED
-        await ctx.message.add_reaction('❕')
-        await ctx.message.reply("This feature is currently disabled")
-        return
-    
+        await ctx.message.add_reaction('❕')  
     
         if(':' in strparse):
             podname_,num = strparse.replace(' ','').split(':')
@@ -144,17 +131,20 @@ class MusicMixin(DiscordInit, commands.Cog):
             embed.add_field(name=f"{self.pre}stop or {self.pre}dc",value="Stop and Disconnect\n Sadly Haven't Implemented any Pause for now", inline=False)
         if(podepi == None and not podname == " "):
             await ctx.send(f'Searching 🔍')
-            embed = discord.Embed(colour=discord.Colour(
-                0xbd10e0), description=" ")
-            embed.set_thumbnail(url=self.avatar)
-            embed.set_author(name=self.name, url=self.avatar,
-                             icon_url=self.avatar)
             try:
                 k = ph.PodSearch(podname)
             except json.JSONDecodeError:
+                embed = discord.Embed(colour=discord.Colour(0x120012), description=" ")
+                embed.set_thumbnail(url=self.avatar)
+                embed.set_author(name=self.name, url=self.avatar,icon_url=self.avatar)
                 embed.add_field(name=f"Corrupted Feed",value="Command raised an exception: JSONDecodeError",inline=False)
                 return
             except:
+                embed = discord.Embed(
+                    colour=discord.Colour(0x120012), description=" ")
+                embed.set_thumbnail(url=self.avatar)
+                embed.set_author(
+                    name=self.name, url=self.avatar, icon_url=self.avatar)
                 embed.add_field(name=f"Somewhere Something went wrong",
                                 value=r"I have 0 clue what the hell happened rn ¯\_(ツ)_/¯", inline=False)
                 return
@@ -163,6 +153,13 @@ class MusicMixin(DiscordInit, commands.Cog):
                 currentpod = ph.Podcast(k['name'], k['rss'])
                 self.lastPod = currentpod
                 paginationsize = ph.Pagination(k['count'],5)
+                try:
+                    thiscol = find_dominant_color(k['image'])
+                except:
+                    thiscol = 0xffffff
+                embed = discord.Embed(colour=thiscol, description=" ")
+                embed.set_thumbnail(url=self.avatar)
+                embed.set_author(name=self.name, url=self.avatar, icon_url=self.avatar)
                 ind = 0 + 5*start
                 for episode_ in currentpod.ListEpisodes()[start:start+5]:
                     embed.add_field(name=f"{ind} : "+episode_,value=k['date'],inline=False)
@@ -179,8 +176,6 @@ class MusicMixin(DiscordInit, commands.Cog):
                 embed.set_thumbnail(url=self.avatar)
 
             embed.set_thumbnail(url=currentpod.PodcastImage(podepi))
-            embed.set_author(name=self.name,icon_url=self.avatar)
-            embed.set_footer(text=k['name'],icon_url=self.avatar)
 
         await ctx.send(embed=embed)
 
@@ -200,7 +195,7 @@ class MusicMixin(DiscordInit, commands.Cog):
         if not voice_client.is_playing():
             voice_client.play(audio_source, after=None)
 
-    @commands.command(aliases=['oldfuckoff', 'olddc' , 'olddisconnect'])
+    @commands.command(aliases=['fuckoff', 'dc' , 'disconnect'])
     async def stop(self, ctx ):
         if(ctx.author.voice.channel):
             await ctx.message.add_reaction('👍')
@@ -219,11 +214,7 @@ class MusicMixin(DiscordInit, commands.Cog):
     @lofi.before_invoke
     @play.before_invoke
     async def ensure_voice(self, ctx):
-        
-        # DISABLED
         await ctx.message.add_reaction('❕')
-        await ctx.message.reply("This feature is currently disabled")
-        return
     
         if ctx.voice_client is None:
             if ctx.author.voice.channel:

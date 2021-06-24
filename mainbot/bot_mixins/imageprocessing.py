@@ -108,7 +108,7 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
                 pass
             os.remove(filname + '.png')
             self.MiscCollection.find_one_and_update({'_id': ObjectId("60be497c826104950c8ea5d6")}, {'$inc': {'images_distorted': 1}})
-        except IndexError:
+        except ValueError:
             await ctx.send(f"Something seemed to be wrong \n use help```{self.pre}idh```")
             
         

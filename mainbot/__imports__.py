@@ -27,6 +27,8 @@ from discord.ext.commands import CommandError , CommandNotFound
 from discord_components import DiscordComponents, Button , ButtonStyle,component,InteractionType
 from .utils import *
 from urllib.parse import quote,unquote
+from libgen_api import LibgenSearch
+from bs4 import BeautifulSoup
 # import subprocess
 # import time
 # import pymongo

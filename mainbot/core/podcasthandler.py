@@ -7,11 +7,11 @@ def Pagination(totlen:int,indsiz:int):
     return ceil(totlen/indsiz)
 
 
-def PodSearch(query):
+def PodSearch(query,searchIndex=0):
     formattedQuery = query.replace(' ', '+')
     response = requests.get(f"https://itunes.apple.com/search?term={formattedQuery}&entity=podcast").json()
     try:
-        Result = response['results'][0]
+        Result = response['results'][searchIndex]
         stuff_to_return = {
             "name":Result['collectionName'],
             "rss":Result['feedUrl'],

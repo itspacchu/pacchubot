@@ -115,7 +115,7 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
             os.remove(filname + '.png')
             self.MiscCollection.find_one_and_update({'_id': ObjectId("60be497c826104950c8ea5d6")}, {'$inc': {'images_distorted': 1}})
         except Exception as e:
-            await ctx.send(f"Something seemed to be wrong \n use help```{self.pre}idh\n{e}```")
+            await ctx.send(f"GIFs aren't working ;-;```{self.pre}idh\n{e}```")
             return
             
         

@@ -93,17 +93,21 @@ class MusicMixin(DiscordInit, commands.Cog):
                 await self.playPodcast(ctx,podepi=podepi,currentpod=currentpod)
                 embed = discord.Embed(title=currentpod.GetEpisodeDetails(podepi)['title'],
                                       colour=find_dominant_color(currentpod.PodcastImage(podepi)), url=currentpod.GetEpisodeDetails(podepi)['link'],
-                                      description=currentpod.GetEpisodeDetails(podepi)['summary'],
+                                      description=currentpod.GetEpisodeDetails(podepi)['summary'][:300],
                                       inline=False)
                 embed.set_thumbnail(url=currentpod.PodcastImage(podepi))
                 embed.set_author(name=self.name,icon_url=self.avatar)
                 embed.set_footer(text=currentpod.GetEpisodeDetails(podepi)['title'],icon_url=self.avatar)
-                await ctx.send(embed=embed)
+                await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")],])
             except AttributeError:
                 await ctx.send("You aren't in voice channel m8")
+            
+        res = await self.client.wait_for("button_click")
+        if(res.component.label == "Stop"):
+            await ctx.invoke(self.client.get_command('stop'))
 
     @commands.command(aliases=['oldpodcast','podcast'])
-    async def pod(self,ctx , * , strparse = " ",pgNo=0):    
+    async def pod(self,ctx , * , strparse = " ",pgNo=0,searchIndex=0):    
         await ctx.message.add_reaction('❕')  
     
         if(':' in strparse):
@@ -131,14 +135,14 @@ class MusicMixin(DiscordInit, commands.Cog):
             embed.add_field(name=f"{self.pre}pod [Name of Podcast] : [Selection Number] or {self.pre}podp [Selection No]", value="Play the podcast selection , default 0 plays the latest available episode",inline=False)
             embed.add_field(name=f"{self.pre}stop or {self.pre}dc",value="Stop and Disconnect\n Sadly Haven't Implemented any Pause for now", inline=False)
         if(podepi == None and not podname == " "):
-            await ctx.send(f'Searching 🔍')
+            await ctx.message.add_reaction('🔍') 
             try:
-                k = ph.PodSearch(podname)
-            except json.JSONDecodeError:
+                k = ph.PodSearch(podname,searchIndex=searchIndex)
+            except json.JSONDecodeError as e:
                 embed = discord.Embed(colour=discord.Colour(0x120012), description=" ")
                 embed.set_thumbnail(url=self.avatar)
                 embed.set_author(name=self.name, url=self.avatar,icon_url=self.avatar)
-                embed.add_field(name=f"Corrupted Feed",value="Command raised an exception: JSONDecodeError",inline=False)
+                embed.add_field(name=f"Corrupted Feed",value=e,inline=False)
                 return
             except:
                 embed = discord.Embed(colour=discord.Colour(0x120012), description=" ")
@@ -162,7 +166,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                 for episode_ in currentpod.ListEpisodes()[start:start+5]:
                     embed.add_field(name=f"{ind} : "+episode_,value=k['date'],inline=False)
                     ind += 1
-                embed.set_footer(text=f"Page {start}/{paginationsize}", icon_url=self.avatar)
+                embed.set_footer(text=f"Page {start+1}/{paginationsize}", icon_url=self.avatar)
                 try:
                     embed.set_thumbnail(url=k['image'])
                 except:
@@ -175,12 +179,23 @@ class MusicMixin(DiscordInit, commands.Cog):
 
             embed.set_thumbnail(url=currentpod.PodcastImage(podepi))
 
-        del_dis = await ctx.send(embed=embed,components=[[Button(style=ButtonStyle.green, label="Next Page")]])
+        del_dis = await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.green, label="Play Latest"), Button(style=ButtonStyle.red, label="Prev Page"), Button(style=ButtonStyle.blue, label="Next Page"), Button(style=ButtonStyle.grey, label="Next Search Result")]])
         
         res = await self.client.wait_for("button_click")
-        if(res.component.label == "Next Page"):
+        if(res.component.label == "Play Latest"):
             await del_dis.delete()
-            await ctx.invoke(self.client.get_command('pod'), podname, pgNo=pgNo+1)
+            await ctx.invoke(self.client.get_command('podplay'))
+        elif(res.component.label == "Next Page"):
+            await del_dis.delete()
+            await ctx.invoke(self.client.get_command('pod'), strparse=strparse, pgNo=pgNo+1)
+        elif(res.component.label == "Prev Page" and pgNo > 2):
+            await del_dis.delete()
+            await ctx.invoke(self.client.get_command('pod'), strparse=strparse, pgNo=pgNo-1)
+        elif(res.component.label == "Next Search Result"):
+            await del_dis.delete()
+            await ctx.invoke(self.client.get_command('pod'), strparse=strparse, pgNo=0 ,searchIndex=searchIndex+1)
+            
+
 
     async def playPodcast(self, context, podepi, currentpod):
         try:

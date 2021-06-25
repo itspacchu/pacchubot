@@ -9,11 +9,14 @@ from random import choice
 
 class ImageProcessingMixin(DiscordInit, commands.Cog):
     @commands.command(aliases=['ic', 'cartoon'])
-    async def cartoonize(self,ctx, member: discord.Member = None):
+    async def cartoonize(self,ctx, member: discord.Member = None,attachedImg=None):
         filname = str(round(time.time()))
         await ctx.message.add_reaction('🖌')
         try:
-            attachment_url = ctx.message.attachments[0].url
+            if(attachedImg == None):
+                attachment_url = ctx.message.attachments[0].url
+            else:
+                attachment_url = attachedImg
             await ctx.message.add_reaction('⏬')
             await better_send(ctx, "Processing will take few seconds..")
         except:
@@ -26,7 +29,7 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
                     attachment_url = hgp.avatar_url
                 await better_send(ctx, "Getting User's avatar")
             except:
-                await better_send(ctx, "I think something went wrong!")
+                await better_send(ctx, "> I think something went wrong!")
                 return None
 
         downloadFileFromUrl(attachment_url, filname)
@@ -66,17 +69,20 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(aliases=['id', 'distort'])
-    async def distortion(self,ctx,member:discord.Member=None):
+    async def distortion(self,ctx,member:discord.Member=None,attachedImg=None):
         choix = choice(range(len(distortionTypes)))
         try:
             if(member == None):
                 member = ctx.message.author
             filname = str(round(time.time()))
             await ctx.message.add_reaction('🔨')
-            try:
-                attachment_url = ctx.message.attachments[0].url
+            try: 
+                if(attachedImg == None):
+                    attachment_url = ctx.message.attachments[0].url
+                else:
+                    attachment_url = attachedImg
                 await ctx.message.add_reaction('⏬')
-                await better_send(ctx, "> Processing will take few seconds..")
+                await ctx.send("> Processing will take few minutes..")
             except:
                 try:
                     hgp = member
@@ -85,10 +91,10 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
                         attachment_url = ctx.message.author.avatar_url
                     else:
                         attachment_url = hgp.avatar_url
-                    await better_send(ctx, "> Getting User's avatar")
+                    await ctx.send("> Getting User's avatar")
                 except:
-                    await better_send(ctx, "I think something went wrong!")
-                    return None
+                    await ctx.send("> I think something went wrong!")
+                    return
 
             downloadFileFromUrl(attachment_url, filname)
             img2distort = Image.open(filname + '.png')
@@ -108,8 +114,9 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
                 pass
             os.remove(filname + '.png')
             self.MiscCollection.find_one_and_update({'_id': ObjectId("60be497c826104950c8ea5d6")}, {'$inc': {'images_distorted': 1}})
-        except ValueError:
-            await ctx.send(f"Something seemed to be wrong \n use help```{self.pre}idh```")
+        except Exception as e:
+            await ctx.send(f"Something seemed to be wrong \n use help```{self.pre}idh\n{e}```")
+            return
             
         
         

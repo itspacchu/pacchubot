@@ -12,15 +12,18 @@ class InteractionsMixin(DiscordInit, commands.Cog):
 
         """
         hgp = member
+        url_link = None
         await ctx.message.add_reaction('🙄')
         if(ctx.message.author == hgp or hgp == None):
             embed = discord.Embed(
                 title="OwO", description=f"{ctx.message.author.mention} steals ...wait thats your OWN", colour=find_dominant_color(ctx.message.author.avatar_url))
             embed.set_image(url=ctx.message.author.avatar_url)
+            url_link = ctx.message.author.avatar_url
         else:
             embed = discord.Embed(
                 title="Swong..!", description=f"{ctx.message.author.mention} yeets {hgp.mention}'s profile pic 👀'", colour=find_dominant_color(hgp.avatar_url))
             embed.set_image(url=hgp.avatar_url)
+            url_link = hgp.avatar_url
         try:
             embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
         except:
@@ -28,7 +31,19 @@ class InteractionsMixin(DiscordInit, commands.Cog):
                              icon_url=ctx.message.author.avatar_url)
         embed.set_footer(text=f"{self.client.user.name}",
                          icon_url=self.client.user.avatar_url)
-        await better_send(ctx,embed=embed)
+        
+        del_dis = await ctx.send(embed=embed, components=[[
+            Button(style=ButtonStyle.green, label="Cartoonize"),
+            Button(style=ButtonStyle.blue, label="Distort"),
+        ],])
+        
+        res = await self.client.wait_for("button_click")
+        if(res.component.label == "Cartoonize"):
+            await del_dis.delete()
+            await ctx.invoke(self.client.get_command('cartoonize'), attachedImg=url_link)
+        elif(res.component.label == "Distort"):
+            await del_dis.delete()
+            await ctx.invoke(self.client.get_command('distortion'), attachedImg=url_link)
         
     @commands.command(aliases=['gb'])
     async def guild_banner(self, ctx, member: discord.Member = None):

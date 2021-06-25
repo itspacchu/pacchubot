@@ -11,6 +11,7 @@ class AnimeMixin(DiscordInit, commands.Cog):
     @commands.command(aliases=['ap','anichar', 'anic'])
     async def anipics(self, ctx, *Query,index=0):
         global ani, http
+        del_dis =None
         charQuery = queryToName(Query)
         try:
             await ctx.message.add_reaction('🔍')
@@ -19,7 +20,7 @@ class AnimeMixin(DiscordInit, commands.Cog):
                 url = f"https://api.jikan.moe/v3/character/{malID}/pictures"
                 name = f"https://api.jikan.moe/v3/character/{malID}"
             except ValueError:
-                charid = ani.search('character', charQuery)['results'][0]
+                charid = ani.search('character', charQuery)['results'][index]
                 url = f"https://api.jikan.moe/v3/character/{charid['mal_id']}/pictures"
                 name = f"https://api.jikan.moe/v3/character/{charid['mal_id']}"
                 
@@ -29,30 +30,41 @@ class AnimeMixin(DiscordInit, commands.Cog):
             color = find_dominant_color(choice(picdat)['large'])
             embed = discord.Embed(title=f"{namedat}",url = chardetail['url'] ,colour=color)
             try:
-                embed.add_field(name="from Anime/Manga",value=chardetail['animeography'][0]['name'], inline=True)
+                embed.add_field(
+                    name="from Anime/Manga", value=chardetail['animeography'][index]['name'], inline=True)
             except:   
                 try:
-                    embed.add_field(name="from Manga", value=chardetail['mangaography'][0]['name'], inline=True)
+                    embed.add_field(
+                        name="from Manga", value=chardetail['mangaography'][index]['name'], inline=True)
                 except:
                     pass
             embed.set_image(url=choice(picdat)['large'])
-            await ctx.send(embed=embed,components=[[
+            del_dis = await ctx.send(embed=embed,components=[[
+                Button(style=ButtonStyle.green, label="Next Picture"),
                 Button(style=ButtonStyle.URL, label="Anime",
-                       url=chardetail['animeography'][0]['url']),
+                       url=chardetail['animeography'][index]['url']),
                 Button(style=ButtonStyle.URL, label="Manga",
-                       url=chardetail['mangaography'][0]['url']),
+                       url=chardetail['mangaography'][index]['url']),
             ],])
-        except:
+        except IndexError as e:
             await ctx.message.add_reaction('😞')
             embed = discord.Embed(color=0xff0000)
             embed.add_field(name="Images Not Found",value=" Coudn't find any images on given Query try charID? ", inline=False)
             embed.set_footer(
                 text=f" {self.name} {version}", icon_url=self.avatar)
             await ctx.send(embed=embed)
+        
+        res = await self.client.wait_for("button_click")
+        if(res.component.label == "Next Picture"):
+            await del_dis.delete()
+            await ctx.invoke(self.client.get_command('anipics'), charQuery, index=index+1)
+        
+        
             
 
     @commands.command(aliases=['ani', 'anim'])
     async def anime(self,ctx, *Query,index=0):
+        del_dis = None
         global  ani
         animeQuery = queryToName(Query).strip()
         dbStore = {
@@ -63,10 +75,10 @@ class AnimeMixin(DiscordInit, commands.Cog):
         try:
             try:
                 await ctx.message.add_reaction('🔍')
-                asrc = ani.search('anime', animeQuery)['results'][0]
+                asrc = ani.search('anime', animeQuery)['results'][index]
             except:
                 await ctx.message.add_reaction('🔍')
-                asrc = ani.search('anime', animeQuery)['results'][1]
+                asrc = ani.search('anime', animeQuery)['results'][index+1]
             mal_id = asrc['mal_id']
             more_info = ani.anime(mal_id)
             trailer_url = more_info['trailer_url']
@@ -125,7 +137,8 @@ class AnimeMixin(DiscordInit, commands.Cog):
             except:
                 pass
             embed.set_footer(text=f"Search for full title for more accurate results", icon_url=self.avatar)
-            await ctx.send(embed=embed,components=[
+            del_dis = await ctx.send(embed=embed,components=[
+                Button(style=ButtonStyle.green, label="Next Anime"),
                 Button(style=ButtonStyle.URL, label="MAL", url=asrc['url'])
             ])
         except KeyError:
@@ -134,11 +147,18 @@ class AnimeMixin(DiscordInit, commands.Cog):
             embed.add_field(name="Anime Not Found", value="That Anime is not found on MAL", inline=False)
             embed.set_footer(text=self.name, icon_url=self.avatar)
             await ctx.send(embed=embed)
+        
+        res = await self.client.wait_for("button_click")
+        if(res.component.label == "Next Anime"):
+            await del_dis.delete()
+            await ctx.invoke(self.client.get_command('anime'), animeQuery , index=index+1)
+        
 
 
     @commands.command(aliases=['man', 'm'])
-    async def manga(self, ctx, *Query):
+    async def manga(self, ctx, *Query,index=0):
         global  ani
+        del_dis = None
         mangaQuery = queryToName(Query)
         dbStore = {
             "charname": mangaQuery,
@@ -147,7 +167,7 @@ class AnimeMixin(DiscordInit, commands.Cog):
         self.mangaSearch.insert_one(dbStore)
         try:
             await ctx.message.add_reaction('🔍')
-            asrc = ani.search('manga', mangaQuery)['results'][0]
+            asrc = ani.search('manga', mangaQuery)['results'][index]
             try:
                 color = find_dominant_color(asrc['image_url'])
             except:
@@ -165,7 +185,8 @@ class AnimeMixin(DiscordInit, commands.Cog):
             except:
                 pass
             embed.set_footer(text=f"Search for full title for more accurate results", icon_url=self.client.user.avatar_url)
-            await ctx.send(embed=embed,components=[
+            del_dis = await ctx.send(embed=embed,components=[
+                Button(style=ButtonStyle.green, label="Next Manga"),
                 Button(style=ButtonStyle.URL, label="Visit MAL", url=asrc['url'])
             ])
         except:
@@ -173,7 +194,11 @@ class AnimeMixin(DiscordInit, commands.Cog):
             embed = discord.Embed(color=0xff0000)
             embed.add_field(name="Manga Not Found", value="Manga Query not found on MAL", inline=False)
             await ctx.send(embed=embed)
-        return
+    
+        res = await self.client.wait_for("button_click")
+        if(res.component.label == "Next Manga"):
+            await del_dis.delete()
+            await ctx.invoke(self.client.get_command('anime'), mangaQuery, index=index+1)
 
 def setup(bot):
     bot.add_cog(AnimeMixin(bot))

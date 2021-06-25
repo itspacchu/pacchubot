@@ -128,6 +128,9 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
 
     @commands.command()
     async def spotify(self , ctx, user:discord.Member = None):
+        wait = None
+        song_url_if_exists = ""
+        le_url = "https://open.spotify.com/track/"
         await ctx.message.add_reaction('🎵')
         flag = 0
         if user == None:
@@ -140,71 +143,86 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
                         activity.title), color=find_dominant_color(activity.album_cover_url))
                     embed.set_thumbnail(url=activity.album_cover_url)
                     embed.add_field(name="Artist", value=activity.artist)
-                    await ctx.reply(embed=embed)
+                    song_url_if_exists = le_url+activity.track_id
+                    wait = await ctx.send(embed=embed,components=[[
+                Button(style=ButtonStyle.URL, label="Open in Spotify",
+                       url=le_url + activity.track_id),
+                        Button(style=ButtonStyle.green, label="Spotify",
+                               url=song_url_if_exists),
+            ], ])
         if(flag == 0):
             embed = discord.Embed(
                 title=f"{user.name}'s Spotify",
                 description="Not Listening to anything",
                 color=0x1DB954)
-            await ctx.reply(embed=embed)
+            await ctx.send(embed=embed)
+        if(not wait == None):
+            res = await self.client.wait_for("button_click")
+            await res.respond(
+                type=InteractionType.ChannelMessageWithSource, content=song_url_if_exists
+            )
+            
+            
 
 
     @commands.command(aliases=['searchbook', 'sb'])
-    async def book_search(self, ctx, *Query):
+    async def book_search(self, ctx, *Query,index=0):
         await ctx.message.add_reaction('🔎')
+        del_dis = None
         try:
-            split = queryToName(Query).split('-')
-            name_of_book,author = split
-        except ValueError:
-            name_of_book = queryToName(Query)
-            author = None
-        
-        bookRes = FetchBookFromLibgenAPI(name_of_book,author)
-        print(bookRes)
-        if(bookRes == None):
-            embed = discord.Embed(
-                title='404', colour=0xff0000)
-            await ctx.send(embed=embed)
-            return
-        s = requests.Session()
-        burl = 'http://libgen.lc'
-        try:
-            url = bookRes['Mirror_2']
-        except:
-            embed = discord.Embed(
-                title='Libgen No Souce Found', colour=0xff0000)
-            await ctx.send(embed=embed)
-            return
-        soup = BeautifulSoup(requests.get(url).text, 'html.parser')
-        imglink = burl + str(soup.find_all('img')[0]['src'])
-        download = burl + str(soup.find_all('a',href=True)[0]['href'])
+            try:
+                split = queryToName(Query).split('-')
+                name_of_book,author = split
+            except ValueError:
+                name_of_book = queryToName(Query)
+                author = None
 
-        embed = discord.Embed(title=bookRes['Title'], colour=find_dominant_color(imglink))
-        try:
-            embed.add_field(name="Author",value=bookRes['Author'], inline=True)
-        except:
-            pass
-        try:
-            embed.add_field(name="Publisher",value=bookRes['Publisher'], inline=True)
-        except:
-            pass
-        try:
-            embed.add_field(name="Year",value=bookRes['Year'], inline=False)
-        except:
-            pass
-        try:
-            embed.set_image(url=imglink)
-        except:
-            pass
-        await ctx.send(embed=embed, components=[[
-            Button(style=ButtonStyle.URL, label="Download",
-                   url=download),
-            Button(style=ButtonStyle.URL, label="libgen.lc",
-                   url=bookRes['Mirror_2']),
-        ], ])
+            bookRes = FetchBookFromLibgenAPI(name_of_book,author,index)
+            print(bookRes)
+            if(bookRes == None):
+                embed = discord.Embed(
+                    title='404', colour=0xff0000)
+                await ctx.send(embed=embed)
+                return
+            s = requests.Session()
+            burl = 'http://libgen.lc'
+            try:
+                url = bookRes['Mirror_2']
+            except:
+                embed = discord.Embed(
+                    title='Libgen No Souce Found', colour=0xff0000)
+                await ctx.send(embed=embed)
+                return
+            soup = BeautifulSoup(requests.get(url).text, 'html.parser')
+            imglink = burl + str(soup.find_all('img')[0]['src'])
+            download = burl + str(soup.find_all('a',href=True)[0]['href'])
+
+            embed = discord.Embed(title=bookRes['Title'], colour=find_dominant_color(imglink))
+            if(bookRes['Author']):
+                embed.add_field(name="Author",value=bookRes['Author'], inline=True)
+            if(bookRes['Publisher']):
+                embed.add_field(name="Publisher",value=bookRes['Publisher'], inline=True)
+            if(bookRes['Year']):
+                embed.add_field(name="Year",value=bookRes['Year'], inline=False)
+            if(imglink):
+                embed.set_image(url=imglink)
+            del_dis = await ctx.send(embed=embed, components=[[
+                Button(style=ButtonStyle.green, label="Next Result"),
+                Button(style=ButtonStyle.URL, label="Download",
+                       url=download),
+                Button(style=ButtonStyle.URL, label="libgen.lc",
+                       url=bookRes['Mirror_2']),
+            ], ])
+        except Exception as e:
+            await ctx.send(f"> Something went wrong!```{e}```")
+        
+        res = await self.client.wait_for("button_click")
+        if(res.component.label == "Next Result"):
+            await del_dis.delete()
+            await ctx.invoke(self.client.get_command('book_search'), name_of_book, index=index+1)
+        
         
     
-
 
 def setup(bot):
     bot.add_cog(AdditionalFeatureMixin(bot))

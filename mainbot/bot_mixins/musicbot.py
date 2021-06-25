@@ -37,7 +37,7 @@ class MusicMixin(DiscordInit, commands.Cog):
 
     @commands.command(pass_context=True, aliases=['p', 's'])
     async def play(self, ctx, *, url="https://youtu.be/dQw4w9WgXcQ"):
-        await ctx.send('> Disabled due to bug in ytdl')
+        await ctx.send("> Disabled")
         return
         await ctx.message.add_reaction('🎧') 
         if ("youtube.com" in str(url) or "youtu.be"):
@@ -66,10 +66,10 @@ class MusicMixin(DiscordInit, commands.Cog):
 
     @commands.command(pass_context=True, aliases=['pl'])
     async def lofi(self, ctx, *, url="https://youtu.be/5qap5aO4i9A"):
-        await ctx.send('> Disabled due to bug in ytdl')
+        await ctx.send("> Disabled")
         return
         async with ctx.typing():
-            player = await YTDLSource.from_url(url, loop=self.client.loop, stream=True)
+            player = await YTDLSource.from_url(self,url=url, loop=self.client.loop, stream=True)
             ctx.voice_client.play(player, after=None)
             embed = discord.Embed(title="Playing from Youtube", colour=discord.Colour(0xff5065), url=url, description=player.title)
             embed.set_image(url="https://i.ytimg.com/vi/5qap5aO4i9A/maxresdefault.jpg")
@@ -78,8 +78,7 @@ class MusicMixin(DiscordInit, commands.Cog):
         await ctx.reply(embed=embed)
 
     @commands.command(aliases=['oldpodp','podp'])
-    async def podplay(self,ctx,epno=0):   
-         
+    async def podplay(self,ctx,epno=0):    
         podepi = epno
         if(self.lastPod == None):
             embed = discord.Embed(colour=discord.Colour(0xbd10e0), description=" ")
@@ -104,7 +103,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                 await ctx.send("You aren't in voice channel m8")
 
     @commands.command(aliases=['oldpodcast','podcast'])
-    async def pod(self,ctx , * , strparse = " "):    
+    async def pod(self,ctx , * , strparse = " ",pgNo=0):    
         await ctx.message.add_reaction('❕')  
     
         if(':' in strparse):
@@ -118,7 +117,7 @@ class MusicMixin(DiscordInit, commands.Cog):
             podepi = None
 
         try:
-            start = int(podname_.split('-')[1])
+            start = pgNo
             podname = podname_.split('-')[0]
         except:
             start = 0
@@ -163,8 +162,6 @@ class MusicMixin(DiscordInit, commands.Cog):
                 for episode_ in currentpod.ListEpisodes()[start:start+5]:
                     embed.add_field(name=f"{ind} : "+episode_,value=k['date'],inline=False)
                     ind += 1
-                if(paginationsize > 1):
-                    embed.add_field(name="Change Page",value=f"```{self.pre}pod {podname} - [Page_Number]```")
                 embed.set_footer(text=f"Page {start}/{paginationsize}", icon_url=self.avatar)
                 try:
                     embed.set_thumbnail(url=k['image'])
@@ -178,7 +175,12 @@ class MusicMixin(DiscordInit, commands.Cog):
 
             embed.set_thumbnail(url=currentpod.PodcastImage(podepi))
 
-        await ctx.send(embed=embed)
+        del_dis = await ctx.send(embed=embed,components=[[Button(style=ButtonStyle.green, label="Next Page")]])
+        
+        res = await self.client.wait_for("button_click")
+        if(res.component.label == "Next Page"):
+            await del_dis.delete()
+            await ctx.invoke(self.client.get_command('pod'), podname, pgNo=pgNo+1)
 
     async def playPodcast(self, context, podepi, currentpod):
         try:
@@ -216,7 +218,6 @@ class MusicMixin(DiscordInit, commands.Cog):
     @play.before_invoke
     async def ensure_voice(self, ctx):
         await ctx.message.add_reaction('❕')
-    
         if ctx.voice_client is None:
             if ctx.author.voice.channel:
                 self.StartTime = ttime.time()

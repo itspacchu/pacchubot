@@ -29,7 +29,7 @@ class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
             Button(style=ButtonStyle.URL, label="I LOV THIS ANIME",
                    url="https://4anime.to/anime/violet-evergarden"),
             Button(style=ButtonStyle.URL, label="ANOTHER BOOTON",
-                   url="http://demo.polr.me/wouldyouclickthis")],
+                   url="bit.ly/IqT6zt")],
             [Button(style=ButtonStyle.URL, label="I LOV THIS WEBTOON",
                     url="https://www.webtoons.com/en/comedy/everywhere-and-nowhere/list?title_no=1598&page=1"),
              Button(style=ButtonStyle.URL, label="DOX PACCHU",

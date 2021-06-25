@@ -32,10 +32,12 @@ def downloadFileFromUrl(something:str,name:str):
     del response
 
 
-def FetchBookFromLibgenAPI(searchQuery:str,bAuthor=None):
+def FetchBookFromLibgenAPI(searchQuery:str,bAuthor=None,index=0):
     x = LibgenSearch().search_title(searchQuery)
     if(bAuthor == None):
-        return x[0]
+        if(len(x)==0):
+            return None
+        return x[index]
     else:
         sanity_counter = 0
         print(f"{searchQuery} by {bAuthor}")
@@ -43,7 +45,6 @@ def FetchBookFromLibgenAPI(searchQuery:str,bAuthor=None):
             sanity_counter += 1
             
             print(book['Title'],' \n-----\n' ,book['Author'])
-            print(bAuthor)
             if(bAuthor.lower().replace(' ','') in str(book['Author']).replace(' ','').lower()):
                 return book
             if(sanity_counter > 5):
@@ -67,7 +68,6 @@ def distortImage(theImage,fxn,ctx=None,discordToken=None):
     
     if(is_gif):
         bc,gc,rc,_ = theImage.split()
-        bc = np.asarr
     else:
         theImage = np.asarray(theImage)
         bc,gc,rc = theImage[:,:,0] , theImage[:,:,1] ,theImage[:,:,2]

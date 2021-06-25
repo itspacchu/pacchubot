@@ -1,30 +1,36 @@
-# Pacchu-s-Slave discord bot
+# Pacchu-s Discord bot
 
- ## [invite it to your server](https://discord.com/api/oauth2/authorize?client_id=709426015759368282&permissions=0&scope=bot)
+ <img src="https://user-images.githubusercontent.com/37984032/123429799-00a56b00-d5e5-11eb-9c96-6ca55bc563e4.png" alt="Download" width="250" href="https://discord.com/api/oauth2/authorize?client_id=709426015759368282&permissions=0&scope=bot"> 
 
-> anime  Searches for given anime
+# Commands
 
-> _manga Searches for give Manga
+> p.anime [Query] ```Searches for given anime <br>```
+> 
+> p.manga [Query] ```Searches for give Manga ```
+> 
+> p.anichar/ac [Query] ```Searches for given Anime Charactor ```
+> 
+> p.anipics/ap [Query/MAL_ID] ```Searches for Images of given Anime Charactor ```
+> 
+> p.avatar/av [@mention] ```Steals the person's DP :d ```
+> 
+> p.stats ```Gives usage stats ```
+> 
+> p.bruh [Image/url/emote] ```Server Unity mate```
+> 
+> p.sike [Image/url/emote] ```self something```
+> 
+> p.podcast/pod [Query] ```Podcast support ```
+> 
+> p.spotify [Mention] ```spotify yeet ```
+> 
+> p.cartoonize [mention/image upload] ```Cartoonizes given photos using Whitebox Cartoonization```
+> 
+> p.distort [mention/image_upload] ```Distorts given image/avatar based on 2D Sinusoidal displacement maps```
+> 
+> p.help ```isnt it obvious```
 
-> _anichar Searches for given Anime Charactor
-
-> _anipics Searches for Images of given Anime Charactor
-
-> _avatar @mention Steals the person's DP :d
-
-> _stats disabled bugs
-
-> _help isnt it obvious :o
-
-> _perk Extra stuff run the command for more commands
-
-> _distort 
-
-> _pod Podcast support [disabled]
-
-> _spotify spotify yeet
-
-> _cartoonize [mention/image upload]
+# Images
 
 ![image](https://user-images.githubusercontent.com/37984032/123426591-38aaaf00-d5e1-11eb-814b-b5203b7d36ad.png)
 

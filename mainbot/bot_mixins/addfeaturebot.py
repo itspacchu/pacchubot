@@ -49,9 +49,9 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
             ])
             self.MiscCollection.find_one_and_update({'_id': ObjectId(
                 "60be497c826104950c8ea5d6")}, {'$inc': {'wikipedia_fetches': 1}})
-        except ValueError:
+        except:
             await ctx.message.add_reaction('‼')
-            await ctx.reply("Is the date in proper format? ```DD-MM-YYYY \n>> 15-09-2001```")
+            await ctx.reply("> Something went wrong processing the image or is the date in proper format? [DD-MM-YYYY]")
 
     @commands.command(aliases=['hb', 'hubbleday'])
     async def hubblebirthday(self, ctx , *date_ish):

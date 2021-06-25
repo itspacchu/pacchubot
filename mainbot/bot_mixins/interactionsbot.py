@@ -29,6 +29,20 @@ class InteractionsMixin(DiscordInit, commands.Cog):
         embed.set_footer(text=f"{self.client.user.name}",
                          icon_url=self.client.user.avatar_url)
         await better_send(ctx,embed=embed)
+        
+    @commands.command(aliases=['gb'])
+    async def guild_banner(self, ctx, member: discord.Member = None):
+        """
+
+        """
+        hgp = member
+        await ctx.message.add_reaction('🙄')
+        try:
+            embed = discord.Embed(title="", colour=find_dominant_color(ctx.message.guild.banner_url))
+            embed.set_image(url=ctx.message.guild.banner_url)
+        except:
+            embed = discord.Embed(title="Server Doesn't have a banner", colour=0xff2020)
+        await better_send(ctx, embed=embed)
     
     @commands.command()
     async def hug(self,ctx, member: discord.Member):

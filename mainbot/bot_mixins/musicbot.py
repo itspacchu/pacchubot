@@ -37,7 +37,8 @@ class MusicMixin(DiscordInit, commands.Cog):
 
     @commands.command(pass_context=True, aliases=['p', 's'])
     async def play(self, ctx, *, url="https://youtu.be/dQw4w9WgXcQ"):
-        
+        await ctx.send('> Disabled due to bug in ytdl')
+        return
         await ctx.message.add_reaction('🎧') 
         if ("youtube.com" in str(url) or "youtu.be"):
             async with ctx.typing():
@@ -63,8 +64,10 @@ class MusicMixin(DiscordInit, commands.Cog):
         embed.set_footer(text=self.name, icon_url=self.avatar)
         await ctx.reply(embed=embed)
 
-    @commands.command(pass_context=True, aliases=['oldpl'])
+    @commands.command(pass_context=True, aliases=['pl'])
     async def lofi(self, ctx, *, url="https://youtu.be/5qap5aO4i9A"):
+        await ctx.send('> Disabled due to bug in ytdl')
+        return
         async with ctx.typing():
             player = await YTDLSource.from_url(url, loop=self.client.loop, stream=True)
             ctx.voice_client.play(player, after=None)
@@ -79,8 +82,7 @@ class MusicMixin(DiscordInit, commands.Cog):
          
         podepi = epno
         if(self.lastPod == None):
-            embed = discord.Embed(colour=discord.Colour(
-                0xbd10e0), description=" ")
+            embed = discord.Embed(colour=discord.Colour(0xbd10e0), description=" ")
             embed.set_thumbnail(url=self.avatar)
             embed.set_author(name=self.name, url=self.avatar,icon_url=self.avatar)
             embed.add_field(name=f"No Recent Podcast Searches",value=f"search for podcast using {self.pre}pod",inline=False)
@@ -140,13 +142,10 @@ class MusicMixin(DiscordInit, commands.Cog):
                 embed.add_field(name=f"Corrupted Feed",value="Command raised an exception: JSONDecodeError",inline=False)
                 return
             except:
-                embed = discord.Embed(
-                    colour=discord.Colour(0x120012), description=" ")
+                embed = discord.Embed(colour=discord.Colour(0x120012), description=" ")
                 embed.set_thumbnail(url=self.avatar)
-                embed.set_author(
-                    name=self.name, url=self.avatar, icon_url=self.avatar)
-                embed.add_field(name=f"Somewhere Something went wrong",
-                                value=r"I have 0 clue what the hell happened rn ¯\_(ツ)_/¯", inline=False)
+                embed.set_author(name=self.name, url=self.avatar, icon_url=self.avatar)
+                embed.add_field(name=f"Somewhere Something went wrong",value=r"I have 0 clue what the hell happened rn ¯\_(ツ)_/¯", inline=False)
                 return
             await ctx.message.add_reaction('⏳')
             if(not k['name'] == "Podcast Not Found"):
@@ -172,7 +171,9 @@ class MusicMixin(DiscordInit, commands.Cog):
                 except:
                     embed.set_thumbnail(url=self.avatar)
             else:
-                embed.add_field(name=f"No Podcasts Found",value="itunes returned no results",inline=False)
+                embed = discord.Embed(colour=discord.Colour(0x120012), description=" ")
+                embed.set_thumbnail(url=self.avatar)
+                embed.add_field(name=f"No Podcasts Found",value="No Results",inline=False)
                 embed.set_thumbnail(url=self.avatar)
 
             embed.set_thumbnail(url=currentpod.PodcastImage(podepi))

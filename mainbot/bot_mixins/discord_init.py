@@ -48,7 +48,7 @@ class DiscordInit:
         # try:
         qq = message.content.lower().split(' ')[0]
         if(len(qq) >= 3 and qq != None):
-            query = {'search': qq} # exact math here
+            query = {'search': qq} # exact match here
             try:
                 match = self.MemberTaunt.find_one(query)['taunt']
                 await message.channel.send(match)

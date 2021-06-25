@@ -32,18 +32,28 @@ class InteractionsMixin(DiscordInit, commands.Cog):
         embed.set_footer(text=f"{self.client.user.name}",
                          icon_url=self.client.user.avatar_url)
         
-        del_dis = await ctx.send(embed=embed, components=[[
+        await ctx.send(embed=embed, components=[[
             Button(style=ButtonStyle.green, label="Cartoonize"),
             Button(style=ButtonStyle.blue, label="Distort"),
         ],])
         
         res = await self.client.wait_for("button_click")
         if(res.component.label == "Cartoonize"):
-            await del_dis.delete()
-            await ctx.invoke(self.client.get_command('cartoonize'), attachedImg=url_link)
+            if(res.message.author.id == ctx.author.id):
+                await ctx.invoke(self.client.get_command('cartoonize'), attachedImg=url_link)
+            else:
+                await res.respond(
+                    type=InteractionType.ChannelMessageWithSource,
+                    content="Only the person who requested can do that mate"
+                )
         elif(res.component.label == "Distort"):
-            await del_dis.delete()
-            await ctx.invoke(self.client.get_command('distortion'), attachedImg=url_link)
+            if(res.message.author.id == ctx.author.id):
+                await ctx.invoke(self.client.get_command('distortion'), attachedImg=url_link)
+            else:
+                await res.respond(
+                    type=InteractionType.ChannelMessageWithSource,
+                    content="Only the person who requested can do that mate"
+                )
         
     @commands.command(aliases=['gb'])
     async def guild_banner(self, ctx, member: discord.Member = None):

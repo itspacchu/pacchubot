@@ -16,9 +16,11 @@ from . import __imports__ as internalImports
 
 
 async def report_errors_to_channel(client,error):
-    channel = client.get_channel(501237046854287365)
-    await client.send(f"```{error}```")
+    print(error)
+    channel = await client.get_channel(501237046854287365)
+    await client.send(f"```{str(error.__name__)}```")
     
+
 
 distortionTypes = [lambda i:[10*np.sin(i), 10*np.sin(i)],
                    lambda i:[10*np.sin(i), 0],

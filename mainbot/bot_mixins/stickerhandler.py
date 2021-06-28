@@ -5,42 +5,51 @@ from .discord_init import DiscordInit
 #webhooks stuff goes here
 class stickerHandler(DiscordInit, commands.Cog):
     @commands.command(aliases=['st','sendsticker','sends'])
-    async def sticker(self, ctx, stickername):
+    async def sticker(self,ctx,stickername=None):
         try:
-            query = {'search': stickername}  # exact match here
+            query = {'search': stickername}
+            member = ctx.author# exact match here
             try:
                 match = self.discordStickers.find_one(query)['stickerurl']
-                webhook = await ctx.channel.create_webhook("pacchu_webhook")
-                await webhook.send(match, username=ctx.author.name, avatar_url=ctx.author.avatar_url)
-                await ctx.message.delete()
+                webhook = await ctx.channel.create_webhook(name=member.name)
+                await webhook.send(str(match), username=member.name, avatar_url=member.avatar_url)
                 webhooks = await ctx.channel.webhooks()
                 for webhook in webhooks:
                     await webhook.delete()
-            except:
+
+            except Exception as e:
                 embed = discord.Embed(color=0xffffff, description=f"Supported Stickers (more adding soon)")
                 embed.set_thumbnail(url=self.avatar)
                 for i in self.discordStickers.find():
                     embed.add_field(name=i['search'],value=f"p.st {i['search']}", inline=True)
                 await ctx.send(embed=embed)
+                await report_errors_to_channel(self.client, e)
+                
         except Exception as e:
             await ctx.channel.send(e)
-            report_errors_to_channel(self.client,e)
+            await report_errors_to_channel(self.client, e)
+        await ctx.message.delete()
 
     @commands.command(aliases=['impersonate','sayas'])
-    async def impersonator(self,ctx,whom:discord.Member,*text):
-            text = queryToName(text)
+    async def impersonator(self, ctx, member: discord.Member, *, message=None):
+            text = queryToName(message)
             try:
-                webhook = await ctx.channel.create_webhook("pacchu_webhook")
-                await webhook.send(text, username=whom.display_name + '*', avatar_url=whom.avatar_url)
+                webhook = await ctx.channel.create_webhook(name=member.name)
+                await webhook.send(str(message), username=member.name+"*", avatar_url=member.avatar_url)
                 webhooks = await ctx.channel.webhooks()
                 for webhook in webhooks:
-                    await webhook.delete()
+                        await webhook.delete()
             except Exception as e:
                 await ctx.message.add_reaction('<:pacDoubleExclaim:858677949775872010>')
-                report_errors_to_channel(self.client, e)
+                await report_errors_to_channel(self.client, e)
+            await ctx.message.delete()
 
-                
-    
+    @commands.command(aliases=['rwh'])
+    async def resetwebhook(self,ctx):
+        webhooks = await ctx.channel.webhooks()
+        for webhook in webhooks:
+            await webhook.delete()
+            
 #discordStickers
 def setup(bot):
     bot.add_cog(stickerHandler(bot))

@@ -9,7 +9,7 @@ class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
     @commands.command()
     async def ecchi(self,ctx):
         try:
-            webhook = await ctx.channel.create_webhook(name="ecchichan")
+            webhook = await ctx.channel.create_webhook(name="pacchu_webhook")
             await webhook.send("That was removed due to licensing issues :( rip ecchichan 2020-2020", username="ecchichan", avatar_url="https://i.redd.it/5xkpkqjoz9g11.jpg")
             await ctx.channel.webhooks()
             await webhook.delete()

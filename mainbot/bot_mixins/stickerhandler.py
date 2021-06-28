@@ -10,7 +10,7 @@ class stickerHandler(DiscordInit, commands.Cog):
             query = {'search': stickername}  # exact match here
             try:
                 match = self.discordStickers.find_one(query)['stickerurl']
-                webhook = await ctx.channel.create_webhook(name=ctx.author.name)
+                webhook = await ctx.channel.create_webhook("pacchu_webhook")
                 await webhook.send(match, username=ctx.author.name, avatar_url=ctx.author.avatar_url)
                 await ctx.channel.webhooks()
                 await ctx.message.delete()
@@ -27,7 +27,7 @@ class stickerHandler(DiscordInit, commands.Cog):
     async def impersonator(self, ctx, whom:discord.Member,*text):
             text = queryToName(text)
             try:
-                webhook = await ctx.channel.create_webhook(name=whom.name)
+                webhook = await ctx.channel.create_webhook("pacchu_webhook")
                 await webhook.send(text, username=whom.name + '*' , avatar_url=whom.avatar_url)
                 await ctx.channel.webhooks()
                 await ctx.message.delete()

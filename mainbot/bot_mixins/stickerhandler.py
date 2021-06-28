@@ -16,6 +16,7 @@ class stickerHandler(DiscordInit, commands.Cog):
                 webhooks = await ctx.channel.webhooks()
                 for webhook in webhooks:
                     await webhook.delete()
+                await ctx.message.delete()
 
             except Exception as e:
                 embed = discord.Embed(color=0xffffff, description=f"Supported Stickers (more adding soon)")
@@ -23,12 +24,13 @@ class stickerHandler(DiscordInit, commands.Cog):
                 for i in self.discordStickers.find():
                     embed.add_field(name=i['search'],value=f"p.st {i['search']}", inline=True)
                 await ctx.send(embed=embed)
+                await ctx.message.delete()
                 await report_errors_to_channel(self.client, e)
                 
         except Exception as e:
             await ctx.channel.send(e)
             await report_errors_to_channel(self.client, e)
-        await ctx.message.delete()
+        
 
     @commands.command(aliases=['impersonate','sayas'])
     async def impersonator(self, ctx, member: discord.Member, *, message=None):
@@ -39,16 +41,12 @@ class stickerHandler(DiscordInit, commands.Cog):
                 webhooks = await ctx.channel.webhooks()
                 for webhook in webhooks:
                         await webhook.delete()
+                await ctx.message.delete()
             except Exception as e:
                 await ctx.message.add_reaction('<:pacDoubleExclaim:858677949775872010>')
                 await report_errors_to_channel(self.client, e)
-            await ctx.message.delete()
+            
 
-    @commands.command(aliases=['rwh'])
-    async def resetwebhook(self,ctx):
-        webhooks = await ctx.channel.webhooks()
-        for webhook in webhooks:
-            await webhook.delete()
             
 #discordStickers
 def setup(bot):

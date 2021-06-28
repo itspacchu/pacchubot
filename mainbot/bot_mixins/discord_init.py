@@ -52,6 +52,10 @@ class DiscordInit:
             try:
                 match = self.MemberTaunt.find_one(query)['taunt']
                 await message.channel.send(match)
+                if('pacchu' in query):
+                    await message.message.add_reaction('<:pac_1:858689626088275988>')
+                    await message.message.add_reaction('<:pac_2:858689625794019328>')
+                    await message.message.add_reaction('<:pac_3:858689626025492522>')
             except:
                 pass
         await self.client.process_commands(message)
@@ -75,6 +79,7 @@ class DiscordInit:
         self.VoiceUsage = self.db['VoiceActivity']
         self.MemberTaunt = self.db['memberTaunt']
         self.MiscCollection = self.db['miscCollection']
+        self.discordStickers = self.db['discordStickers']
 
 class BaseBot(DiscordInit, commands.Cog):
 

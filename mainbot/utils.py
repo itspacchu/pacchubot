@@ -12,6 +12,7 @@ import scipy.cluster
 import urllib3,os
 import requests
 from tqdm import tqdm
+from . import __imports__ as internalImports
 
 
 distortionTypes = [lambda i:[10*np.sin(i), 10*np.sin(i)],
@@ -25,8 +26,28 @@ distortionTypes = [lambda i:[10*np.sin(i), 10*np.sin(i)],
                    ]
 
 
-def ButtonValidator(res,ctx,labelName,userCheck=False):
-    cond = (res.channel == ctx.channel) and (res.component.label == labelName)
+async def ButtonProcessor(ctx,res,label:str,userCheck=True):
+    try:
+        if(res.component.label == label):
+            if(res.author.id == ctx.author.id or not userCheck):
+                return True
+            else:
+                await res.respond(
+                    type=internalImports.InteractionType.ChannelMessageWithSource,
+                    content="Only the person who requested can do that mate"
+                )
+                return False
+    except:
+        await res.respond(
+            type=internalImports.InteractionType.ChannelMessageWithSource,
+            content="That Button expired mate"
+        )
+        return False
+        
+
+
+def ButtonValidator(res,ctx,userCheck=False):
+    cond = (res.channel == ctx.channel)
     if(userCheck):
         cond = cond and (res.author.id==ctx.author.id)
     return cond

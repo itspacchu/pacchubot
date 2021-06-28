@@ -1,6 +1,8 @@
 
 from datetime import datetime as dt
 from datetime import date
+
+from discord_components import button
 from mainbot.core.injectPayload import FetchBookFromLibgenAPI
 #from typing_extensions import Unpack
 from mainbot.core import wikipedia_api,nasabirthday_api
@@ -216,10 +218,12 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
         except Exception as e:
             await ctx.send(f"> Something went wrong!```{e}```")
         
-        res = await self.client.wait_for("button_click")
-        if(res.component.label == "Next Result"):
-            await del_dis.delete()
-            await ctx.invoke(self.client.get_command('book_search'), name_of_book, index=index+1)
+        while True:
+            res = await self.client.wait_for("button_click", timeout=500)
+            if(await ButtonProcessor(ctx,res,"Next Result")):
+                await del_dis.delete()
+                del_dis = None
+                await ctx.invoke(self.client.get_command('book_search'), name_of_book, index=index+1)
         
         
     

@@ -102,8 +102,10 @@ class MusicMixin(DiscordInit, commands.Cog):
             except AttributeError:
                 await ctx.send("You aren't in voice channel m8")
         while True:
-            res = await self.client.wait_for("button_click",check=ButtonValidator(res=res,ctx=ctx,userCheck=True))
-            await ctx.invoke(self.client.get_command('stop'))
+            res = await self.client.wait_for("button_click")
+            if(await ButtonProcessor(ctx,res,"stop")):
+                await ctx.invoke(self.client.get_command('stop'))
+                break
 
     @commands.command(aliases=['oldpodcast','podcast'])
     async def pod(self,ctx , * , strparse = " ",pgNo=0,searchIndex=0):    

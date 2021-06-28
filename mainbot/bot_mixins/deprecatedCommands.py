@@ -8,7 +8,13 @@ from .discord_init import DiscordInit
 class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
     @commands.command()
     async def ecchi(self,ctx):
-        await ctx.reply("That was removed due to licensing issues :( rip ecchichan 2020-2020")
+        try:
+            webhook = await ctx.channel.create_webhook(name="ecchichan")
+            await webhook.send("That was removed due to licensing issues :( rip ecchichan 2020-2020", username="ecchichan", avatar_url="https://i.redd.it/5xkpkqjoz9g11.jpg")
+            await ctx.channel.webhooks()
+            await webhook.delete()
+        except:
+            ctx.send("That was removed due to licensing issues :( rip ecchichan 2020-2020")
     
     @commands.command()
     async def fuck(self,ctx):
@@ -22,6 +28,8 @@ class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
     @commands.command()
     async def simp(self,ctx):
         await ctx.send("No")
+        
+    
     @commands.command()
     async def buttons(self,ctx):
         await ctx.send("WUT DA FOOK BOOTANS",components=[

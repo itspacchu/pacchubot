@@ -54,10 +54,12 @@ class AnimeMixin(DiscordInit, commands.Cog):
                 text=f" {self.name} {version}", icon_url=self.avatar)
             await ctx.send(embed=embed)
         
-        res = await self.client.wait_for("button_click")
-        if(res.component.label == "Next Picture"):
-            await del_dis.delete()
-            await ctx.invoke(self.client.get_command('anipics'), charQuery, index=index+1)
+        while True:
+            res = await self.client.wait_for("button_click")
+            if(await ButtonProcessor(ctx, res, "Next Picture")):
+                await del_dis.delete()
+                del_dis = None
+                await ctx.invoke(self.client.get_command('anipics'), charQuery, index=index+1)
         
         
             
@@ -147,11 +149,12 @@ class AnimeMixin(DiscordInit, commands.Cog):
             embed.add_field(name="Anime Not Found", value="That Anime is not found on MAL", inline=False)
             embed.set_footer(text=self.name, icon_url=self.avatar)
             await ctx.send(embed=embed)
-        
-        res = await self.client.wait_for("button_click")
-        if(res.component.label == "Next Anime"):
-            await del_dis.delete()
-            await ctx.invoke(self.client.get_command('anime'), animeQuery , index=index+1)
+        while True:
+            res = await self.client.wait_for("button_click")
+            if(await ButtonProcessor(ctx,res,"Next Anime")):
+                await del_dis.delete()
+                del_dis = None
+                await ctx.invoke(self.client.get_command('anime'), animeQuery , index=index+1)
         
 
 
@@ -194,11 +197,12 @@ class AnimeMixin(DiscordInit, commands.Cog):
             embed = discord.Embed(color=0xff0000)
             embed.add_field(name="Manga Not Found", value="Manga Query not found on MAL", inline=False)
             await ctx.send(embed=embed)
-    
-        res = await self.client.wait_for("button_click")
-        if(res.component.label == "Next Manga"):
-            await del_dis.delete()
-            await ctx.invoke(self.client.get_command('anime'), mangaQuery, index=index+1)
+        while True:
+            res = await self.client.wait_for("button_click",timeout=500)
+            if(await ButtonProcessor(ctx, res, "Next Manga")):
+                await del_dis.delete()
+                del_dis = None
+                await ctx.invoke(self.client.get_command('anime'), mangaQuery, index=index+1)
 
 def setup(bot):
     bot.add_cog(AnimeMixin(bot))

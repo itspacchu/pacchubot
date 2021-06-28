@@ -82,7 +82,7 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
                 else:
                     attachment_url = attachedImg
                 await ctx.message.add_reaction('⏬')
-                await ctx.send("> Processing will take few minutes..")
+                await ctx.send("> Moving Pixels around...might take couple of seconds")
             except:
                 try:
                     hgp = member

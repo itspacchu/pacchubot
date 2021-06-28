@@ -34,8 +34,8 @@ def questionreply(text_in: str):
     response = requests.request("POST", Q_URL, headers=headers, data=text_in)
     try:
         return json.loads(response.content.decode("utf-8"))[0]["generated_text"]
-    except:
-        return choice(perks.perkdict['replies']['gpterror'])
+    except Exception as e:
+        return choice(perks.perkdict['replies']['gpterror']) + f"\n||e||"
 
 def rawgptquery(text_in:str):
     response = requests.request("POST", API_URL, headers=headers, data=text_in)

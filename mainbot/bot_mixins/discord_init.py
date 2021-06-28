@@ -43,19 +43,23 @@ class DiscordInit:
             return
 
         for x in message.mentions:
-            if(x == self.client.user and len(message.content)==21):
+            if(x == self.client.user and len(message.content)<=21):
                 await message.channel.send(choice(self.perks['replies']['pings']))
-        # try:
+
+        if('pacchu' in message.content.lower() and message.content < 10):
+            await message.message.add_reaction('<:pac_1:858689626088275988>')
+            asyncio.sleep(0.5)
+            await message.message.add_reaction('<:pac_2:858689625794019328>')
+            asyncio.sleep(0.5)
+            await message.message.add_reaction('<:pac_3:858689626025492522>')
+            asyncio.sleep(0.5)
+            
         qq = message.content.lower().split(' ')[0]
         if(len(qq) >= 3 and qq != None):
             query = {'search': qq} # exact match here
             try:
                 match = self.MemberTaunt.find_one(query)['taunt']
                 await message.channel.send(match)
-                if('pacchu' in query):
-                    await message.message.add_reaction('<:pac_1:858689626088275988>')
-                    await message.message.add_reaction('<:pac_2:858689625794019328>')
-                    await message.message.add_reaction('<:pac_3:858689626025492522>')
             except:
                 pass
         await self.client.process_commands(message)

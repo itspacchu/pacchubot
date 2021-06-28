@@ -146,6 +146,10 @@ class BaseBot(DiscordInit, commands.Cog):
                         value=f"Something of use atleast", inline=False)
         embed.add_field(name=f"{self.pre}bruh/sike [emote,link,text message]",
                         value=f"Something to be saved? idk why it an option", inline=False)
+        embed.add_field(name=f"{self.pre}sticker/st [sticker name]",
+                        value="Discord Stickers NQN clone", inline=False)
+        embed.add_field(name=f"{self.pre}impersonate/sayas @mention 'Deez nuzz' ",
+                        value="Impersonates the person mentioned", inline=False)
         embed.add_field(name=f"{self.pre}gpt \"Today is a wonderful..\"",
                         value="gpt neo text completion", inline=True)
         embed.add_field(name=f"{self.pre}q \"Why is chocolate beautiful?\"",

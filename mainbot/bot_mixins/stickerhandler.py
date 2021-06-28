@@ -15,11 +15,15 @@ class stickerHandler(DiscordInit, commands.Cog):
                 await ctx.channel.webhooks()
                 await ctx.message.delete()
             except:
-                pass  
+                embed = discord.Embed(color=0xffffff, description=f"Supported Stickers (more adding soon)")
+                embed.set_thumbnail(url=self.avatar)
+                for i in self.discordStickers.find():
+                    embed.add_field(name=i['search'],value=f"p.st {i['search']}", inline=True)
+                await ctx.send(embed=embed)
         except Exception as e:
             await ctx.channel.send(e)
 
-    @commands.command(aliases=['impersonate'])
+    @commands.command(aliases=['impersonate','sayas'])
     async def impersonator(self, ctx, whom:discord.Member,*text):
             text = queryToName(text)
             try:

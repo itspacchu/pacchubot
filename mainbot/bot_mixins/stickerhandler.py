@@ -15,7 +15,10 @@ class stickerHandler(DiscordInit, commands.Cog):
                 await webhook.send(str(match), username=member.name, avatar_url=member.avatar_url)
                 webhooks = await ctx.channel.webhooks()
                 for webhook in webhooks:
-                    await webhook.delete()
+                    try:
+                        await webhook.delete()
+                    except:
+                        pass
                 await ctx.message.delete()
 
             except Exception as e:
@@ -40,7 +43,10 @@ class stickerHandler(DiscordInit, commands.Cog):
                 await webhook.send(str(message), username=member.name+"*", avatar_url=member.avatar_url)
                 webhooks = await ctx.channel.webhooks()
                 for webhook in webhooks:
+                    try:
                         await webhook.delete()
+                    except:
+                        pass
                 await ctx.message.delete()
             except Exception as e:
                 await ctx.message.add_reaction('<:pacDoubleExclaim:858677949775872010>')

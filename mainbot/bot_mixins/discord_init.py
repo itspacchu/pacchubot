@@ -46,13 +46,13 @@ class DiscordInit:
             if(x == self.client.user and len(message.content)<=21):
                 await message.channel.send(choice(self.perks['replies']['pings']))
 
-        if('pacchu' in message.content.lower() and message.content < 10):
-            await message.message.add_reaction('<:pac_1:858689626088275988>')
-            asyncio.sleep(0.5)
-            await message.message.add_reaction('<:pac_2:858689625794019328>')
-            asyncio.sleep(0.5)
-            await message.message.add_reaction('<:pac_3:858689626025492522>')
-            asyncio.sleep(0.5)
+        if('pacchu' in message.content.lower() and len(message.content) > 10):
+            await message.add_reaction('<:pac_1:858689626088275988>')
+            await asyncio.sleep(0.5)
+            await message.add_reaction('<:pac_2:858689625794019328>')
+            await asyncio.sleep(0.5)
+            await message.add_reaction('<:pac_3:858689626025492522>')
+            await asyncio.sleep(0.5)
             
         qq = message.content.lower().split(' ')[0]
         if(len(qq) >= 3 and qq != None):

@@ -15,6 +15,11 @@ from tqdm import tqdm
 from . import __imports__ as internalImports
 
 
+async def report_errors_to_channel(client,error):
+    channel = client.get_channel(501237046854287365)
+    await client.send(f"```{error}```")
+    
+
 distortionTypes = [lambda i:[10*np.sin(i), 10*np.sin(i)],
                    lambda i:[10*np.sin(i), 0],
                    lambda i:[0, 10*np.sin(i)],

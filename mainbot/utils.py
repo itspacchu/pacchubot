@@ -25,6 +25,13 @@ distortionTypes = [lambda i:[10*np.sin(i), 10*np.sin(i)],
                    ]
 
 
+def ButtonValidator(res,ctx,labelName,userCheck=False):
+    cond = (res.channel == ctx.channel) and (res.component.label == labelName)
+    if(userCheck):
+        cond = cond and (res.author.id==ctx.author.id)
+    return cond
+
+
 def find_dominant_color(imageurl:str,local=False):
     try:
         NUM_CLUSTERS = 10

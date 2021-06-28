@@ -36,24 +36,24 @@ class InteractionsMixin(DiscordInit, commands.Cog):
             Button(style=ButtonStyle.green, label="Cartoonize"),
             Button(style=ButtonStyle.blue, label="Distort"),
         ],])
-        
-        res = await self.client.wait_for("button_click")
-        if(res.component.label == "Cartoonize"):
-            if(res.message.author.id == ctx.author.id):
-                await ctx.invoke(self.client.get_command('cartoonize'), attachedImg=url_link)
-            else:
-                await res.respond(
-                    type=InteractionType.ChannelMessageWithSource,
-                    content="Only the person who requested can do that mate"
-                )
-        elif(res.component.label == "Distort"):
-            if(res.message.author.id == ctx.author.id):
-                await ctx.invoke(self.client.get_command('distortion'), attachedImg=url_link)
-            else:
-                await res.respond(
-                    type=InteractionType.ChannelMessageWithSource,
-                    content="Only the person who requested can do that mate"
-                )
+        while True:
+            res = await self.client.wait_for("button_click",check=ButtonValidator(res=res, ctx=ctx, userCheck=False))
+            if(res.component.label == "Cartoonize"):
+                if(res.message.author.id == ctx.author.id):
+                    await ctx.invoke(self.client.get_command('cartoonize'), attachedImg=url_link)
+                else:
+                    await res.respond(
+                        type=InteractionType.ChannelMessageWithSource,
+                        content="Only the person who requested can do that mate"
+                    )
+            elif(res.component.label == "Distort"):
+                if(res.message.author.id == ctx.author.id):
+                    await ctx.invoke(self.client.get_command('distortion'), attachedImg=url_link)
+                else:
+                    await res.respond(
+                        type=InteractionType.ChannelMessageWithSource,
+                        content="Only the person who requested can do that mate"
+                    )
         
     @commands.command(aliases=['gb'])
     async def guild_banner(self, ctx, member: discord.Member = None):

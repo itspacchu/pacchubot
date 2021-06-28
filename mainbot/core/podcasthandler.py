@@ -6,6 +6,27 @@ from math import ceil
 def Pagination(totlen:int,indsiz:int):
     return ceil(totlen/indsiz)
 
+def EpisodeSearch(query,searchIndex):
+    formattedQuery = query.replace(' ','+')
+    response = requests.get(f"https://itunes.apple.com/search?term={formattedQuery}&entity=podcastEpisode").json()
+    try:
+        Result = response['results'][searchIndex]
+        stuff_to_return = {
+            "name":Result['artistIds'][0]['collectionName'],
+            "rss":Result['episodeUrl'],
+            "image":Result['artworkUrl160'],
+            "count":0,
+            "date":Result['releaseDate'][:-10]
+        }
+    except IndexError:
+        stuff_to_return = {
+            "name": "Podcast Not Found",
+            "rss": ' ',
+            "image": ' ',
+            "count": ' ',
+            "date": ' This date is in Future wut '
+        }
+    return stuff_to_return
 
 def PodSearch(query,searchIndex=0):
     formattedQuery = query.replace(' ', '+')

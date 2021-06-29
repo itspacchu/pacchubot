@@ -53,6 +53,7 @@ class AnimeMixin(DiscordInit, commands.Cog):
             embed.set_footer(
                 text=f" {self.name} {version}", icon_url=self.avatar)
             await ctx.send(embed=embed)
+            await report_errors_to_channel(self.client, e)
         
         while True:
             res = await self.client.wait_for("button_click")
@@ -192,11 +193,12 @@ class AnimeMixin(DiscordInit, commands.Cog):
                 Button(style=ButtonStyle.green, label="Next Manga"),
                 Button(style=ButtonStyle.URL, label="Visit MAL", url=asrc['url'])
             ])
-        except:
+        except Exception as e:
             await ctx.message.add_reaction('😿')
             embed = discord.Embed(color=0xff0000)
             embed.add_field(name="Manga Not Found", value="Manga Query not found on MAL", inline=False)
             await ctx.send(embed=embed)
+            await report_errors_to_channel(self.client, e)
         while True:
             res = await self.client.wait_for("button_click",timeout=500)
             if(await ButtonProcessor(ctx, res, "Next Manga")):

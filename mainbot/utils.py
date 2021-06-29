@@ -16,9 +16,10 @@ from . import __imports__ as internalImports
 
 
 async def report_errors_to_channel(client,error):
-    print(error)
+    pass
+    """print(repr(error))
     channel = await client.get_channel(501237046854287365)
-    await client.send(f"```{str(error.__name__)}```")
+    await client.send(f"```{str(repr(error))}```")"""
     
 
 
@@ -132,7 +133,34 @@ def better_send(ctx,content=None,embed=None,file=None):
     except:
         return ctx.send("Coudn't send the message.. something went wrong!!")
 
-    
+
+def domain_finder(link):
+    import string
+    dot_splitter = link.split('.')
+
+    seperator_first = 0
+    if '//' in dot_splitter[0]:
+        seperator_first = (dot_splitter[0].find('//') + 2)
+
+    seperator_end = ''
+    for i in dot_splitter[2]:
+        if i in string.punctuation:
+            seperator_end = i
+            break
+
+    if seperator_end:
+        end_ = dot_splitter[2].split(seperator_end)[0]
+    else:
+        end_ = dot_splitter[2]
+
+    domain = [dot_splitter[0][seperator_first:], dot_splitter[1], end_]
+    domain = '.'.join(domain)
+
+    return domain
+
+
+
+
 
 class bcolors:
     HEADER = '\033[95m'

@@ -32,7 +32,7 @@ class stickerHandler(DiscordInit, commands.Cog):
                 
         except Exception as e:
             await ctx.channel.send(e)
-            print(e)
+            await report_errors_to_channel(self.client, e)
         
 
     @commands.command(aliases=['impersonate','sayas'])
@@ -50,7 +50,7 @@ class stickerHandler(DiscordInit, commands.Cog):
                 await ctx.message.delete()
             except Exception as e:
                 await ctx.message.add_reaction('<:pacDoubleExclaim:858677949775872010>')
-                print(e)
+                await report_errors_to_channel(self.client, e)
             
 
             

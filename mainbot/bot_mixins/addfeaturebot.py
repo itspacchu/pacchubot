@@ -164,7 +164,34 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
                 type=InteractionType.ChannelMessageWithSource, content=song_url_if_exists
             )
             
-            
+    
+    @commands.command(aliases=['linkify', 'li'])
+    async def linkit(self,ctx,*,url):
+        try:
+            response = requests.get(url)
+            try:
+                soup = BeautifulSoup(response.text, 'html.parser')
+                title = soup.find("meta", property="og:title")
+                imageurl = soup.find("meta", property="og:image")
+                titleval = title["content"] if title else domain_finder(url)
+                webhook = await ctx.channel.create_webhook(name=ctx.author.name)
+                embed = discord.Embed(
+                    title=titleval, colour=discord.Colour(0x90ca1f), url=url)
+                if(imageurl):
+                    embed.set_thumbnail(url=imageurl["content"])
+                await webhook.send(embed=embed, username=ctx.author.name, avatar_url=ctx.author.avatar_url)
+                webhooks = await ctx.channel.webhooks()
+                for webhook in webhooks:
+                    try:
+                        await webhook.delete()
+                    except:
+                        pass
+                await ctx.message.delete()
+            except Exception as e:
+                await ctx.message.add_reaction('<:pacDoubleExclaim:858677949775872010>')
+                print(e)
+        except requests.ConnectionError as exception:
+            pass
 
 
     @commands.command(aliases=['searchbook', 'sb'])

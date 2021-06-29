@@ -46,6 +46,9 @@ class DiscordInit:
             if(x == self.client.user and len(message.content)<=21):
                 await message.channel.send(choice(self.perks['replies']['pings']))
 
+
+        await self.client.process_commands(message)  
+        
         if('pacchu' in message.content.lower() and len(message.content) > 10):
             await message.add_reaction('<:pac_1:858689626088275988>')
             await asyncio.sleep(0.5)
@@ -53,16 +56,17 @@ class DiscordInit:
             await asyncio.sleep(0.5)
             await message.add_reaction('<:pac_3:858689626025492522>')
             await asyncio.sleep(0.5)
-            
+         
         qq = message.content.lower().split(' ')[0]
         if(len(qq) >= 3 and qq != None):
             query = {'search': qq} # exact match here
             try:
                 match = self.MemberTaunt.find_one(query)['taunt']
                 await message.channel.send(match)
-            except:
-                pass
-        await self.client.process_commands(message)
+            except Exception as e:
+                await report_errors_to_channel(self.client, e)
+                print(e)
+        
     
     async def on_command_error(self,ctx, error):
         if isinstance(error, CommandNotFound):

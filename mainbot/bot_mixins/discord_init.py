@@ -64,8 +64,7 @@ class DiscordInit:
                 match = self.MemberTaunt.find_one(query)['taunt']
                 await message.channel.send(match)
             except Exception as e:
-                await report_errors_to_channel(self.client, e)
-                print(e)
+                pass #this error is on every goddamn message ffs
         
     
     async def on_command_error(self,ctx, error):

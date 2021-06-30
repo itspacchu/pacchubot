@@ -70,11 +70,6 @@ class AnimeMixin(DiscordInit, commands.Cog):
         del_dis = None
         global  ani
         animeQuery = queryToName(Query).strip()
-        dbStore = {
-            "charname": animeQuery,
-            "username": ctx.message.author.name,
-        }
-        self.animeSearch.insert_one(dbStore)
         try:
             try:
                 await ctx.message.add_reaction('🔍')
@@ -164,11 +159,6 @@ class AnimeMixin(DiscordInit, commands.Cog):
         global  ani
         del_dis = None
         mangaQuery = queryToName(Query)
-        dbStore = {
-            "charname": mangaQuery,
-            "username": ctx.message.author.name,
-        }
-        self.mangaSearch.insert_one(dbStore)
         try:
             await ctx.message.add_reaction('🔍')
             asrc = ani.search('manga', mangaQuery)['results'][index]

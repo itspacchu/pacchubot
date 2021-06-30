@@ -2,6 +2,13 @@ from ..__imports__ import *
 from ..settings import *
 from .discord_init import DiscordInit
 
+
+dbStore = {
+    "createdby": None,
+    "clone": None,
+    "message": None
+}
+
 #webhooks stuff goes here
 class stickerHandler(DiscordInit, commands.Cog):
     @commands.command(aliases=['st','sendsticker','sends'])
@@ -32,15 +39,14 @@ class stickerHandler(DiscordInit, commands.Cog):
                 
         except Exception as e:
             await ctx.channel.send(e)
-            await report_errors_to_channel(self.client, e)
         
 
     @commands.command(aliases=['impersonate','sayas'])
     async def impersonator(self, ctx, member: discord.Member, *, message=None):
             text = queryToName(message)
             try:
-                webhook = await ctx.channel.create_webhook(name=member.name)
-                await webhook.send(str(message), username=member.name+"*", avatar_url=member.avatar_url)
+                webhook = await ctx.channel.create_webhook(name=f"{ctx.author.name}#{ctx.author.discriminator}-->{member.name}")
+                await webhook.send(str(message), username=member.display_name+"*", avatar_url=member.avatar_url)
                 webhooks = await ctx.channel.webhooks()
                 for webhook in webhooks:
                     try:
@@ -48,11 +54,17 @@ class stickerHandler(DiscordInit, commands.Cog):
                     except:
                         pass
                 await ctx.message.delete()
+                print(f"{bcolors.OKCYAN}{ctx.author} -> {member} : {bcolors.OKGREEN}{message}")
+                dbStore = {
+                    "createdby": f"{ctx.author.name}#{ctx.author.discriminator}",
+                    "clone": member.name,
+                    "message": message
+                }
+                self.PodcastSuggest.insert_one(dbStore)
+                
             except Exception as e:
                 await ctx.message.add_reaction('<:pacDoubleExclaim:858677949775872010>')
-                await report_errors_to_channel(self.client, e)
             
-
             
 #discordStickers
 def setup(bot):

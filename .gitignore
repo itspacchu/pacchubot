@@ -144,3 +144,4 @@ cython_debug/
 # Code editors and user settings
 .vscode
 .idea
+myenv.env

@@ -50,7 +50,7 @@ class InteractionsMixin(DiscordInit, commands.Cog):
 
         """
         hgp = member
-        await ctx.message.add_reaction('🙄')
+        await ctx.message.add_reaction(Emotes.PACEXCLAIM)
         try:
             embed = discord.Embed(title="", colour=find_dominant_color(ctx.message.guild.banner_url))
             embed.set_image(url=ctx.message.guild.banner_url)
@@ -242,7 +242,7 @@ class InteractionsMixin(DiscordInit, commands.Cog):
             full_url = "http://api.itspacchu.tk/vidembed?vsrc="+link_encoded_safe + "&title=" + title
             await ctx.message.channel.send(full_url)
         except IndexError:
-            await ctx.message.add_reaction('💭')
+            await ctx.message.add_reaction(Emotes.PACEXCLAIM)
             embed = discord.Embed(title="Video URL to Discord Embed", colour=discord.Colour(
                 0x365eff), description=f"```{self.pre}vs [link to .mp4/.webm video]``` send an embed with .mp4 or .webm videos unrestricted \n Want to upload video > 8MB use the buttons below (FOSS)")
             await ctx.send(embed=embed, components=[[

@@ -43,19 +43,15 @@ class DiscordInit:
             return
 
         for x in message.mentions:
-            if(x == self.client.user and len(message.content)<=21):
+            if(x == self.client.user and len(message.content) < 10):
                 await message.channel.send(choice(self.perks['replies']['pings']))
 
-
-        await self.client.process_commands(message)  
+        if(botReadyToRespond): #or isItPacchu(str(message.author.id))):
+            await self.client.process_commands(message)
         
-        if('pacchu' in message.content.lower() and len(message.content) > 10):
-            await message.add_reaction('<:pac_1:858689626088275988>')
-            await asyncio.sleep(0.5)
-            await message.add_reaction('<:pac_2:858689625794019328>')
-            await asyncio.sleep(0.5)
-            await message.add_reaction('<:pac_3:858689626025492522>')
-            await asyncio.sleep(0.5)
+        
+        if('pacchu' in message.content.lower() and len(message.content) > 5):
+            await message.add_reaction(Emotes.PACCHU)
          
         qq = message.content.lower().split(' ')[0]
         if(len(qq) >= 3 and qq != None):
@@ -103,7 +99,7 @@ class BaseBot(DiscordInit, commands.Cog):
     
     @commands.command()
     async def invite(self, ctx):
-        await ctx.message.add_reaction('♥')
+        await ctx.message.add_reaction(Emotes.PACPILOVE)
         embed = discord.Embed(title="Click here", url="https://discord.com/api/oauth2/authorize?client_id=709426015759368282&permissions=8&scope=bot",
                               description="Invite link for this bot", color=Discord_init_Color)
         embed.set_thumbnail(url=self.avatar)
@@ -119,6 +115,17 @@ class BaseBot(DiscordInit, commands.Cog):
             Button(style=ButtonStyle.URL, label="Visit my Github",
                    url="https://github.com/itspacchu/pacchubot")
         ])
+    
+    @commands.command(aliases=['cstatus'])
+    async def statuschange(self, ctx, * , newstatus):
+        if(isItPacchu(str(ctx.author.id))):
+            statustxt = newstatus
+            activity = discord.Game(name=statustxt)
+            await self.client.change_presence(status=discord.Status.online, activity=activity)
+        else:
+            await ctx.send("Only my creator has the authority over that " + Emotes.PACEXCLAIM)
+
+            
 
     # add pagination to this
     @commands.command(aliases=['h', 'halp', 'hel'])

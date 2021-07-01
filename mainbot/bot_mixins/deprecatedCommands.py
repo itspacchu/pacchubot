@@ -16,7 +16,7 @@ class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
         except:
             ctx.send("That was removed due to licensing issues :( rip ecchichan 2020-2020")
     
-    @commands.command()
+    @commands.command(aliases=['pappu','lundi','seggs','sex','69'])
     async def fuck(self,ctx):
         await ctx.send(choice(self.perks['links']['erotic_perv']))
         await ctx.send("well about that discord might be looking at you bud")

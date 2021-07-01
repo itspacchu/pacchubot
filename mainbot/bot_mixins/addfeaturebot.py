@@ -158,11 +158,12 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
                 description="Not Listening to anything",
                 color=0x1DB954)
             await ctx.send(embed=embed)
-        if(not wait == None):
-            res = await self.client.wait_for("button_click")
+        while True:
+            res = await self.client.wait_for("button_click",timeout=300)
             await res.respond(
                 type=InteractionType.ChannelMessageWithSource, content=song_url_if_exists
             )
+            song_url_if_exists = "Expired"
             
     
     @commands.command(aliases=['linkify', 'li'])

@@ -95,14 +95,14 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
                 except:
                     await ctx.send("> I think something went wrong!")
                     return
-
-            downloadFileFromUrl(attachment_url, filname)
-            img2distort = Image.open(filname + '.png')
-            dimg = distortImage(img2distort,distortionTypes[choix])
-            dimg[0].save(filname + '.png')
-            file = discord.File(filname + '.png', filename="distortedImage.png")
-            embed = discord.Embed(color=find_dominant_color(filname + '.png',local=True))
-            embed.set_image(url="attachment://distortedImage.png")
+            async with ctx.typing():
+                downloadFileFromUrl(attachment_url, filname)
+                img2distort = Image.open(filname + '.png')
+                dimg = distortImage(img2distort,distortionTypes[choix])
+                dimg[0].save(filname + '.png')
+                file = discord.File(filname + '.png', filename="distortedImage.png")
+                embed = discord.Embed(color=find_dominant_color(filname + '.png',local=True))
+                embed.set_image(url="attachment://distortedImage.png")
             if(dimg[1] != None):
                 embed.set_footer(text=dimg[1])
             else:

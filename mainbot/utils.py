@@ -15,6 +15,10 @@ from tqdm import tqdm
 from . import __imports__ as internalImports
 
 
+lifeChoice = [True,False]
+
+botReadyToRespond = True
+
 async def report_errors_to_channel(client,error):
     pass
     """print(repr(error))
@@ -134,6 +138,10 @@ def better_send(ctx,content=None,embed=None,file=None):
         return ctx.send("Coudn't send the message.. something went wrong!!")
 
 
+def isItPacchu(checkid:str):
+    return str(checkid) == "749975627633000520" or str(checkid) == "170783707647442947"
+
+
 def domain_finder(link):
     import string
     dot_splitter = link.split('.')
@@ -159,7 +167,15 @@ def domain_finder(link):
     return domain
 
 
-
+class Emotes:
+    PACPILOVE = "<:pacpilove:860277910106800198>"
+    PACCHU = "<:pacchu:860277741546373131>"
+    PACEXCLAIM = "<:pacDoubleExclaim:858677949775872010>"
+    PACSTOP = '<:pacstop:860273983614091325>'
+    PACPLAY = '<:pacplay:860273984213483531>'
+    PACPAUSE = '<:pacpause:860273984218464267>'
+    PACDEPRESS = "<:pacdepression:860277067730649135>"
+    LOFISPARKO = "<:lofisparko:858551929977962547>"
 
 
 class bcolors:
@@ -174,3 +190,4 @@ class bcolors:
     UNDERLINE = '\033[4m'
     DEFAULT = CGREY  = '\33[90m'
     CWHITE2  = '\33[97m'
+

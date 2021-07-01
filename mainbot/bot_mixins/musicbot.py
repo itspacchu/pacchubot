@@ -1,4 +1,5 @@
 from discord.errors import DiscordException
+from discord.player import AudioPlayer, AudioSource
 from ..__imports__ import *
 from ..settings import *
 from .discord_init import DiscordInit
@@ -25,60 +26,39 @@ class YTDLSource(discord.PCMVolumeTransformer):
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 
 class MusicMixin(DiscordInit, commands.Cog):
-    StartTime = 0
     lastPod = None
-
+    source = None
+    Aplayer = None
     @commands.command()
     async def join(self, ctx, *, channel: discord.VoiceChannel):
         if ctx.voice_client is not None:
             return await ctx.voice_client.move_to(channel)
         await channel.connect()
 
-
-    @commands.command(pass_context=True, aliases=['p', 's'])
-    async def play(self, ctx, *, url="https://youtu.be/dQw4w9WgXcQ"):
-        await ctx.send("> Disabled")
-        return
-        await ctx.message.add_reaction('🎧') 
-        if ("youtube.com" in str(url) or "youtu.be"):
-            async with ctx.typing():
-                player = await YTDLSource.from_url(url=url, loop=self.client.loop, stream=True)
-                ctx.voice_client.play(player, after=None)
-                if(str(url) == "https://youtu.be/dQw4w9WgXcQ"):
-                    embed = discord.Embed(title="You need to give a url!", colour=discord.Colour(0xff5065), url=url, description=player.title)
-                    embed.set_image(url="https://i.imgur.com/xrBXtFh.png")
-                else:
-                    embed = discord.Embed(title="Playing from Youtube", colour=discord.Colour(0xff5065), url=url, description=player.title)
-                    y = re.search("/?v=(.{,11})", url).groups()[0]
-                    try:
-                        embed.set_image(url=f"https://img.youtube.com/vi/{y}/0.jpg")
-                    except:
-                        pass
-        else:
-            embed = discord.Embed(title=f"Searching : {str(url)}", colour=discord.Colour(0xff5065))
-            async with ctx.typing():
-                player = await YTDLSource.from_url(url, loop=self.client.loop, stream=True)
-                ctx.voice_client.play(player, after=None)
-
-        embed.set_author(name=ctx.message.author.name,icon_url=ctx.message.author.avatar_url)
-        embed.set_footer(text=self.name, icon_url=self.avatar)
-        await ctx.reply(embed=embed)
-
-    @commands.command(pass_context=True, aliases=['pl'])
-    async def lofi(self, ctx, *, url="https://youtu.be/5qap5aO4i9A"):
-        await ctx.send("> Disabled")
-        return
+    @commands.command(pass_context=True, aliases=['pl','plf','lf'])
+    async def lofi(self, ctx,*,flavour='study'):
+        voice_client: discord.VoiceClient = discord.utils.get(self.client.voice_clients, guild=ctx.guild)
+        await ctx.message.add_reaction(Emotes.LOFISPARKO)
+        url = ""
+        flavoururls = {
+            'study':'https://www.youtube.com/watch?v=5qap5aO4i9A',
+            'sleep': 'https://www.youtube.com/watch?v=DWcJFNfaw9c'
+        }
         async with ctx.typing():
-            player = await YTDLSource.from_url(self,url=url, loop=self.client.loop, stream=True)
-            ctx.voice_client.play(player, after=None)
-            embed = discord.Embed(title="Playing from Youtube", colour=discord.Colour(0xff5065), url=url, description=player.title)
-            embed.set_image(url="https://i.ytimg.com/vi/5qap5aO4i9A/maxresdefault.jpg")
+            with youtube_dl.YoutubeDL(ytdl_format_options) as ydl:
+                info = ydl.extract_info(flavoururls[flavour], download=False)
+                url = info['formats'][0]['url']
+        embed = discord.Embed(title=f"Playing flavour {flavour} lofi", colour=discord.Colour(0xff5065), url=url)
+        embed.set_image(url=f"https://i.ytimg.com/vi/{flavoururls[flavour][-11:]}/maxresdefault.jpg")
         embed.set_author(name=ctx.message.author.name,icon_url=ctx.message.author.avatar_url)
         embed.set_footer(text=self.name, icon_url=self.avatar)
-        await ctx.reply(embed=embed)
+        await ctx.send(embed=embed,components=[[Button(style=ButtonStyle.red, label="Stop")],])
+        await self.playmp3source(url, context=ctx)
+        
 
-    @commands.command(aliases=['oldpodp','podp'])
-    async def podplay(self,ctx,epno=0):    
+    @commands.command(aliases=['podp'])
+    async def podplay(self,ctx,epno=0):  
+        await ctx.message.add_reaction(Emotes.PACPLAY) 
         podepi = epno
         if(self.lastPod == None):
             embed = discord.Embed(colour=discord.Colour(0xbd10e0), description=" ")
@@ -101,16 +81,10 @@ class MusicMixin(DiscordInit, commands.Cog):
                 await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")],])
             except AttributeError:
                 await ctx.send("You aren't in voice channel m8")
-        while True:
-            res = await self.client.wait_for("button_click")
-            if(await ButtonProcessor(ctx,res,"stop")):
-                await ctx.invoke(self.client.get_command('stop'))
-                break
 
-    @commands.command(aliases=['oldpodcast','podcast'])
-    async def pod(self,ctx , * , strparse = " ",pgNo=0,searchIndex=0):    
-        await ctx.message.add_reaction('❕')  
-    
+
+    @commands.command(aliases=['podcast'])
+    async def pod(self,ctx , * , strparse = " ",pgNo=0,searchIndex=0):        
         if(':' in strparse):
             podname_,num = strparse.replace(' ','').split(':')
             podepi = int(num)
@@ -177,70 +151,102 @@ class MusicMixin(DiscordInit, commands.Cog):
                 embed.set_thumbnail(url=self.avatar)
                 embed.add_field(name=f"No Podcasts Found",value="No Results",inline=False)
                 embed.set_thumbnail(url=self.avatar)
-
-            embed.set_thumbnail(url=currentpod.PodcastImage(podepi))
+            try:
+                embed.set_thumbnail(url=currentpod.PodcastImage(podepi))
+            except:
+                pass
 
         del_dis = await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.green, label="Play Latest"), Button(style=ButtonStyle.red, label="Prev Page"), Button(style=ButtonStyle.blue, label="Next Page"), Button(style=ButtonStyle.grey, label="Next Search Result")]])
         
-        res = await self.client.wait_for("button_click")
-        if(res.component.label == "Play Latest"):
-            await del_dis.delete()
-            await ctx.invoke(self.client.get_command('podplay'))
-        elif(res.component.label == "Next Page"):
-            await del_dis.delete()
-            await ctx.invoke(self.client.get_command('pod'), strparse=strparse, pgNo=pgNo+1)
-        elif(res.component.label == "Prev Page" and pgNo > 2):
-            await del_dis.delete()
-            await ctx.invoke(self.client.get_command('pod'), strparse=strparse, pgNo=pgNo-1)
-        elif(res.component.label == "Next Search Result"):
-            await del_dis.delete()
-            await ctx.invoke(self.client.get_command('pod'), strparse=strparse, pgNo=0 ,searchIndex=searchIndex+1)
+        while True:
+            res = await self.client.wait_for("button_click",timeout=1200)
+            if(res.component.label == "Play Latest"):
+                await ctx.invoke(self.client.get_command('podplay'))
+            elif(res.component.label == "Next Page"):
+                await del_dis.delete()
+                await ctx.invoke(self.client.get_command('pod'), strparse=strparse, pgNo=pgNo+1)
+            elif(res.component.label == "Prev Page" and pgNo > 2):
+                await del_dis.delete()
+                await ctx.invoke(self.client.get_command('pod'), strparse=strparse, pgNo=pgNo-1)
+            elif(res.component.label == "Next Search Result"):
+                await del_dis.delete()
+                await ctx.invoke(self.client.get_command('pod'), strparse=strparse, pgNo=0 ,searchIndex=searchIndex+1)
+            del_dis = None
             
-
-
     async def playPodcast(self, context, podepi, currentpod):
         try:
             await context.voice_client.disconnect()
         except:
             pass
+        
         if context.voice_client is None:
             if context.author.voice.channel:
                 await context.author.voice.channel.connect()
-
-        guild = context.guild
-        voice_client: discord.VoiceClient = discord.utils.get(self.client.voice_clients, guild=guild)
+                
         _source_ = currentpod.GetEpisodeMp3(podepi)
-        audio_source = discord.FFmpegPCMAudio(_source_)
+        await self.playmp3source(_source_,context=context)
+            
+    async def playmp3source(self,mp3link:str,context):
+        ctx = context
+        voice_client: discord.VoiceClient = discord.utils.get(self.client.voice_clients, guild=ctx.guild)
+        audio_source = discord.FFmpegPCMAudio(mp3link)
+        self.source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(mp3link, before_options=ffmpeg_options), volume=100)
         if not voice_client.is_playing():
             voice_client.play(audio_source, after=None)
+            
+        while ctx.voice_client.is_connected():
+            await asyncio.sleep(1)
+            if len(ctx.voice_client.channel.members) == 1:
+                await ctx.send("> Dont leave me alone " + Emotes.PACDEPRESS)
+                await ctx.voice_client.disconnect()
+                break
+            elif ctx.voice_client.is_paused():
+                await asyncio.sleep(1)
+            elif ctx.voice_client.is_playing():
+                await asyncio.sleep(1)
+            else:
+                await ctx.voice_client.disconnect()
+                break
+            res = await self.client.wait_for("button_click", timeout=1200)
+            if(await ButtonProcessor(ctx, res, "Stop")):
+                await ctx.invoke(self.client.get_command('stop'))
+                break
+    
+    @commands.command(aliases=['pau','p'])
+    async def pause(self, ctx):
+        try:
+            ctx.voice_client.pause()
+            await ctx.message.add_reaction(Emotes.PACPAUSE)
+        except:
+            await ctx.send(f"> {ctx.author.mention} I see-eth nothing playin")
 
+    @commands.command(aliases=['r'])
+    async def resume(self, ctx):
+        try:
+            await ctx.message.add_reaction(Emotes.PACPLAY)
+            ctx.voice_client.resume()
+        except:
+            await ctx.send(f"> {ctx.author.mention} Nothing's playing")
+
+    
     @commands.command(aliases=['fuckoff', 'dc' , 'disconnect'])
     async def stop(self, ctx ):
         if(ctx.author.voice.channel):
-            await ctx.message.add_reaction('👍')
-            embed = discord.Embed( title=f"Exiting", description=f"played" ,colour=discord.Colour(0xff5065))
-            embed.set_author(name=ctx.message.author.name,icon_url=ctx.message.author.avatar_url)
-            embed.set_footer(text=self.client.user.name,icon_url=self.client.user.avatar_url)
+            await ctx.message.add_reaction(Emotes.PACSTOP)
             await ctx.voice_client.disconnect()
-            return await ctx.reply(embed=embed)
+            return await ctx.send(f"> {ctx.author.mention} stopped playback")
         else:
-            await ctx.message.add_reaction('❗')
-            embed = discord.Embed( title=f"you are not in the voice channel", colour=discord.Colour(0xff5065))
-            embed.set_author(name=ctx.message.author.name,icon_url=ctx.message.author.avatar_url)
-            embed.set_footer(text=self.client.user.name,icon_url=self.client.user.avatar_url)
-            return await ctx.reply(embed=embed)
+            await ctx.message.add_reaction(Emotes.PACEXCLAIM)
+            return await ctx.reply("> You're not in voice channel")
 
     @lofi.before_invoke
-    @play.before_invoke
     async def ensure_voice(self, ctx):
         await ctx.message.add_reaction('❕')
         if ctx.voice_client is None:
             if ctx.author.voice.channel:
-                self.StartTime = ttime.time()
-                print("timer started")
                 await ctx.author.voice.channel.connect()
             else:
-                embed = discord.Embed(title=f"{ctx.message.author.mention} is not connected to any Voice channel", colour=discord.Colour(0xff5065))
+                embed = discord.Embed(title=f"> {ctx.message.author.mention} isn't in any voice channel that I can see mate", colour=discord.Colour(0xff5065))
                 embed.set_author(name=ctx.message.author.name,icon_url=ctx.message.author.avatar_url)
                 embed.set_footer(text=self.client.user.name,icon_url=self.client.user.avatar_url)
                 return await ctx.send(embed=embed)

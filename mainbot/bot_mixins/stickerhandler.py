@@ -42,7 +42,7 @@ class stickerHandler(DiscordInit, commands.Cog):
         
 
     @commands.command(aliases=['impersonate','sayas'])
-    async def impersonator(self, ctx, member: discord.Member, *, message=None):
+    async def impersonator(self, ctx, member:discord.Member, *, message=None):
             text = queryToName(message)
             try:
                 webhook = await ctx.channel.create_webhook(name=f"{ctx.author.id}")
@@ -53,7 +53,10 @@ class stickerHandler(DiscordInit, commands.Cog):
                         await webhook.delete()
                     except:
                         pass
-                await ctx.message.delete()
+                try:
+                    await ctx.message.delete()
+                except discord.ext.commands.errors.CommandInvokeError as e:
+                    print(bcolors.FAIL + f"{e} -- deleted message error")
                 
                 print(f"{bcolors.OKCYAN}{ctx.author} -> {member} : {bcolors.OKGREEN}{message}")
                 dbStore = {
@@ -66,6 +69,7 @@ class stickerHandler(DiscordInit, commands.Cog):
             except Exception as e:
                 await ctx.message.add_reaction('<:pacDoubleExclaim:858677949775872010>')
                 print(f"{bcolors.FAIL}{e}")
+                
             
             
 #discordStickers

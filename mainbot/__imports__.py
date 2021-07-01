@@ -33,6 +33,7 @@ from bs4 import BeautifulSoup
 # import time
 # import pymongo
 # from discord import Spotify
-# from discord_slash import SlashCommand, SlashContext
+from discord_slash import SlashCommand, SlashContext,SlashCommandOptionType
+
 # import numpy as np
 # from time import *

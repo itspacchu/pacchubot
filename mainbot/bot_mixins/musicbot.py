@@ -13,17 +13,6 @@ class YTDLSource(discord.PCMVolumeTransformer):
         self.title = data.get('title')
         self.url = data.get('url')
 
-    @classmethod
-    async def from_url(self, cls, url, *, loop=None, stream=False):
-        loop = loop or asyncio.get_event_loop()
-        data = await loop.run_in_executor(None, lambda: self.ytdl.extract_info(url, download=not stream))
-
-        if 'entries' in data:
-            # take first item from a playlist
-            data = data['entries'][0]
-
-        filename = data['url'] if stream else self.ytdl.prepare_filename(data)
-        return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 
 class MusicMixin(DiscordInit, commands.Cog):
     lastPod = None
@@ -70,19 +59,28 @@ class MusicMixin(DiscordInit, commands.Cog):
         else:
             currentpod = self.lastPod
             try:
+                await self.playPodcast(ctx, podepi=podepi, currentpod=currentpod)
                 try:
                     desc = currentpod.GetEpisodeDetails(podepi)['summary'][:300]
                 except:
                     desc = "No Information Available"
-                await self.playPodcast(ctx,podepi=podepi,currentpod=currentpod)
-                embed = discord.Embed(title=currentpod.GetEpisodeDetails(podepi)['title'],colour=find_dominant_color(currentpod.PodcastImage(podepi)), url=currentpod.GetEpisodeDetails(podepi)['link'],
-                                      description=desc,
-                                      inline=False)
-                embed.set_thumbnail(url=currentpod.PodcastImage(podepi))
-                embed.set_footer(text=currentpod.GetEpisodeDetails(podepi)['title'],icon_url=self.avatar)
-                await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")], [Button(style=ButtonStyle.blue, label="Pause")], [Button(style=ButtonStyle.red, label="Resume")]])
+                try:
+                    title = currentpod.GetEpisodeDetails(podepi)['title']
+                except:
+                    title = "Title unavailable"
+                    
+                embed = discord.Embed(title=title,colour=find_dominant_color(currentpod.PodcastImage(podepi)), url=currentpod.GetEpisodeDetails(podepi)['link'],description=desc,inline=False)
+                try:
+                    embed.set_thumbnail(url=currentpod.PodcastImage(podepi))
+                except:
+                    pass
+                try:
+                    embed.set_footer(text=currentpod.GetEpisodeDetails(podepi)['title'],icon_url=self.avatar)
+                except:
+                    pass
+                await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")],])
             except AttributeError:
-                await ctx.send("You aren't in voice channel m8")
+                await ctx.send("> No Episode found")
 
 
     @commands.command(aliases=['podcast'])
@@ -138,7 +136,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                     thiscol = 0xffffff
                 embed = discord.Embed(colour=thiscol, description=" ")
                 embed.set_thumbnail(url=self.avatar)
-                embed.set_author(name=self.name, url=self.avatar, icon_url=self.avatar)
+                embed.set_author(name=k['name'], url=k['rss'], icon_url=k['image'])
                 ind = 0 + 5*start
                 for episode_ in currentpod.ListEpisodes()[start:start+5]:
                     embed.add_field(name=f"{ind} : "+episode_,value=k['date'],inline=False)

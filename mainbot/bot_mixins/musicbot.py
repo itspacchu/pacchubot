@@ -208,18 +208,19 @@ class MusicMixin(DiscordInit, commands.Cog):
                 await asyncio.sleep(1)
             elif ctx.voice_client.is_playing():
                 await asyncio.sleep(1)
+                res = await self.client.wait_for("button_click")
+                if(await ButtonProcessor(ctx, res, "Stop")):
+                    await ctx.invoke(self.client.get_command('stop'))
+                    break
+                elif(await ButtonProcessor(ctx, res, "Pause")):
+                    await ctx.invoke(self.client.get_command('pause'))
+                elif(await ButtonProcessor(ctx, res, "Resume")):
+                    await ctx.invoke(self.client.get_command('resume'))
             else:
                 await ctx.voice_client.disconnect()
                 break
             
-            res = await self.client.wait_for("button_click", timeout=5)
-            if(await ButtonProcessor(ctx, res, "Stop")):
-                await ctx.invoke(self.client.get_command('stop'))
-                break
-            elif(await ButtonProcessor(ctx, res, "Pause")):
-                await ctx.invoke(self.client.get_command('pause'))
-            elif(await ButtonProcessor(ctx, res, "Resume")):
-                await ctx.invoke(self.client.get_command('resume'))
+            
             
 
     

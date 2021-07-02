@@ -15,7 +15,7 @@ mongo_url = f"mongodb+srv://{os.environ['MONGO_INITDB_ROOT_USERNAME']}:{os.envir
 mongo_client = MongoClient(mongo_url)
 
 # global variables
-version = "v1.7 beta"
+version = "v1.7.3 beta"
 http = urllib3.PoolManager()
 ani = Jikan()
 self_name = "Pacchu's Bot"
@@ -26,7 +26,7 @@ command_prefix_use = ['_', 'p.', 'pacchubot.']
 guild_ids = [685469328929587268, 705682250460823602, 737504783937830924]
 
 
-ffmpeg_options = '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 > errors.txt'
+ffmpeg_options = '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -loglevel quiet'
 
 ytdl_format_options = {
     'format': 'bestaudio/best',

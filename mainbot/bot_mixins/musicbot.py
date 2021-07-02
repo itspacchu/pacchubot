@@ -212,7 +212,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                 await ctx.voice_client.disconnect()
                 break
             
-            res = await self.client.wait_for("button_click",timeout=1)
+            res = await self.client.wait_for("button_click", timeout=5)
             if(await ButtonProcessor(ctx, res, "Stop")):
                 await ctx.invoke(self.client.get_command('stop'))
                 break
@@ -220,6 +220,8 @@ class MusicMixin(DiscordInit, commands.Cog):
                 await ctx.invoke(self.client.get_command('pause'))
             elif(await ButtonProcessor(ctx, res, "Resume")):
                 await ctx.invoke(self.client.get_command('resume'))
+            
+
     
     @commands.command(aliases=['pau','p'])
     async def pause(self, ctx):

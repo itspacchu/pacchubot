@@ -1,6 +1,4 @@
 from .__imports__ import *
-from pprint import pprint
-
 
 # The full path to the repository root.
 PROJECT_PACKAGE = Path(__file__).resolve().parent.parent
@@ -12,23 +10,23 @@ def env_to_bool(env, default):
     return default if str_val is None else str_val == 'True'
 
 # file imports
-#jsonfile = io.open("mainbot/perks.json", mode="r", encoding="utf-8")
-
 # db init
 mongo_url = f"mongodb+srv://{os.environ['MONGO_INITDB_ROOT_USERNAME']}:{os.environ['MONGO_INITDB_ROOT_PASSWORD']}@{os.environ['MONGO_HOST']}"
-#mongo_url = ""
 mongo_client = MongoClient(mongo_url)
 
 # global variables
-version = "v1.2 beta"
+version = "v1.7.3 beta"
 http = urllib3.PoolManager()
 ani = Jikan()
 self_name = "Pacchu's Bot"
 self_avatar = "https://raw.githubusercontent.com/itspacchu/Pacchu-s-Slave/master/Screenshot%202021-04-09%20225421.png"
 command_prefix = "p."
-command_prefix_use = ['_', 'p.']
+command_prefix_use = ['_', 'p.', 'pacchubot.']
 
-guild_ids = [685469328929587268,705682250460823602]
+guild_ids = [685469328929587268, 705682250460823602, 737504783937830924]
+
+
+ffmpeg_options = '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -loglevel quiet'
 
 ytdl_format_options = {
     'format': 'bestaudio/best',
@@ -45,9 +43,6 @@ ytdl_format_options = {
         'default_search': 'auto',
         'source_address': '0.0.0.0',
 }
-ffmpeg_options = {
-        'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
-        'options': '-vn',}
 
 __all__ = [
     'version',

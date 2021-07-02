@@ -102,6 +102,11 @@ perkdict = {
                 "Nope","How about ...no!"
             ],
             
+            "lowbudget" : [
+                "CPU power is expensive man ;-;",
+                "poor pacchu's server having to load bear "
+            ],
+            
             "command_not_found_error" : [
                 "I've searched in all my code ... coudn't find that command :(",
                 "am I supposed to know what that is?",

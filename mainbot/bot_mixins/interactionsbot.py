@@ -12,15 +12,18 @@ class InteractionsMixin(DiscordInit, commands.Cog):
 
         """
         hgp = member
+        url_link = None
         await ctx.message.add_reaction('🙄')
         if(ctx.message.author == hgp or hgp == None):
             embed = discord.Embed(
                 title="OwO", description=f"{ctx.message.author.mention} steals ...wait thats your OWN", colour=find_dominant_color(ctx.message.author.avatar_url))
             embed.set_image(url=ctx.message.author.avatar_url)
+            url_link = ctx.message.author.avatar_url
         else:
             embed = discord.Embed(
                 title="Swong..!", description=f"{ctx.message.author.mention} yeets {hgp.mention}'s profile pic 👀'", colour=find_dominant_color(hgp.avatar_url))
             embed.set_image(url=hgp.avatar_url)
+            url_link = hgp.avatar_url
         try:
             embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
         except:
@@ -28,7 +31,32 @@ class InteractionsMixin(DiscordInit, commands.Cog):
                              icon_url=ctx.message.author.avatar_url)
         embed.set_footer(text=f"{self.client.user.name}",
                          icon_url=self.client.user.avatar_url)
-        await better_send(ctx,embed=embed)
+        
+        await ctx.send(embed=embed, components=[[
+            Button(style=ButtonStyle.green, label="Cartoonize"),
+            Button(style=ButtonStyle.blue, label="Distort"),
+        ],])
+        while True:
+            res = await self.client.wait_for("button_click", timeout=100)
+            if(res.channel == ctx.channel):
+                if(await ButtonProcessor(ctx,res,"Cartoonize")):
+                    await ctx.invoke(self.client.get_command('cartoonize'), attachedImg=url_link)
+                elif(await ButtonProcessor(ctx, res, "Distort")):
+                    await ctx.invoke(self.client.get_command('distortion'), attachedImg=url_link)
+        
+    @commands.command(aliases=['gb'])
+    async def guild_banner(self, ctx, member: discord.Member = None):
+        """
+
+        """
+        hgp = member
+        await ctx.message.add_reaction(Emotes.PACEXCLAIM)
+        try:
+            embed = discord.Embed(title="", colour=find_dominant_color(ctx.message.guild.banner_url))
+            embed.set_image(url=ctx.message.guild.banner_url)
+        except:
+            embed = discord.Embed(title="Server Doesn't have a banner", colour=0xff2020)
+        await better_send(ctx, embed=embed)
     
     @commands.command()
     async def hug(self,ctx, member: discord.Member):
@@ -42,7 +70,7 @@ class InteractionsMixin(DiscordInit, commands.Cog):
             embed.set_image(url=choice(self.perks['links']['hugs']))
         embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
         embed.set_footer(text=f"{self.name}", icon_url=self.avatar)
-        await ctx.reply(embed=embed)
+        await ctx.send(embed=embed)
 
 
     @commands.command()
@@ -60,7 +88,7 @@ class InteractionsMixin(DiscordInit, commands.Cog):
         embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
         embed.set_footer(text=f"{self.client.user.name}",
                         icon_url=self.client.user.avatar_url)
-        await ctx.reply(embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command()
     async def kill(self, ctx, member: discord.Member):
@@ -74,7 +102,7 @@ class InteractionsMixin(DiscordInit, commands.Cog):
             embed.set_image(url=choice(self.perks['links']['kill']))
         embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
         embed.set_footer(text=f"{self.client.user.name}",icon_url=self.client.user.avatar_url)
-        await ctx.reply(embed=embed)
+        await ctx.send(embed=embed)
 
 
     @commands.command()
@@ -92,7 +120,7 @@ class InteractionsMixin(DiscordInit, commands.Cog):
         embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
         embed.set_footer(text=f"{self.client.user.name}",
                         icon_url=self.client.user.avatar_url)
-        await ctx.reply(embed=embed)
+        await ctx.send(embed=embed)
 
 
     @commands.command(aliases=['sk'])
@@ -200,7 +228,27 @@ class InteractionsMixin(DiscordInit, commands.Cog):
         self.MiscCollection.find_one_and_update({'_id': ObjectId(
             "60be497c826104950c8ea5d6")}, {'$inc': {'bruhs_delivered': 1}})
     
+    @commands.command(aliases=['vs','vemb'])
+    async def vidembed(self, ctx, *qlink):
+        try:
+            if(len(qlink) <= 1):
+                raise IndexError("There should be a string url")
+            await ctx.message.add_reaction('🎥')
+            link_encoded_safe = quote(queryToName(qlink[:1]), safe='')
+            try:
+                title = quote(queryToName(qlink[1:]), safe='')
+            except:
+                title = f"Video by {ctx.message.author.mention}"
+            full_url = "http://api.itspacchu.tk/vidembed?vsrc="+link_encoded_safe + "&title=" + title
+            await ctx.message.channel.send(full_url)
+        except IndexError:
+            await ctx.message.add_reaction(Emotes.PACEXCLAIM)
+            embed = discord.Embed(title="Video URL to Discord Embed", colour=discord.Colour(
+                0x365eff), description=f"```{self.pre}vs [link to .mp4/.webm video]``` send an embed with .mp4 or .webm videos unrestricted \n Want to upload video > 8MB use the buttons below (FOSS)")
+            await ctx.send(embed=embed, components=[[
+                Button(style=ButtonStyle.URL,label="Transfer.sh", url="https://transfer.sh/"),
+            ],])
         
-    
+ 
 def setup(bot):
     bot.add_cog(InteractionsMixin(bot))

@@ -5,8 +5,8 @@ from .. import perks
 from random import choice
 
 
-API_URL = "https://api-inference.huggingface.co/models/EleutherAI/gpt-neo-125M"
-Q_URL = "https://api-inference.huggingface.co/models/google/t5-large-ssm-nq"
+API_URL = "https://api-inference.huggingface.co/models/gpt2"
+Q_URL = "https://api-inference.huggingface.co/models/google/t5-small-ssm-nq"
 CPT_URL = "https://api-inference.huggingface.co/models/microsoft/CodeGPT-small-py"
 headers = {"Authorization": f"Bearer api_yLZWmlkhOxJRODrXzDFnIFihYulbnXkUUP"}
 
@@ -34,8 +34,8 @@ def questionreply(text_in: str):
     response = requests.request("POST", Q_URL, headers=headers, data=text_in)
     try:
         return json.loads(response.content.decode("utf-8"))[0]["generated_text"]
-    except:
-        return choice(perks.perkdict['replies']['gpterror'])
+    except Exception as e:
+        return choice(perks.perkdict['replies']['gpterror']) + f"\n||e||"
 
 def rawgptquery(text_in:str):
     response = requests.request("POST", API_URL, headers=headers, data=text_in)

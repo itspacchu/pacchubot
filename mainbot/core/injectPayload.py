@@ -1,10 +1,16 @@
+"""
+Basically stuff which requires web parsing and stuff go here
+"""
+
 import numpy as np
-from PIL import Image
+from PIL import Image,ImageSequence
 from io import FileIO
+from numpy.lib.twodim_base import triu_indices_from
 import requests,shutil
 from bs4 import BeautifulSoup
 import time
 from tqdm import tqdm
+from libgen_api import LibgenSearch
 
 def cartoonize(myfile,filname):
     downloadFileFromUrl(myfile,filname,none=None)
@@ -26,21 +32,45 @@ def downloadFileFromUrl(something:str,name:str):
     del response
 
 
+def FetchBookFromLibgenAPI(searchQuery:str,bAuthor=None,index=0):
+    x = LibgenSearch().search_title(searchQuery)
+    if(bAuthor == None):
+        if(len(x)==0):
+            return None
+        return x[index]
+    else:
+        sanity_counter = 0
+        print(f"{searchQuery} by {bAuthor}")
+        for book in tqdm(x):
+            sanity_counter += 1
+            
+            print(book['Title'],' \n-----\n' ,book['Author'])
+            if(bAuthor.lower().replace(' ','') in str(book['Author']).replace(' ','').lower()):
+                return book
+            if(sanity_counter > 5):
+                return None
+
+
 #very shitty implementation i know but well 512,512 is a small image
 def distortImage(theImage,fxn,ctx=None,discordToken=None):
     info = None
-    try:
-        theImage.seek(1)
-    except EOFError:
-        pass
-    else:
-        theImage = theImage.seek(0)
+    is_gif = False
+    if(theImage.is_animated):
+        is_gif = True
+        theImage = ImageSequence.Iterator(theImage)[0].copy()
+        newImg = Image.new('RGBA',theImage.size,(255,255,255))
+        newImg.paste(theImage,(0,0),0)
+        theImage = newImg
     imRatio = theImage.size[0]/theImage.size[1]
-    if(theImage.size[0] > 256 or theImage.size[1] > 256):
-        theImage = theImage.resize((256,int(256/imRatio)))
-        info = "Image has been Downsampled to 256p (Low on CPU budget buddy)"
-    theImage = np.asarray(theImage)
-    bc,gc,rc = theImage[:,:,0] , theImage[:,:,1] ,theImage[:,:,2]
+    if(theImage.size[0] > 512 or theImage.size[1] > 512):
+        theImage = theImage.resize((512,int(512/imRatio)))
+        info = "Image has been Downsampled to 512p (Low on CPU budget ;--;)"
+    
+    if(is_gif):
+        bc,gc,rc,_ = theImage.split()
+    else:
+        theImage = np.asarray(theImage)
+        bc,gc,rc = theImage[:,:,0] , theImage[:,:,1] ,theImage[:,:,2]
     dc = []
     for imgChannel in bc,gc,rc: 
         dImg = np.zeros(imgChannel.shape)

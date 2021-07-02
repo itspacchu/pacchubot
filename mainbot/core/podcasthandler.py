@@ -6,12 +6,33 @@ from math import ceil
 def Pagination(totlen:int,indsiz:int):
     return ceil(totlen/indsiz)
 
+def EpisodeSearch(query,searchIndex):
+    formattedQuery = query.replace(' ','+')
+    response = requests.get(f"https://itunes.apple.com/search?term={formattedQuery}&entity=podcastEpisode").json()
+    try:
+        Result = response['results'][searchIndex]
+        stuff_to_return = {
+            "name":Result['artistIds'][0]['collectionName'],
+            "rss":Result['episodeUrl'],
+            "image":Result['artworkUrl160'],
+            "count":0,
+            "date":Result['releaseDate'][:-10]
+        }
+    except IndexError:
+        stuff_to_return = {
+            "name": "Podcast Not Found",
+            "rss": ' ',
+            "image": ' ',
+            "count": ' ',
+            "date": ' This date is in Future wut '
+        }
+    return stuff_to_return
 
-def PodSearch(query):
+def PodSearch(query,searchIndex=0):
     formattedQuery = query.replace(' ', '+')
     response = requests.get(f"https://itunes.apple.com/search?term={formattedQuery}&entity=podcast").json()
     try:
-        Result = response['results'][0]
+        Result = response['results'][searchIndex]
         stuff_to_return = {
             "name":Result['collectionName'],
             "rss":Result['feedUrl'],
@@ -73,6 +94,7 @@ class Podcast:
         return link
     
     def PodcastImage(self,arg = 0):
+        arg = 0
         entry = self.entries[arg]
         try:
             return entry['image']['href']

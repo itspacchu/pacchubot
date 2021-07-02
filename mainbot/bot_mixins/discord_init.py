@@ -30,7 +30,7 @@ class DiscordInit:
             self.name = self.client.user.name
         if not hasattr(self, 'avatar'):
             self.avatar = "https://cdn.discordapp.com/attachments/715107506187272234/850379532459573288/pacslav.png"
-        statustxt = "Questioning Insanity now" #adding loop changing statuses
+        statustxt = "Booted up and happyn't"
         activity = discord.Game(name=statustxt)
         if(self.client):
             print("Connected to Database...")
@@ -43,18 +43,25 @@ class DiscordInit:
             return
 
         for x in message.mentions:
-            if(x == self.client.user and len(message.content)==21):
+            if(x == self.client.user and len(message.content) < 10):
                 await message.channel.send(choice(self.perks['replies']['pings']))
-        # try:
+
+        if(botReadyToRespond): #or isItPacchu(str(message.author.id))):
+            await self.client.process_commands(message)
+        
+        
+        if('pacchu' in message.content.lower() and len(message.content) > 5):
+            await message.add_reaction(Emotes.PACCHU)
+         
         qq = message.content.lower().split(' ')[0]
         if(len(qq) >= 3 and qq != None):
-            query = {'search': qq} # exact math here
+            query = {'search': qq} # exact match here
             try:
                 match = self.MemberTaunt.find_one(query)['taunt']
                 await message.channel.send(match)
-            except:
-                pass
-        await self.client.process_commands(message)
+            except Exception as e:
+                pass #this error is on every goddamn message ffs
+        
     
     async def on_command_error(self,ctx, error):
         if isinstance(error, CommandNotFound):
@@ -75,6 +82,7 @@ class DiscordInit:
         self.VoiceUsage = self.db['VoiceActivity']
         self.MemberTaunt = self.db['memberTaunt']
         self.MiscCollection = self.db['miscCollection']
+        self.discordStickers = self.db['discordStickers']
 
 class BaseBot(DiscordInit, commands.Cog):
 
@@ -83,15 +91,15 @@ class BaseBot(DiscordInit, commands.Cog):
         await ctx.message.add_reaction('⌚')
         embed = discord.Embed(colour=discord.Colour(0x27ce89))
         embed.add_field(name="Latency", value=f"{round(self.client.latency,2)} ms")
-        embed.add_field(name="CPU", value=f"{round(psutil.cpu_freq().current/1024,2)}Ghz -- {round(psutil.cpu_percent(interval=0.1),2)}%")
-        embed.add_field(name="Memory", value=f'{round(psutil.virtual_memory().available/1024**2,2)} MB')
+        embed.add_field(name="CPU Load", value=f"{round(psutil.cpu_freq().current/1024,2)}Ghz")
+        embed.add_field(name="Memory Load", value=f'{round(psutil.virtual_memory().available/1024**2,2)} MB')
         embed.add_field(name="Servers", value=f"Active in {str(len(self.client.guilds))} Servers", inline=True)
         await better_send(ctx,embed=embed)
         
     
     @commands.command()
     async def invite(self, ctx):
-        await ctx.message.add_reaction('♥')
+        await ctx.message.add_reaction(Emotes.PACPILOVE)
         embed = discord.Embed(title="Click here", url="https://discord.com/api/oauth2/authorize?client_id=709426015759368282&permissions=8&scope=bot",
                               description="Invite link for this bot", color=Discord_init_Color)
         embed.set_thumbnail(url=self.avatar)
@@ -107,6 +115,16 @@ class BaseBot(DiscordInit, commands.Cog):
             Button(style=ButtonStyle.URL, label="Visit my Github",
                    url="https://github.com/itspacchu/pacchubot")
         ])
+    
+    @commands.command(aliases=['cstatus'])
+    async def statuschange(self, ctx, * , newstatus):
+        if(isItPacchu(str(ctx.author.id))):
+            statustxt = newstatus
+            await self.client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=statustxt))
+        else:
+            await ctx.send("Only my creator has the authority over that " + Emotes.PACEXCLAIM)
+
+            
 
     # add pagination to this
     @commands.command(aliases=['h', 'halp', 'hel'])
@@ -141,6 +159,10 @@ class BaseBot(DiscordInit, commands.Cog):
                         value=f"Something of use atleast", inline=False)
         embed.add_field(name=f"{self.pre}bruh/sike [emote,link,text message]",
                         value=f"Something to be saved? idk why it an option", inline=False)
+        embed.add_field(name=f"{self.pre}sticker/st [sticker name]",
+                        value="Discord Stickers NQN clone", inline=False)
+        embed.add_field(name=f"{self.pre}impersonate/sayas @mention 'Deez nuzz' ",
+                        value="Impersonates the person mentioned", inline=False)
         embed.add_field(name=f"{self.pre}gpt \"Today is a wonderful..\"",
                         value="gpt neo text completion", inline=True)
         embed.add_field(name=f"{self.pre}q \"Why is chocolate beautiful?\"",
@@ -153,10 +175,9 @@ class BaseBot(DiscordInit, commands.Cog):
                         value="isnt it obvious :o", inline=False)
         embed.set_footer(
             text=f"{self.name} {self.VERSION}", icon_url=self.avatar)
-        try:
-            await ctx.reply(embed=embed)
-        except AttributeError:
-            await ctx.send(embed=embed)
+        
+        await ctx.send(embed=embed)
+
 
 
 def setup(bot):

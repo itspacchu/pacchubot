@@ -26,7 +26,7 @@ command_prefix_use = ['_', 'p.', 'pacchubot.']
 guild_ids = [685469328929587268, 705682250460823602, 737504783937830924]
 
 
-ffmpeg_options = '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'
+ffmpeg_options = '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -hide_banner -loglevel error'
 
 ytdl_format_options = {
     'format': 'bestaudio/best',

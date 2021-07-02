@@ -120,7 +120,6 @@ class BaseBot(DiscordInit, commands.Cog):
     async def statuschange(self, ctx, * , newstatus):
         if(isItPacchu(str(ctx.author.id))):
             statustxt = newstatus
-            activity = discord.Game(name=statustxt)
             await self.client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=statustxt))
         else:
             await ctx.send("Only my creator has the authority over that " + Emotes.PACEXCLAIM)

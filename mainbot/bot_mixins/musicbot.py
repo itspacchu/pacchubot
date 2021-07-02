@@ -200,7 +200,6 @@ class MusicMixin(DiscordInit, commands.Cog):
             voice_client.play(audio_source, after=None)
             
         while ctx.voice_client.is_connected():
-            await asyncio.sleep(1)
             if len(ctx.voice_client.channel.members) == 1:
                 await ctx.send("> Dont leave me alone " + Emotes.PACDEPRESS)
                 await ctx.voice_client.disconnect()
@@ -212,13 +211,14 @@ class MusicMixin(DiscordInit, commands.Cog):
             else:
                 await ctx.voice_client.disconnect()
                 break
-            res = await self.client.wait_for("button_click")
+            
+            res = await self.client.wait_for("button_click",timeout=1)
             if(await ButtonProcessor(ctx, res, "Stop")):
                 await ctx.invoke(self.client.get_command('stop'))
                 break
             elif(await ButtonProcessor(ctx, res, "Pause")):
                 await ctx.invoke(self.client.get_command('pause'))
-            if(await ButtonProcessor(ctx, res, "Resume")):
+            elif(await ButtonProcessor(ctx, res, "Resume")):
                 await ctx.invoke(self.client.get_command('resume'))
     
     @commands.command(aliases=['pau','p'])

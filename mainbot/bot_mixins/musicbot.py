@@ -48,7 +48,7 @@ class MusicMixin(DiscordInit, commands.Cog):
             with youtube_dl.YoutubeDL(ytdl_format_options) as ydl:
                 info = ydl.extract_info(flavoururls[flavour], download=False)
                 url = info['formats'][0]['url']
-        embed = discord.Embed(title=f"Playing flavour {flavour} lofi", colour=discord.Colour(0xff5065), url=url)
+        embed = discord.Embed(title=f"Playing {flavour} + lofi", colour=discord.Colour(0xff5065), url=url)
         embed.set_image(url=f"https://i.ytimg.com/vi/{flavoururls[flavour][-11:]}/maxresdefault.jpg")
         embed.set_author(name=ctx.message.author.name,icon_url=ctx.message.author.avatar_url)
         embed.set_footer(text=self.name, icon_url=self.avatar)
@@ -70,15 +70,17 @@ class MusicMixin(DiscordInit, commands.Cog):
         else:
             currentpod = self.lastPod
             try:
+                try:
+                    desc = currentpod.GetEpisodeDetails(podepi)['summary'][:300]
+                except:
+                    desc = "No Information Available"
                 await self.playPodcast(ctx,podepi=podepi,currentpod=currentpod)
-                embed = discord.Embed(title=currentpod.GetEpisodeDetails(podepi)['title'],
-                                      colour=find_dominant_color(currentpod.PodcastImage(podepi)), url=currentpod.GetEpisodeDetails(podepi)['link'],
-                                      description=currentpod.GetEpisodeDetails(podepi)['summary'][:300],
+                embed = discord.Embed(title=currentpod.GetEpisodeDetails(podepi)['title'],colour=find_dominant_color(currentpod.PodcastImage(podepi)), url=currentpod.GetEpisodeDetails(podepi)['link'],
+                                      description=desc,
                                       inline=False)
                 embed.set_thumbnail(url=currentpod.PodcastImage(podepi))
-                embed.set_author(name=self.name,icon_url=self.avatar)
                 embed.set_footer(text=currentpod.GetEpisodeDetails(podepi)['title'],icon_url=self.avatar)
-                await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")],])
+                await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")], [Button(style=ButtonStyle.blue, label="Pause")], [Button(style=ButtonStyle.red, label="Resume")]])
             except AttributeError:
                 await ctx.send("You aren't in voice channel m8")
 
@@ -164,14 +166,17 @@ class MusicMixin(DiscordInit, commands.Cog):
                 await ctx.invoke(self.client.get_command('podplay'))
             elif(res.component.label == "Next Page"):
                 await del_dis.delete()
+                del_dis = None
                 await ctx.invoke(self.client.get_command('pod'), strparse=strparse, pgNo=pgNo+1)
             elif(res.component.label == "Prev Page" and pgNo > 2):
                 await del_dis.delete()
+                del_dis = None
                 await ctx.invoke(self.client.get_command('pod'), strparse=strparse, pgNo=pgNo-1)
             elif(res.component.label == "Next Search Result"):
                 await del_dis.delete()
+                del_dis = None
                 await ctx.invoke(self.client.get_command('pod'), strparse=strparse, pgNo=0 ,searchIndex=searchIndex+1)
-            del_dis = None
+            
             
     async def playPodcast(self, context, podepi, currentpod):
         try:
@@ -207,10 +212,14 @@ class MusicMixin(DiscordInit, commands.Cog):
             else:
                 await ctx.voice_client.disconnect()
                 break
-            res = await self.client.wait_for("button_click", timeout=1200)
+            res = await self.client.wait_for("button_click")
             if(await ButtonProcessor(ctx, res, "Stop")):
                 await ctx.invoke(self.client.get_command('stop'))
                 break
+            elif(await ButtonProcessor(ctx, res, "Pause")):
+                await ctx.invoke(self.client.get_command('pause'))
+            if(await ButtonProcessor(ctx, res, "Resume")):
+                await ctx.invoke(self.client.get_command('resume'))
     
     @commands.command(aliases=['pau','p'])
     async def pause(self, ctx):
@@ -241,10 +250,10 @@ class MusicMixin(DiscordInit, commands.Cog):
 
     @lofi.before_invoke
     async def ensure_voice(self, ctx):
-        await ctx.message.add_reaction('❕')
         if ctx.voice_client is None:
             if ctx.author.voice.channel:
                 await ctx.author.voice.channel.connect()
+                await ctx.guild.change_voice_state(channel=ctx.author.voice.channel, self_mute=False, self_deaf=True)
             else:
                 embed = discord.Embed(title=f"> {ctx.message.author.mention} isn't in any voice channel that I can see mate", colour=discord.Colour(0xff5065))
                 embed.set_author(name=ctx.message.author.name,icon_url=ctx.message.author.avatar_url)

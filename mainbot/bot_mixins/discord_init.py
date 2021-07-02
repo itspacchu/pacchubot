@@ -30,7 +30,7 @@ class DiscordInit:
             self.name = self.client.user.name
         if not hasattr(self, 'avatar'):
             self.avatar = "https://cdn.discordapp.com/attachments/715107506187272234/850379532459573288/pacslav.png"
-        statustxt = "Raining bugs 🌧" #adding loop changing statuses
+        statustxt = "Booted up and happyn't"
         activity = discord.Game(name=statustxt)
         if(self.client):
             print("Connected to Database...")
@@ -91,8 +91,8 @@ class BaseBot(DiscordInit, commands.Cog):
         await ctx.message.add_reaction('⌚')
         embed = discord.Embed(colour=discord.Colour(0x27ce89))
         embed.add_field(name="Latency", value=f"{round(self.client.latency,2)} ms")
-        embed.add_field(name="CPU", value=f"{round(psutil.cpu_freq().current/1024,2)}Ghz -- {round(psutil.cpu_percent(interval=0.1),2)}%")
-        embed.add_field(name="Memory", value=f'{round(psutil.virtual_memory().available/1024**2,2)} MB')
+        embed.add_field(name="CPU Load", value=f"{round(psutil.cpu_freq().current/1024,2)}Ghz")
+        embed.add_field(name="Memory Load", value=f'{round(psutil.virtual_memory().available/1024**2,2)} MB')
         embed.add_field(name="Servers", value=f"Active in {str(len(self.client.guilds))} Servers", inline=True)
         await better_send(ctx,embed=embed)
         
@@ -121,7 +121,7 @@ class BaseBot(DiscordInit, commands.Cog):
         if(isItPacchu(str(ctx.author.id))):
             statustxt = newstatus
             activity = discord.Game(name=statustxt)
-            await self.client.change_presence(status=discord.Status.online, activity=activity)
+            await self.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=statustxt))
         else:
             await ctx.send("Only my creator has the authority over that " + Emotes.PACEXCLAIM)
 
@@ -176,10 +176,9 @@ class BaseBot(DiscordInit, commands.Cog):
                         value="isnt it obvious :o", inline=False)
         embed.set_footer(
             text=f"{self.name} {self.VERSION}", icon_url=self.avatar)
-        try:
-            await ctx.reply(embed=embed)
-        except AttributeError:
-            await ctx.send(embed=embed)
+        
+        await ctx.send(embed=embed)
+
 
 
 def setup(bot):

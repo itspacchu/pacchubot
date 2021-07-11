@@ -56,7 +56,7 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
             attachment_url = await unified_imagefetcher(ctx=ctx, member=member, attachedImg=attachedImg)
             async with ctx.typing():
                 downloadFileFromUrl(attachment_url, filname)
-                distortion_new(filname + '.png',choice(distortionTypes))
+                distortion_new(filname + '.png',choice(distortionTypes)).save(filname + '.png')
                 file = discord.File(filname + '.png', filename="distortedImage.png")
                 embed = discord.Embed(color=find_dominant_color(filname + '.png',local=True))
                 embed.set_image(url="attachment://distortedImage.png")

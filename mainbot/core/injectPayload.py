@@ -77,7 +77,8 @@ def distortion_new(imgFilename, noisemodifier, preview=False):
         cv2.destroyAllWindows()
     else:
         print(imgFilename[:-3])
-        cv2.imwrite(imgFilename[:-3]+'png', myim)
+        cv2.imwrite(imgFilename, myim)
+    return cv2.cvtColor(myim, cv2.COLOR_BGR2RGB)
 
 #very shitty implementation i know but well 512,512 is a small image
 def distortImage(theImage,fxn,ctx=None,discordToken=None):

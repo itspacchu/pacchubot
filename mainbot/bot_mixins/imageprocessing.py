@@ -11,7 +11,7 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
     @commands.command(aliases=['ic', 'cartoon'])
     async def cartoonize(self,ctx, member: discord.Member = None,attachedImg=None):
         filname = str(round(time.time()))
-        attachment_url = unified_imagefetcher(ctx=ctx,member=member,attachedImg=attachedImg)
+        attachment_url = await unified_imagefetcher(ctx=ctx,member=member,attachedImg=attachedImg)
         downloadFileFromUrl(attachment_url, filname)
         s = requests.Session()
         url = "https://cartoonize-lkqov62dia-de.a.run.app/cartoonize"
@@ -53,7 +53,7 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
         choix = choice(range(len(distortionTypes)))
         try:
             filname = str(round(time.time()))
-            attachment_url = unified_imagefetcher(ctx=ctx, member=member, attachedImg=attachedImg)
+            attachment_url = await unified_imagefetcher(ctx=ctx, member=member, attachedImg=attachedImg)
             async with ctx.typing():
                 downloadFileFromUrl(attachment_url, filname)
                 distortion_new(filname + '.png',choice(distortionTypes))

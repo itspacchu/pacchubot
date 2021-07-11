@@ -129,7 +129,7 @@ class InteractionsMixin(DiscordInit, commands.Cog):
             link = ctx.message.attachments[0].url
         except:
             link = queryToName(qlink)
-        if(ctx.message.guild == None):
+        if(False):
             await ctx.reply("This is a dm tho? try it in a server m8")
         else:
             if(link == ""):

@@ -65,7 +65,7 @@ def distortion_new(imgFilename, noisemodifier, preview=False):
     if(myim.shape[0] > 1024 or myim.shape[1] > 1024):
         myim = cv2.resize(myim, (0, 0), fx=0.5, fy=0.5)
 
-    for i in range(0, myim.shape[0]):
+    for i in tqdm(range(0, myim.shape[0])):
         for j in range(0, myim.shape[1]):
             try:
                 myim[i][j] = myim[i + int(noisemodifier(i, j)[0]*randint(0, int(myim.shape[0]/100)))][j + int(noisemodifier(i, j)[1]*randint(0, int(myim.shape[0]/100)))]
@@ -76,6 +76,7 @@ def distortion_new(imgFilename, noisemodifier, preview=False):
         cv2.waitKey(0)
         cv2.destroyAllWindows()
     else:
+        print(imgFilename[:-3])
         cv2.imwrite(imgFilename[:-3]+'png', myim)
 
 #very shitty implementation i know but well 512,512 is a small image

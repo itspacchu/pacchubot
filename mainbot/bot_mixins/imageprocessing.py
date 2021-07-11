@@ -61,6 +61,7 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
                 file = discord.File(filname + '.png', filename="distortedImage.png")
                 print(file)
                 embed = discord.Embed(color=find_dominant_color(filname + '.png',local=True))
+                embed.set_footer(text="from api.itspacchu.tk")
                 embed.set_image(url="attachment://distortedImage.png")
             try:
                 await ctx.send(file=file, embed=embed)

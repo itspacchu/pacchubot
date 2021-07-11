@@ -11,6 +11,8 @@ from bs4 import BeautifulSoup
 import time
 from tqdm import tqdm
 from libgen_api import LibgenSearch
+import cv2
+from random import randint
 
 def cartoonize(myfile,filname):
     downloadFileFromUrl(myfile,filname,none=None)
@@ -50,6 +52,31 @@ def FetchBookFromLibgenAPI(searchQuery:str,bAuthor=None,index=0):
             if(sanity_counter > 5):
                 return None
 
+
+def distortion_new(imgFilename, noisemodifier, preview=False):
+        
+    try:
+        myim = cv2.imread(imgFilename)
+        myim.shape
+    except AttributeError:
+        theim = cv2.VideoCapture(imgFilename)
+        ret, myim = theim.read()
+
+    if(myim.shape[0] > 1024 or myim.shape[1] > 1024):
+        myim = cv2.resize(myim, (0, 0), fx=0.5, fy=0.5)
+
+    for i in range(0, myim.shape[0]):
+        for j in range(0, myim.shape[1]):
+            try:
+                myim[i][j] = myim[i + int(noisemodifier(i, j)[0]*randint(0, int(myim.shape[0]/100)))][j + int(noisemodifier(i, j)[1]*randint(0, int(myim.shape[0]/100)))]
+            except IndexError:
+                myim[i][j] = myim[i][j]
+    if(preview):
+        cv2.imshow('image', myim)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+    else:
+        cv2.imwrite(imgFilename[:imgFilename.find('.')]+'png', myim)
 
 #very shitty implementation i know but well 512,512 is a small image
 def distortImage(theImage,fxn,ctx=None,discordToken=None):

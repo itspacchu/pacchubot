@@ -34,6 +34,5 @@ from bs4 import BeautifulSoup
 # import pymongo
 # from discord import Spotify
 from discord_slash import SlashCommand, SlashContext,SlashCommandOptionType
-
 # import numpy as np
 # from time import *

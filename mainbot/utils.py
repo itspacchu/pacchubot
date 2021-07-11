@@ -26,15 +26,13 @@ async def report_errors_to_channel(client,error):
     await client.send(f"```{str(repr(error))}```")"""
     
 
-
-distortionTypes = [lambda i:[10*np.sin(i), 10*np.sin(i)],
-                   lambda i:[10*np.sin(i), 0],
-                   lambda i:[0, 10*np.sin(i)],
-                   lambda i:[np.tan(i),np.cos(i)],
-                   lambda i:[5*np.tan(i), 5*np.tan(i)],
-                   lambda i:[5*np.tan(i), 0],
-                   lambda i:[0, 5*np.tan(i)],
-                   lambda i:[(i**np.sin(i)) , (i**np.sin(i))],
+distortionTypes = [lambda i, j:[2*np.sin(i/100) + 2, 2*np.sin(j/100) + 2],
+                   lambda i, j:[2*np.sin(i/100) + 2, 0],
+                   lambda i, j:[0, 4*np.sin(j/100) + 4],
+                   lambda i, j:[abs(np.tan(i/100)), np.cos(j/100) + 2],
+                   lambda i, j:[4*np.tan(i/100), 0],
+                   lambda i, j:[0, 4*np.tan(j/100)],
+                   lambda i, j: [1*np.sin(i/100), 1*np.cos(j/100)],
                    ]
 
 
@@ -56,7 +54,29 @@ async def ButtonProcessor(ctx,res,label:str,userCheck=True):
         )
         return False
         
-
+async def unified_imagefetcher(ctx,member=None,attachedImg=None):
+    await ctx.message.add_reaction('🖌')
+    try:
+        if(attachedImg == None):
+            attachment_url = ctx.message.attachments[0].url
+        else:
+            attachment_url = attachedImg
+        await ctx.message.add_reaction('📩')
+        await ctx.send("Downloading and processing image 📩")
+        return attachment_url
+    except:
+        try:
+            hgp = member
+            await ctx.message.add_reaction('🎭')
+            if(ctx.message.author == hgp or hgp == None):
+                attachment_url = ctx.message.author.avatar_url
+            else:
+                attachment_url = hgp.avatar_url
+            await ctx.send("Getting User's avatar")
+            return attachment_url
+        except:
+            await ctx.send("> I think something went wrong!")
+            return None
 
 def ButtonValidator(res,ctx,userCheck=False):
     cond = (res.channel == ctx.channel)

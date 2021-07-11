@@ -1,5 +1,5 @@
 from discord import member
-from mainbot.core.injectPayload import distortImage, downloadFileFromUrl
+from mainbot.core.injectPayload import downloadFileFromUrl,distortion_new
 from ..__imports__ import *
 from ..settings import *
 from .discord_init import DiscordInit
@@ -11,27 +11,7 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
     @commands.command(aliases=['ic', 'cartoon'])
     async def cartoonize(self,ctx, member: discord.Member = None,attachedImg=None):
         filname = str(round(time.time()))
-        await ctx.message.add_reaction('🖌')
-        try:
-            if(attachedImg == None):
-                attachment_url = ctx.message.attachments[0].url
-            else:
-                attachment_url = attachedImg
-            await ctx.message.add_reaction('⏬')
-            await better_send(ctx, "Processing will take few seconds..")
-        except:
-            try:
-                hgp = member
-                await ctx.message.add_reaction('🎭')
-                if(ctx.message.author == hgp or hgp == None):
-                    attachment_url = ctx.message.author.avatar_url
-                else:
-                    attachment_url = hgp.avatar_url
-                await better_send(ctx, "Getting User's avatar")
-            except:
-                await better_send(ctx, "> I think something went wrong!")
-                return None
-
+        attachment_url = unified_imagefetcher(ctx=ctx,member=member,attachedImg=attachedImg)
         downloadFileFromUrl(attachment_url, filname)
         s = requests.Session()
         url = "https://cartoonize-lkqov62dia-de.a.run.app/cartoonize"
@@ -72,41 +52,14 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
     async def distortion(self,ctx,member:discord.Member=None,attachedImg=None):
         choix = choice(range(len(distortionTypes)))
         try:
-            if(member == None):
-                member = ctx.message.author
             filname = str(round(time.time()))
-            await ctx.message.add_reaction('🔨')
-            try: 
-                if(attachedImg == None):
-                    attachment_url = ctx.message.attachments[0].url
-                else:
-                    attachment_url = attachedImg
-                await ctx.message.add_reaction('⏬')
-                await ctx.send("> Moving Pixels around...might take couple of seconds")
-            except:
-                try:
-                    hgp = member
-                    await ctx.message.add_reaction('🎭')
-                    if(ctx.message.author == hgp or hgp == None):
-                        attachment_url = ctx.message.author.avatar_url
-                    else:
-                        attachment_url = hgp.avatar_url
-                    await ctx.send("> Getting User's avatar")
-                except:
-                    await ctx.send("> I think something went wrong!")
-                    return
+            attachment_url = unified_imagefetcher(ctx=ctx, member=member, attachedImg=attachedImg)
             async with ctx.typing():
                 downloadFileFromUrl(attachment_url, filname)
-                img2distort = Image.open(filname + '.png')
-                dimg = distortImage(img2distort,distortionTypes[choix])
-                dimg[0].save(filname + '.png')
+                distortion_new(filname + '.png',choice(distortionTypes))
                 file = discord.File(filname + '.png', filename="distortedImage.png")
                 embed = discord.Embed(color=find_dominant_color(filname + '.png',local=True))
                 embed.set_image(url="attachment://distortedImage.png")
-            if(dimg[1] != None):
-                embed.set_footer(text=dimg[1])
-            else:
-                embed.set_footer(text=" ")
             try:
                 await ctx.send(file=file, embed=embed)
                 await asyncio.sleep(1)

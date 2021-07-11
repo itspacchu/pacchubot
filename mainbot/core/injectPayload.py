@@ -53,8 +53,7 @@ def FetchBookFromLibgenAPI(searchQuery:str,bAuthor=None,index=0):
                 return None
 
 
-def distortion_new(imgFilename, noisemodifier, preview=False):
-        
+def distortion_new(imgFilename, noisemodifier, preview=False):     
     try:
         myim = cv2.imread(imgFilename)
         myim.shape
@@ -77,6 +76,22 @@ def distortion_new(imgFilename, noisemodifier, preview=False):
         cv2.destroyAllWindows()
     else:
         cv2.imwrite(imgFilename, myim)
+    return cv2.cvtColor(myim, cv2.COLOR_BGR2RGB)
+
+
+
+
+
+def edgeDetect(imgFilename, preview=False):      
+    try:
+        myim = cv2.imread(imgFilename)
+        myim.shape
+    except AttributeError:
+        theim = cv2.VideoCapture(imgFilename)
+        ret, myim = theim.read()
+    if(myim.shape[0] > 1024 or myim.shape[1] > 1024):
+        myim = cv2.resize(myim, (0, 0), fx=0.5, fy=0.5)
+    myim = cv2.Canny(myim,100,200)
     return cv2.cvtColor(myim, cv2.COLOR_BGR2RGB)
 
 #very shitty implementation i know but well 512,512 is a small image

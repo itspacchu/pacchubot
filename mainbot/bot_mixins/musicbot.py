@@ -31,7 +31,7 @@ class MusicMixin(DiscordInit, commands.Cog):
         url = ""
         flavoururls = {
             'study':'https://www.youtube.com/watch?v=5qap5aO4i9A',
-            'sleep': 'https://www.youtube.com/watch?v=DWcJFNfaw9c'
+            'sleep': 'https://www.youtube.com/watch?v=DWcJFNfaw9c',
         }
         async with ctx.typing():
             with youtube_dl.YoutubeDL(ytdl_format_options) as ydl:
@@ -42,6 +42,28 @@ class MusicMixin(DiscordInit, commands.Cog):
         embed.set_author(name=ctx.message.author.name,icon_url=ctx.message.author.avatar_url)
         embed.set_footer(text=self.name, icon_url=self.avatar)
         await ctx.send(embed=embed,components=[[Button(style=ButtonStyle.red, label="Stop")],])
+        await self.playmp3source(url, context=ctx)
+        
+    @commands.command(pass_context=True, aliases=['rp', 'ytp'])
+    async def rawplay(self, ctx, *, flavour='https://www.youtube.com/watch?v=dQw4w9WgXcQ'):
+        voice_client: discord.VoiceClient = discord.utils.get(
+            self.client.voice_clients, guild=ctx.guild)
+        await ctx.message.add_reaction(Emotes.PACPLAY)
+        if(flavour=='vsauce'):
+            flavour = "https://www.youtube.com/watch?v=TN25ghkfgQA"
+        url = ""
+        async with ctx.typing():
+            with youtube_dl.YoutubeDL(ytdl_format_options) as ydl:
+                info = ydl.extract_info(flavour, download=False)
+                url = info['formats'][0]['url']
+        embed = discord.Embed(
+            title=f"Playing {flavour} + lofi", colour=discord.Colour(0xff5065), url=url)
+        embed.set_image(
+            url=f"https://i.ytimg.com/vi/{flavour[-11:]}/maxresdefault.jpg")
+        embed.set_author(name=ctx.message.author.name,
+                         icon_url=ctx.message.author.avatar_url)
+        embed.set_footer(text=self.name, icon_url=self.avatar)
+        await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")], ])
         await self.playmp3source(url, context=ctx)
         
 

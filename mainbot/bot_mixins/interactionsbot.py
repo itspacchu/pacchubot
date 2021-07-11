@@ -35,6 +35,7 @@ class InteractionsMixin(DiscordInit, commands.Cog):
         await ctx.send(embed=embed, components=[[
             Button(style=ButtonStyle.green, label="Cartoonize"),
             Button(style=ButtonStyle.blue, label="Distort"),
+            Button(style=ButtonStyle.red, label="Edge"),
         ],])
         while True:
             res = await self.client.wait_for("button_click", timeout=100)
@@ -43,6 +44,8 @@ class InteractionsMixin(DiscordInit, commands.Cog):
                     await ctx.invoke(self.client.get_command('cartoonize'), attachedImg=url_link)
                 elif(await ButtonProcessor(ctx, res, "Distort")):
                     await ctx.invoke(self.client.get_command('distortion'), attachedImg=url_link)
+                elif(await ButtonProcessor(ctx, res, "Edge")):
+                    await ctx.invoke(self.client.get_command('edgeDetect'), attachedImg=url_link)
         
     @commands.command(aliases=['gb'])
     async def guild_banner(self, ctx, member: discord.Member = None):

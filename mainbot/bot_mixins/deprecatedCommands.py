@@ -30,29 +30,6 @@ class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
         await ctx.send("No")
         
     
-    @commands.command()
-    async def buttons(self,ctx):
-        await ctx.send("WUT DA FOOK BOOTANS",components=[
-            [Button(style=ButtonStyle.red,label="DIS BUTTON EXISTS WOAOWI"),
-            Button(style=ButtonStyle.URL, label="I LOV THIS ANIME",
-                   url="https://4anime.to/anime/violet-evergarden"),
-            Button(style=ButtonStyle.URL, label="ANOTHER BOOTON",
-                   url="bit.ly/IqT6zt")],
-            [Button(style=ButtonStyle.URL, label="I LOV THIS WEBTOON",
-                    url="https://www.webtoons.com/en/comedy/everywhere-and-nowhere/list?title_no=1598&page=1"),
-             Button(style=ButtonStyle.URL, label="DOX PACCHU",
-                    url="https://www.youtube.com/user/bandinancandy")]
-        ])
-        
-        res = await self.client.wait_for("button_click")
-        if(res.channel == ctx.message.channel):
-            await res.respond(
-                type = InteractionType.ChannelMessageWithSource,
-                content = "YOU CLICKED A BUTTTTOOONNNNNNNNNNNNNNNNN"
-            )
-            
-        
-    
 
 def setup(bot):
     bot.add_cog(DeprecatedCommandsMixin(bot))

@@ -76,7 +76,6 @@ def distortion_new(imgFilename, noisemodifier, preview=False):
         cv2.waitKey(0)
         cv2.destroyAllWindows()
     else:
-        print(imgFilename[:-3])
         cv2.imwrite(imgFilename, myim)
     return cv2.cvtColor(myim, cv2.COLOR_BGR2RGB)
 

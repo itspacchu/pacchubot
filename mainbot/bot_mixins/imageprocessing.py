@@ -57,18 +57,20 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
             async with ctx.typing():
                 downloadFileFromUrl(attachment_url, filname)
                 Image.fromarray(distortion_new(filname + '.png', choice(distortionTypes))).convert('RGB').save(filname + '.png')
+                print('file saved')
                 file = discord.File(filname + '.png', filename="distortedImage.png")
+                print(file)
                 embed = discord.Embed(color=find_dominant_color(filname + '.png',local=True))
                 embed.set_image(url="attachment://distortedImage.png")
             try:
                 await ctx.send(file=file, embed=embed)
                 await asyncio.sleep(1)
-            except:
+            except AttributeError:
                 pass
             os.remove(filname + '.png')
             self.MiscCollection.find_one_and_update({'_id': ObjectId("60be497c826104950c8ea5d6")}, {'$inc': {'images_distorted': 1}})
         except Exception as e:
-            await ctx.send(f"GIFs aren't working ;-;```{self.pre}idh\n{e}```")
+            await ctx.send(f"Something went wrong ```{self.pre}idh\n{e}```")
             return
             
         

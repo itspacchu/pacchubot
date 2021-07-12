@@ -71,7 +71,7 @@ class stickerHandler(DiscordInit, commands.Cog):
                 print(f"{bcolors.FAIL}{e}")
     
     @commands.command(aliases=['fp', 'fakeperson'])
-    async def rawimp(self, ctx, member: discord.Member, *, message=None):
+    async def rawimp(self, ctx, *, message=None):
         text = queryToName(message)
         try:
             msg,dname,avatarurl = text.split('$$')
@@ -92,14 +92,6 @@ class stickerHandler(DiscordInit, commands.Cog):
                 await ctx.message.delete()
             except discord.ext.commands.errors.CommandInvokeError as e:
                 print(bcolors.FAIL + f"{e} -- deleted message error")
-            print(
-                f"{bcolors.OKCYAN}{ctx.author} -> {member} : {bcolors.OKGREEN}{message}")
-            dbStore = {
-                "createdby": f"{ctx.author.name}#{ctx.author.discriminator}",
-                "clone": member.name,
-                "message": message
-            }
-            self.PodcastSuggest.insert_one(dbStore)
         except Exception as e:
             await ctx.message.add_reaction(Emotes.PACEXCLAIM)
             print(f"{bcolors.FAIL}{e}")

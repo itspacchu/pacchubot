@@ -137,8 +137,10 @@ class BaseBot(DiscordInit, commands.Cog):
     # add pagination to this
     @commands.command(aliases=['h', 'halp', 'hel'])
     async def help(self, ctx , pgno=0):
+        # save avatar of user into a variable 
+        embedColor = find_dominant_color(ctx.author.avatar_url_as(format=None, static_format='png', size=64))
         embed = discord.Embed(
-            color=Discord_init_Color, description=f"Created by Pacchu & Leo")
+            color=embedColor, description=f"Created by Pacchu & Leo")
         embed.set_thumbnail(url=self.avatar)
         if(pgno == 0):
 
@@ -186,11 +188,11 @@ class BaseBot(DiscordInit, commands.Cog):
                             value="isnt it obvious :o", inline=False)
         embed.set_footer(text=f"{self.name} {self.VERSION}", icon_url=self.avatar)
         del_dis = await ctx.send(embed=embed, components=[[
-            Button(style=ButtonStyle.green, label="More Help"),
+            Button(style=ButtonStyle.gray, label="➡️"),
         ], ])
 
         res = await self.client.wait_for("button_click", timeout=100)
-        if(await ButtonProcessor(ctx, res, "More Help" , userCheck=True)):
+        if(await ButtonProcessor(ctx, res, "➡️" , userCheck=True)):
             await del_dis.delete()
             del_dis = None
             if(pgno == 0):

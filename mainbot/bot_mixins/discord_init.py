@@ -188,11 +188,11 @@ class BaseBot(DiscordInit, commands.Cog):
                             value="isnt it obvious :o", inline=False)
         embed.set_footer(text=f"{self.name} {self.VERSION}", icon_url=self.avatar)
         del_dis = await ctx.send(embed=embed, components=[[
-            Button(style=ButtonStyle.gray, label="➡️"),
+            Button(style=ButtonStyle.gray, label=Emotes.PACPLAY),
         ], ])
 
         res = await self.client.wait_for("button_click", timeout=100)
-        if(await ButtonProcessor(ctx, res, "➡️" , userCheck=True)):
+        if(await ButtonProcessor(ctx, res, Emotes.PACPLAY , userCheck=True)):
             await del_dis.delete()
             del_dis = None
             if(pgno == 0):

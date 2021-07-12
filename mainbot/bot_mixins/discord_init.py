@@ -110,7 +110,7 @@ class BaseBot(DiscordInit, commands.Cog):
         
     @commands.command(aliases=['gh'])
     async def github(self, ctx):
-        await ctx.message.add_reaction('♥')
+        await ctx.message.add_reaction(Emotes.PACPILOVE)
         await ctx.send("https://github.com/itspacchu/pacchubot",components = [
             Button(style=ButtonStyle.URL, label="Visit my Github",
                    url="https://github.com/itspacchu/pacchubot")
@@ -118,6 +118,7 @@ class BaseBot(DiscordInit, commands.Cog):
     
     @commands.command(aliases=['cstatus'])
     async def statuschange(self, ctx, * , newstatus):
+        await ctx.message.add_reaction(Emotes.PACPLAY)
         if(isItPacchu(str(ctx.author.id))):
             statustxt = newstatus
             await self.client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=statustxt))

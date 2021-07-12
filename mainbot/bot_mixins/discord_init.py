@@ -124,7 +124,7 @@ class BaseBot(DiscordInit, commands.Cog):
         else:
             await ctx.send("> Only my creator has the authority over that!!" + ctx.author.mention)
             
-    @commands.command(aliases=['cstatus'])
+    @commands.command(aliases=['asbot'])
     async def impbot(self, ctx, *, msgtosend):
         if(isItPacchu(str(ctx.author.id))):
             await ctx.send(msgtosend)

@@ -23,7 +23,7 @@ def map(x, in_min, in_max, out_min, out_max):
 def blackPointSelect(img,blackPoint):
 	#global img
 	
-	
+	print("adjusting black point for final output ...")
 	
 	# refer repository's wiki page for detailed explanation
 
@@ -49,7 +49,7 @@ def blackPointSelect(img,blackPoint):
 def whitePointSelect(img,whitePoint):
 	#global img
 	
-	
+	print("white point selection running ...")
 
 	# refer repository's wiki page for detailed explanation
 
@@ -93,7 +93,7 @@ def highPassFilter(img,kSize=51):
 	
 	img = filtered
 	return img
-def filter(imgFilename,mode = "GCMODE",ksize = 51,whitePoint = 160,blackPoint = 60,preview = false ):
+def filter(img,mode = "GCMODE",ksize = 51,whitePoint = 160,blackPoint = 60 ):
 
 
 	# define values for blackPoint and whitePoint
@@ -103,15 +103,7 @@ def filter(imgFilename,mode = "GCMODE",ksize = 51,whitePoint = 160,blackPoint = 
 	#whitePoint = 250
 	
 	# store desired mode of operation as string
-    try:
-        img = cv.imread(imgFilename)
-        img.shape
-    except AttributeError: # to get first frame of gif
-        img = cv.VideoCapture(imgFilename)
-        ret, img = theim.read()
-
-    if(img.shape[0] > 1024 or img.shape[1] > 1024):
-        img = cv2.resize(img, (0, 0), fx=0.5, fy=0.5)
+	
 
 	if mode == "GCMODE":
 		img = highPassFilter(img,ksize)
@@ -125,18 +117,7 @@ def filter(imgFilename,mode = "GCMODE",ksize = 51,whitePoint = 160,blackPoint = 
 		img = blackPointSelect(img,blackPoint)
 		img = whitePointSelect(img,whitePoint)
 		img = blackAndWhite(img)
-
-	
-	
-	if(preview):
-        cv2.imshow('image', img)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-    else:
-        cv2.imwrite(imgFilename, img)
-	im_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
-
+	return img
 
 #use this command ---->
 #im = cv2.imread(path)

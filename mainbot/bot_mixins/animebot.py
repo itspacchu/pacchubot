@@ -56,7 +56,7 @@ class AnimeMixin(DiscordInit, commands.Cog):
             await report_errors_to_channel(self.client, e)
         
         while True:
-            res = await self.client.wait_for("button_click")
+            res = await self.client.wait_for("button_click", timeout=100)
             if(await ButtonProcessor(ctx, res, "Next Picture")):
                 await del_dis.delete()
                 del_dis = None
@@ -146,7 +146,7 @@ class AnimeMixin(DiscordInit, commands.Cog):
             embed.set_footer(text=self.name, icon_url=self.avatar)
             await ctx.send(embed=embed)
         while True:
-            res = await self.client.wait_for("button_click")
+            res = await self.client.wait_for("button_click", timeout=100)
             if(await ButtonProcessor(ctx,res,"Next Anime")):
                 await del_dis.delete()
                 del_dis = None
@@ -190,7 +190,7 @@ class AnimeMixin(DiscordInit, commands.Cog):
             await ctx.send(embed=embed)
             await report_errors_to_channel(self.client, e)
         while True:
-            res = await self.client.wait_for("button_click",timeout=500)
+            res = await self.client.wait_for("button_click",timeout=100)
             if(await ButtonProcessor(ctx, res, "Next Manga")):
                 await del_dis.delete()
                 del_dis = None

@@ -46,8 +46,7 @@ class MusicMixin(DiscordInit, commands.Cog):
         
     @commands.command(pass_context=True, aliases=['rp', 'ytp'])
     async def rawplay(self, ctx, *, flavour='https://www.youtube.com/watch?v=dQw4w9WgXcQ'):
-        voice_client: discord.VoiceClient = discord.utils.get(
-            self.client.voice_clients, guild=ctx.guild)
+        voice_client: discord.VoiceClient = discord.utils.get(self.client.voice_clients, guild=ctx.guild)
         await ctx.message.add_reaction(Emotes.PACPLAY)
         if(flavour=='vsauce'):
             flavour = "https://www.youtube.com/watch?v=TN25ghkfgQA"
@@ -56,12 +55,9 @@ class MusicMixin(DiscordInit, commands.Cog):
             with youtube_dl.YoutubeDL(ytdl_format_options) as ydl:
                 info = ydl.extract_info(flavour, download=False)
                 url = info['formats'][0]['url']
-        embed = discord.Embed(
-            title=f"Playing {flavour} + lofi", colour=discord.Colour(0xff5065), url=url)
-        embed.set_image(
-            url=f"https://i.ytimg.com/vi/{flavour[-11:]}/maxresdefault.jpg")
-        embed.set_author(name=ctx.message.author.name,
-                         icon_url=ctx.message.author.avatar_url)
+        embed = discord.Embed(title=f"Playing {flavour} + lofi", colour=discord.Colour(0xff5065), url=url)
+        embed.set_image(url=f"https://i.ytimg.com/vi/{flavour[-11:]}/maxresdefault.jpg")
+        embed.set_author(name=ctx.message.author.name,icon_url=ctx.message.author.avatar_url)
         embed.set_footer(text=self.name, icon_url=self.avatar)
         await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")], ])
         await self.playmp3source(url, context=ctx)
@@ -181,18 +177,18 @@ class MusicMixin(DiscordInit, commands.Cog):
         del_dis = await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.green, label="Play Latest"), Button(style=ButtonStyle.red, label="Prev Page"), Button(style=ButtonStyle.blue, label="Next Page"), Button(style=ButtonStyle.grey, label="Next Search Result")]])
         
         while True:
-            res = await self.client.wait_for("button_click",timeout=1200)
-            if(res.component.label == "Play Latest"):
+            res = await self.client.wait_for("button_click",timeout=100)
+            if(await ButtonProcessor(ctx, res, "Play Latest")):
                 await ctx.invoke(self.client.get_command('podplay'))
-            elif(res.component.label == "Next Page"):
+            elif(await ButtonProcessor(ctx, res, "Next Page")):
                 await del_dis.delete()
                 del_dis = None
                 await ctx.invoke(self.client.get_command('pod'), strparse=strparse, pgNo=pgNo+1)
-            elif(res.component.label == "Prev Page" and pgNo > 2):
+            elif(await ButtonProcessor(ctx, res, "Prev Page") and pgNo > 2):
                 await del_dis.delete()
                 del_dis = None
                 await ctx.invoke(self.client.get_command('pod'), strparse=strparse, pgNo=pgNo-1)
-            elif(res.component.label == "Next Search Result"):
+            elif(await ButtonProcessor(ctx, res, "Next Search Result")):
                 await del_dis.delete()
                 del_dis = None
                 await ctx.invoke(self.client.get_command('pod'), strparse=strparse, pgNo=0 ,searchIndex=searchIndex+1)
@@ -261,7 +257,7 @@ class MusicMixin(DiscordInit, commands.Cog):
             await ctx.send(f"> {ctx.author.mention} Nothing's playing")
 
     
-    @commands.command(aliases=['fuckoff', 'dc' , 'disconnect'])
+    @commands.command(aliases=['fuckoff', 'dc' , 'disconnect','stfu'])
     async def stop(self, ctx ):
         if(ctx.author.voice.channel):
             await ctx.message.add_reaction(Emotes.PACSTOP)

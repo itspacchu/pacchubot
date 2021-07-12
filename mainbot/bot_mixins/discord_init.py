@@ -140,7 +140,7 @@ class BaseBot(DiscordInit, commands.Cog):
         # save avatar of user into a variable 
         embedColor = find_dominant_color(ctx.author.avatar_url_as(format=None, static_format='png', size=64))
         embed = discord.Embed(
-            color=embedColor, description=f"Created by Pacchu & Leo")
+            color=embedColor, description=f"Created by Pacchu & Leo {pgno+1}/2")
         embed.set_thumbnail(url=self.avatar)
         if(pgno == 0):
 

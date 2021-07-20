@@ -110,7 +110,7 @@ class BaseBot(DiscordInit, commands.Cog):
         
     @commands.command(aliases=['gh'])
     async def github(self, ctx):
-        await ctx.message.add_reaction('♥')
+        await ctx.message.add_reaction(Emotes.PACPILOVE)
         await ctx.send("https://github.com/itspacchu/pacchubot",components = [
             Button(style=ButtonStyle.URL, label="Visit my Github",
                    url="https://github.com/itspacchu/pacchubot")
@@ -118,65 +118,98 @@ class BaseBot(DiscordInit, commands.Cog):
     
     @commands.command(aliases=['cstatus'])
     async def statuschange(self, ctx, * , newstatus):
+        await ctx.message.add_reaction(Emotes.PACPLAY)
         if(isItPacchu(str(ctx.author.id))):
             statustxt = newstatus
             await self.client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=statustxt))
         else:
-            await ctx.send("Only my creator has the authority over that " + Emotes.PACEXCLAIM)
+            await ctx.send("> Only my creator has the authority over that!!" + ctx.author.mention)
+            
+    @commands.command(aliases=['asbot'])
+    async def impbot(self, ctx, *, msgtosend):
+        if(isItPacchu(str(ctx.author.id))):
+            await ctx.send(msgtosend)
+            await ctx.message.delete()
+        else:
+            await ctx.send("> Who are you? " + ctx.author.mention)
 
             
 
     # add pagination to this
     @commands.command(aliases=['h', 'halp', 'hel'])
-    async def help(self, ctx):
+    async def help(self, ctx , pgno=0):
+        # save avatar of user into a variable 
+        embedColor = find_dominant_color(ctx.author.avatar_url_as(format=None, static_format='png', size=64))
         embed = discord.Embed(
-            color=Discord_init_Color, description=f"Created by Pacchu & Leo")
+            color=embedColor, description=f"Created by Pacchu & Leo {pgno+1}/2")
         embed.set_thumbnail(url=self.avatar)
-        embed.add_field(name=f"{self.pre}anime/ani",
-                        value="Searches for given anime", inline=True)
-        embed.add_field(name=f"{self.pre}manga/m",
-                        value="Searches for give Manga", inline=True)
-        embed.add_field(name=f"{self.pre}anipics/ap",
-                        value="Searches for Images of given Anime Charactor", inline=True)
-        embed.add_field(name=f"{self.pre}cartoonize/ic @mention/file",
-                        value="Image Processing Cartoonize AI", inline=True)
-        embed.add_field(name=f"{self.pre}distort/id @mention/file",
-                        value="Image Processing Distort Image based on VectorField", inline=True)
-        embed.add_field(name=f"{self.pre}wikipic/wpotd",
-                        value="Fetches Wikipedia Picture of the Day", inline=False)
-        embed.add_field(name=f"{self.pre}hubbleday/hb",
-                        value="What Hubble saw on your birthday", inline=False)
-        embed.add_field( name=f"{self.pre}stats", value="partially implemented **bugs**", inline=False)
-        """
-        embed.add_field(name=f"{self.pre}pod",
-                        value="Podcast playback section", inline=False)
-        embed.add_field(name=f"{self.pre}play/p  , {self.pre}lofi/pl",
-                        value="Youtube Playback and Lofi music", inline=False)
-        """
-        embed.add_field(name=f"{self.pre}invite",
-                        value="Invite link for this bot", inline=False)  
-        embed.add_field(name=f"{self.pre}avatar @Pacchu / {self.pre}av @Pacchu",
-                        value=f"Something of use atleast", inline=False)
-        embed.add_field(name=f"{self.pre}bruh/sike [emote,link,text message]",
-                        value=f"Something to be saved? idk why it an option", inline=False)
-        embed.add_field(name=f"{self.pre}sticker/st [sticker name]",
-                        value="Discord Stickers NQN clone", inline=False)
-        embed.add_field(name=f"{self.pre}impersonate/sayas @mention 'Deez nuzz' ",
-                        value="Impersonates the person mentioned", inline=False)
-        embed.add_field(name=f"{self.pre}gpt \"Today is a wonderful..\"",
-                        value="gpt neo text completion", inline=True)
-        embed.add_field(name=f"{self.pre}q \"Why is chocolate beautiful?\"",
-                        value="gpt neo answering", inline=True)
-        embed.add_field(name=f"{self.pre}spotify @mention",
-                        value="Gets the user's Spotify activity", inline=False)
-        embed.add_field(name=f"{self.pre}github",
-                        value="Contribute to this bot", inline=False)
-        embed.add_field(name=f"{self.pre}help",
-                        value="isnt it obvious :o", inline=False)
-        embed.set_footer(
-            text=f"{self.name} {self.VERSION}", icon_url=self.avatar)
-        
-        await ctx.send(embed=embed)
+        if(pgno == 0):
+
+            embed.add_field(name=f"{self.pre}avatar @Pacchu / {self.pre}av @Pacchu",
+                            value=f"Supports Cartoonizing [p.ic] , Edge Detection [p.ied] , Distorting [p.id] ", inline=False)
+            
+            embed.add_field(name=f"{self.pre}bruh/sike [emote,link,text message]",
+                            value=f"Something to be saved? idk why it an option", inline=False)
+
+            embed.add_field(name=f"{self.pre}pod",
+                            value="Podcast playback section", inline=False)
+            
+            embed.add_field(name=f"{self.pre}lofi/pl [study/sleep]",
+                            value="Lofi music", inline=False)
+
+            embed.add_field(name=f"{self.pre}anime/ani",
+                            value="Searches for given anime", inline=True)
+            
+            embed.add_field(name=f"{self.pre}manga/m",
+                            value="Searches for give Manga", inline=True)
+            
+            embed.add_field(name=f"{self.pre}spotify @mention",
+                            value="Gets the user's Spotify activity", inline=False)
+            
+        elif(pgno == 1): 
+            embed.add_field(name=f"{self.pre}wikipic/wpotd Date",
+                            value="Fetches Wikipedia Picture of the Day", inline=False)
+            embed.add_field(name=f"{self.pre}hubbleday/hb Date",
+                            value="What Hubble saw on your birthday", inline=False)
+            embed.add_field(
+                name=f"{self.pre}stats", value="partially implemented **bugs**", inline=False)
+            
+            embed.add_field(name=f"{self.pre}invite",
+                            value="Invite link for this bot", inline=False)  
+            embed.add_field(name=f"{self.pre}anipics/ap",
+                            value="Searches for Images of given Anime Charactor", inline=True)
+            embed.add_field(name=f"{self.pre}cartoonize/ic @mention/file",
+                            value="Image Processing Cartoonize AI", inline=True)
+            embed.add_field(name=f"{self.pre}distort/id @mention/file",
+                            value="Image Processing Distort Image based on VectorField", inline=True)
+            
+            embed.add_field(name=f"{self.pre}sticker/st [sticker name]",
+                            value="Discord Stickers NQN clone", inline=False)
+            embed.add_field(name=f"{self.pre}impersonate/sayas @mention 'Deez nuzz' ",
+                            value="Impersonates the person mentioned", inline=False)
+            embed.add_field(name=f"{self.pre}gpt \"Today is a wonderful..\"",
+                            value="gpt neo text completion", inline=True)
+            embed.add_field(name=f"{self.pre}q \"Why is chocolate beautiful?\"",
+                            value="gpt neo answering", inline=True)
+            
+            embed.add_field(name=f"{self.pre}github",
+                            value="Contribute to this bot", inline=False)
+            embed.add_field(name=f"{self.pre}help",
+                            value="isnt it obvious :o", inline=False)
+        embed.set_footer(text=f"{self.name} {self.VERSION}", icon_url=self.avatar)
+        del_dis = await ctx.send(embed=embed, components=[[
+            Button(style=ButtonStyle.gray, label="More help"),
+        ], ])
+
+        res = await self.client.wait_for("button_click", timeout=100)
+        if(await ButtonProcessor(ctx, res, "More help" , userCheck=True)):
+            await del_dis.delete()
+            del_dis = None
+            if(pgno == 0):
+                pgnoToGo = 1
+            else:
+                pgnoToGo = 0
+            await ctx.invoke(self.client.get_command('help'),pgno=pgnoToGo)
 
 
 

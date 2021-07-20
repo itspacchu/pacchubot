@@ -145,3 +145,13 @@ cython_debug/
 .vscode
 .idea
 myenv.env
+bot-test/Scripts/activate
+bot-test/pyvenv.cfg
+bot-test/Scripts/activate.bat
+bot-test/Scripts/Activate.ps1
+bot-test/Scripts/deactivate.bat
+bot-test/Scripts/pip.exe
+bot-test/Scripts/pip3.9.exe
+bot-test/Scripts/pip3.exe
+bot-test/Scripts/python.exe
+bot-test/Scripts/pythonw.exe

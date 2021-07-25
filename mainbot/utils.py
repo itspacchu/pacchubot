@@ -159,7 +159,7 @@ def better_send(ctx,content=None,embed=None,file=None):
 
 
 def isItPacchu(checkid:str):
-    return str(checkid) == "749975627633000520" or str(checkid) == "170783707647442947" or str(checkid) == "741139834260815964"
+    return str(checkid) == "749975627633000520" or str(checkid) == "170783707647442947" or str(checkid) == "741139834260815964" or str(checkid) == "627135815985659904"
 
 
 def domain_finder(link):

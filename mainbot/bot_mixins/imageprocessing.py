@@ -97,7 +97,7 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
             await ctx.send(f"Something went wrong ```{self.pre}idh\n{e}```")
             return
     @commands.command(aliases=['la','lineart'])
-    async def la(self,ctx,member:discord.Member = None,attachedImg=None):
+    async def lineart(self,ctx,member:discord.Member = None,attachedImg=None):
         try:
             filname = str(round(time.time()))
             attachment_url = await unified_imagefetcher(ctx=ctx, member=member, attachedImg=attachedImg)

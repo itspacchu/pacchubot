@@ -19,7 +19,7 @@ class DiscordInit:
         
         self.client.event(self.on_ready)
         self.client.event(self.on_message)
-        self.client.event(self.on_command_error)
+        #self.client.event(self.on_command_error)
         
         self.db = mongo_client['PacchuSlave']
         self.init_db()
@@ -61,13 +61,6 @@ class DiscordInit:
                 await message.channel.send(match)
             except Exception as e:
                 pass #this error is on every goddamn message ffs
-        
-    
-    async def on_command_error(self,ctx, error):
-        if isinstance(error, CommandNotFound):
-            await ctx.send(choice(self.perks['replies']['command_not_found_error']) + f"```{self.pre}help```")
-            return 
-        raise error
 
 
     def init_db(self):

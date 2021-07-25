@@ -6,6 +6,7 @@ from .discord_init import DiscordInit
 import time
 from bs4 import BeautifulSoup
 from random import choice
+import mainbot.core.mismage
 
 class ImageProcessingMixin(DiscordInit, commands.Cog):
     @commands.command(aliases=['ic', 'cartoon'])
@@ -37,8 +38,7 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
     @commands.command(aliases=['idh', 'distort-help'])
     async def distortion_help(self,ctx):
         embed = discord.Embed(title="Image Distortion", colour=discord.Colour(0xff7e2e), description=f"```{self.pre}id @mention/file``` attach an image or @mention someone to get their dp")
-        embed.set_image(
-            url="https://raw.githubusercontent.com/itspacchu/pacchubot/master/images/helper.png")
+        embed.set_image(url="https://raw.githubusercontent.com/itspacchu/pacchubot/master/images/helper.png")
         await ctx.send(embed=embed)
     
     @commands.command(aliases=['ich', 'cartoonize-help'])
@@ -95,7 +95,27 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
         except Exception as e:
             await ctx.send(f"Something went wrong ```{self.pre}idh\n{e}```")
             return
-            
+    @commands.command(aliases=['ila','lineart'])
+    async def imla(self,ctx,member:discord.Member = None,attachedImg=None):
+        try:
+            filname = str(round(time.time()))
+            attachment_url = await unified_imagefetcher(ctx=ctx, member=member, attachedImg=attachedImg)
+            async with ctx.typing():
+                downloadFileFromUrl(attachment_url, filname)
+                Image.fromarray(mainbot.core.mismage.shadow(filname + '.png')).save(filname + '.png')
+                file = discord.File(filname + '.png', filename="edgedetect.png")
+                embed = discord.Embed(color=find_dominant_color(filname + '.png', local=True))
+                embed.set_footer(text="from api.itspacchu.tk")
+                embed.set_image(url="attachment://edgedetect.png")
+            try:
+                await ctx.send(file=file, embed=embed)
+                await asyncio.sleep(1)
+            except AttributeError:
+                pass
+            os.remove(filname + '.png')
+        except Exception as e:
+            await ctx.send(f"Something went wrong ```{self.pre}idh\n{e}```")
+            return    
         
         
 

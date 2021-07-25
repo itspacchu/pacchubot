@@ -6,6 +6,7 @@ from .discord_init import DiscordInit
 import time
 from bs4 import BeautifulSoup
 from random import choice
+import mainbot.core.mismage
 
 class ImageProcessingMixin(DiscordInit, commands.Cog):
     @commands.command(aliases=['ic', 'cartoon'])
@@ -95,7 +96,29 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
         except Exception as e:
             await ctx.send(f"Something went wrong ```{self.pre}idh\n{e}```")
             return
-            
+    @commands.command(aliases=['la','lineart'])
+    async def lineart(self,ctx,member:discord.Member = None,attachedImg=None):
+        try:
+            filname = str(round(time.time()))
+            attachment_url = await unified_imagefetcher(ctx=ctx, member=member, attachedImg=attachedImg)
+            async with ctx.typing():
+                downloadFileFromUrl(attachment_url, filname)
+                Image.fromarray(mainbot.core.mismage.shadow(filname + '.png')).save(filname + '.png')
+                file = discord.File(filname + '.png', filename="edgedetect.png")
+                embed = discord.Embed(color=find_dominant_color(filname + '.png', local=True))
+                embed.set_footer(text="from api.itspacchu.tk")
+                embed.set_image(url="attachment://edgedetect.png")
+            try:
+                await ctx.send(file=file, embed=embed)
+                await asyncio.sleep(1)
+            except AttributeError:
+                pass
+            os.remove(filname + '.png')
+            self.MiscCollection.find_one_and_update({'_id': ObjectId(
+                "60be497c826104950c8ea5d6")}, {'$inc': {'images_distorted': 1}})
+        except Exception as e:
+            await ctx.send(f"Something went wrong ```{self.pre}idh\n{e}```")
+            return    
         
         
 

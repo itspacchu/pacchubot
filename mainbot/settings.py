@@ -21,7 +21,7 @@ ani = Jikan()
 self_name = "Pacchu's Bot"
 self_avatar = "https://raw.githubusercontent.com/itspacchu/Pacchu-s-Slave/master/Screenshot%202021-04-09%20225421.png"
 command_prefix = "p."
-command_prefix_use = ['p.','_.','>','69.']
+command_prefix_use = ['p.','_','>','69.']
 
 guild_ids = [685469328929587268, 705682250460823602, 737504783937830924]
 

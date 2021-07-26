@@ -40,12 +40,12 @@ def highpass(imgFilename,ksize = 51,whitePoint = 127,blackPoint = 61 ):
     img = cv2.imread(imgFilename)
     if(img.shape[0] > 1024 or img.shape[1] > 1024):
         img = cv2.resize(img, (0, 0), fx=0.5, fy=0.5)
-        img = highPassFilter(img,ksize)
-        img = whitePointSelect(img,whitePoint)
-        img = blackPointSelect(img,blackPoint)
-        cv2.imwrite(imgFilename, img)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        return img
+    img = highPassFilter(img,ksize)
+    img = whitePointSelect(img,whitePoint)
+    img = blackPointSelect(img,blackPoint)
+    cv2.imwrite(imgFilename, img)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    return img
 
 #use this command ---->
 #im = cv2.imread(path)
@@ -56,7 +56,15 @@ def highpass(imgFilename,ksize = 51,whitePoint = 127,blackPoint = 61 ):
 #line art function starts here
 
 def shadow(imgFilename,method = 0):
-    img = cv2.imread(imgFilename)
+
+	try:
+    	img = cv2.imread(imgFilename)
+    	img.shape
+    except AttributeError:
+    	vid = cv2.VideoCapture(imgFilename)
+        ret, img = theim.read()
+    if(img.shape[0] > 1024 or img.shape[1] > 1024):
+        img = cv2.resize(img, (0, 0), fx=0.5, fy=0.5)
     rgb_planes = cv2.split(img)
     result_planes = []
     result_norm_planes = []

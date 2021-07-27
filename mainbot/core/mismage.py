@@ -19,12 +19,10 @@ def whitePointSelect(img,whitePoint):
 	img = img.astype('int32')
 	img = map(img, 0, whitePoint, 0, 255)
 	img = img.astype('uint8')
-	
 	return img
 
 def highPassFilter(img,kSize=51):
 	print("applying high pass filter")
-	
 	if not kSize%2:
 		kSize +=1
 
@@ -56,20 +54,19 @@ def highpass(imgFilename,ksize = 51,whitePoint = 127,blackPoint = 61 ):
 #line art function starts here
 
 def shadow(imgFilename,method = 0):
-
 	try:
-    	img = cv2.imread(imgFilename)
-    	img.shape
-    except AttributeError:
-    	vid = cv2.VideoCapture(imgFilename)
-        ret, img = theim.read()
-    if(img.shape[0] > 1024 or img.shape[1] > 1024):
-        img = cv2.resize(img, (0, 0), fx=0.5, fy=0.5)
-    rgb_planes = cv2.split(img)
+		img = cv2.imread(imgFilename)
+		img.shape
+	except AttributeError:
+		vid = cv2.VideoCapture(imgFilename)
+	    ret, img = theim.read()
+	if(img.shape[0] > 1024 or img.shape[1] > 1024):
+	    img = cv2.resize(img, (0, 0), fx=0.5, fy=0.5)
+	rgb_planes = cv2.split(img)
     result_planes = []
     result_norm_planes = []
     for plane in rgb_planes:
-        dilated_img = cv2.dilate(plane, np.ones((7,7), np.uint8))
+	    dilated_img = cv2.dilate(plane, np.ones((7,7), np.uint8))
         bg_img = cv2.medianBlur(dilated_img, 21)
         diff_img = 255 - cv2.absdiff(plane, bg_img)
         norm_img = cv2.normalize(diff_img,None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8UC1)
@@ -80,3 +77,4 @@ def shadow(imgFilename,method = 0):
     result_norm = cv2.cvtColor(result_norm,cv2.COLOR_BGR2RGB)
     return result_norm
 #lineart function ends here
+#fixing intendation

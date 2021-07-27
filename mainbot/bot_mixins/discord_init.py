@@ -43,7 +43,7 @@ class DiscordInit:
             return
 
         for x in message.mentions:
-            if(x == self.client.user and len(message.content) < 10):
+            if(x == self.client.user and len(message.content) < 50):
                 await message.channel.send(choice(self.perks['replies']['pings']))
 
         if(botReadyToRespond): #or isItPacchu(str(message.author.id))):

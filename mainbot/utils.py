@@ -159,7 +159,8 @@ def better_send(ctx,content=None,embed=None,file=None):
 
 
 def isItPacchu(checkid:str):
-    return str(checkid) == "749975627633000520" or str(checkid) == "170783707647442947" or str(checkid) == "741139834260815964" or str(checkid) == "627135815985659904"
+    #                   Pacchu              Pacchu              Macky            Leo                Monsieur
+    return checkid in [749975627633000520,170783707647442947,741139834260815964,520114282776625162,627135815985659904]
 
 
 def domain_finder(link):

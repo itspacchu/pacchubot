@@ -62,6 +62,41 @@ class MusicMixin(DiscordInit, commands.Cog):
         await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")], ])
         await self.playmp3source(url, context=ctx)
         
+    @commands.command(aliases=['podepi'])
+    async def podepisode(self,ctx,epno=0):  
+        await ctx.message.add_reaction("🔍") 
+        podepi = epno
+        if(self.lastPod == None):
+            embed = discord.Embed(colour=discord.Colour(0xbd10e0), description=" ")
+            embed.set_thumbnail(url=self.avatar)
+            embed.set_author(name=self.name, url=self.avatar,icon_url=self.avatar)
+            embed.add_field(name=f"No Recent Podcast Searches",value=f"search for podcast using {self.pre}pod",inline=False)
+            embed.set_thumbnail(url=self.avatar)
+            await ctx.send(embed=embed)
+        else:
+            currentpod = self.lastPod
+            try:
+                try:
+                    desc = currentpod.GetEpisodeDetails(podepi)['summary'][:500] + "..."
+                except:
+                    desc = "No Information Available"
+                try:
+                    title = currentpod.GetEpisodeDetails(podepi)['title']
+                except:
+                    title = "404"
+                    
+                embed = discord.Embed(title=title,colour=find_dominant_color(currentpod.PodcastImage(podepi)), url=currentpod.GetEpisodeDetails(podepi)['link'],description=desc,inline=False)
+                try:
+                    embed.set_thumbnail(url=currentpod.PodcastImage(podepi))
+                except:
+                    pass
+                try:
+                    embed.set_footer(text="Published on " + currentpod.GetEpisodeDetails(podepi)['published'][:16],icon_url=self.avatar)
+                except:
+                    pass
+                await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")],])
+            except AttributeError:
+                await ctx.send("> No Episode found")
 
     @commands.command(aliases=['podp'])
     async def podplay(self,ctx,epno=0):  
@@ -77,15 +112,14 @@ class MusicMixin(DiscordInit, commands.Cog):
         else:
             currentpod = self.lastPod
             try:
-                await self.playPodcast(ctx, podepi=podepi, currentpod=currentpod)
                 try:
-                    desc = currentpod.GetEpisodeDetails(podepi)['summary'][:300]
+                    desc = currentpod.GetEpisodeDetails(podepi)['summary'][:500] + "..."
                 except:
                     desc = "No Information Available"
                 try:
                     title = currentpod.GetEpisodeDetails(podepi)['title']
                 except:
-                    title = "Title unavailable"
+                    title = "404"
                     
                 embed = discord.Embed(title=title,colour=find_dominant_color(currentpod.PodcastImage(podepi)), url=currentpod.GetEpisodeDetails(podepi)['link'],description=desc,inline=False)
                 try:
@@ -93,10 +127,11 @@ class MusicMixin(DiscordInit, commands.Cog):
                 except:
                     pass
                 try:
-                    embed.set_footer(text=currentpod.GetEpisodeDetails(podepi)['title'],icon_url=self.avatar)
+                    embed.set_footer(text="Published on " + currentpod.GetEpisodeDetails(podepi)['published'][:16],icon_url=self.avatar)
                 except:
                     pass
                 await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")],])
+                await self.playPodcast(ctx, podepi=podepi, currentpod=currentpod)
             except AttributeError:
                 await ctx.send("> No Episode found")
 
@@ -126,7 +161,8 @@ class MusicMixin(DiscordInit, commands.Cog):
             embed.add_field(name=f"{self.pre}pod", value="This very command you ran",inline=False)
             embed.add_field(name=f"{self.pre}pod [Name of Podcast]",value="Searches for the Podcast and shows Episodes related to it.", inline=False)
             embed.add_field(name=f"{self.pre}pod [Name of Podcast] : [Selection Number] or {self.pre}podp [Selection No]", value="Play the podcast selection , default 0 plays the latest available episode",inline=False)
-            embed.add_field(name=f"{self.pre}stop or {self.pre}dc",value="Stop and Disconnect\n Sadly Haven't Implemented any Pause for now", inline=False)
+            embed.add_field(name=f"{self.pre}stop or {self.pre}dc",value="Stop and Disconnect\n", inline=False)
+            embed.add_field(name=f"{self.pre}pause or {self.pre}resume",value="Pause and Resume\n (Havent Implemented Seeking and queueing yet)", inline=False)
         if(podepi == None and not podname == " "):
             await ctx.message.add_reaction('🔍') 
             try:
@@ -157,7 +193,8 @@ class MusicMixin(DiscordInit, commands.Cog):
                 embed.set_author(name=k['name'], url=k['rss'], icon_url=k['image'])
                 ind = 0 + 5*start
                 for episode_ in currentpod.ListEpisodes()[start:start+5]:
-                    embed.add_field(name=f"{ind} : "+episode_,value=k['date'],inline=False)
+                    currentEpisodeDetail = currentpod.GetEpisodeDetails(ind)
+                    embed.add_field(name=f"{ind} >>  **" + currentEpisodeDetail['title'] +f"**\n ```{currentEpisodeDetail['summary'][:200]}...````",value=currentEpisodeDetail['published'][:16],inline=False)
                     ind += 1
                 embed.set_footer(text=f"Page {start+1}/{paginationsize}", icon_url=self.avatar)
                 try:

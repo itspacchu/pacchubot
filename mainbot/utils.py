@@ -78,10 +78,10 @@ async def unified_imagefetcher(ctx,member=None,attachedImg=None):
             await ctx.send("> I think something went wrong!")
             return None
 
-def ButtonValidator(res,ctx,userCheck=False):
+def ButtonValidator(res,ctx,userCheck=True):
     cond = (res.channel == ctx.channel)
     if(userCheck):
-        cond = cond and (res.author.id==ctx.author.id)
+        cond = (cond and (res.author.id==ctx.author.id))
     return cond
 
 
@@ -159,7 +159,8 @@ def better_send(ctx,content=None,embed=None,file=None):
 
 
 def isItPacchu(checkid:str):
-    return str(checkid) == "749975627633000520" or str(checkid) == "170783707647442947" or str(checkid) == "741139834260815964" or str(checkid) == "627135815985659904"
+    #                   Pacchu              Pacchu              Macky            Leo                Monsieur
+    return int(checkid) in [749975627633000520,170783707647442947,741139834260815964,520114282776625162,627135815985659904]
 
 
 def domain_finder(link):
@@ -196,6 +197,7 @@ class Emotes:
     PACPAUSE = '<:pacpause:860273984218464267>'
     PACDEPRESS = "<:pacdepression:860277067730649135>"
     LOFISPARKO = "<:lofisparko:858551929977962547>"
+    ANGRYPING = "<:Angryping:869550989328400434>"
 
 
 class bcolors:

@@ -101,6 +101,14 @@ perkdict = {
                 "No",
                 "Nope","How about ...no!"
             ],
+
+            "slutty" : {
+                "Oh Dadddyio",
+                "Oniichan :3",
+                "( ͡° ͜ʖ ͡°) :3",
+                "Hey Daddy",
+                "Aw Daddy"
+            },
             
             "lowbudget" : [
                 "CPU power is expensive man ;-;",
@@ -112,7 +120,7 @@ perkdict = {
                 "am I supposed to know what that is?",
                 "you know pacchu is too lazy to work on stuff",
                 "That doesnt look like something I know?",
-                "that took suspicious hmmm",
+                "that look suspicious hmmm",
                 "https://i.imgur.com/Bp9u8Ps.png",
                 "ay I cant do that ...yet once pacchu stops procrastinating :|"
             ],
@@ -124,7 +132,7 @@ perkdict = {
                 "Just ping someone randomly ;)"
             ],
             "pings": [
-                "Hewwlo","Yeah?.. ","ye?","Eyy ","Owo","ay ", " Hewwo ", "Hello Hooman ","Wut? ","yeah m8 ","yes?","did someone ping me?","pong"
+                "Hewwlo","Yeah?.. ","ye?","Eyy ","Owo","ay ", " Hewwo ", "Hello Hooman ","Wut? ","yeah m8 ","yes?","did someone ping me?","<:Angryping:869550989328400434>","sup","wassup","```Today's Date isn't supposed to exist ... universe has split```"
             ],
             "gpterror": [
                 "My brain isnt responding right now T_T","um... idk" , "I can't Understand that","Could you elaborate?" , "I have zero clue ._." , "Someone find my brain .. it seem to be afking in processes", "eeeeee idk","GPT model loading"

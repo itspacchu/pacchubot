@@ -10,11 +10,11 @@ class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
     async def ecchi(self,ctx):
         try:
             webhook = await ctx.channel.create_webhook(name="pacchu_webhook")
-            await webhook.send("That was removed due to licensing issues :( rip ecchichan 2020-2020", username="ecchichan", avatar_url="https://i.redd.it/5xkpkqjoz9g11.jpg")
+            await webhook.send("That no longer exists :( rip ecchichan 2020-2020", username="ecchichan", avatar_url="https://i.redd.it/5xkpkqjoz9g11.jpg")
             await ctx.channel.webhooks()
             await webhook.delete()
         except:
-            ctx.send("That was removed due to licensing issues :( rip ecchichan 2020-2020")
+            ctx.send("That no longer exists :( rip ecchichan 2020-2020")
     
     @commands.command(aliases=['pappu','lundi','seggs','sex','69'])
     async def fuck(self,ctx):
@@ -27,7 +27,13 @@ class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
     
     @commands.command()
     async def simp(self,ctx):
-        await ctx.send("No")
+        try:
+            webhook = await ctx.channel.create_webhook(name="pacchu_webhook")
+            await webhook.send(choice(perkdict['replies']['slutty']), username="Waifuchan", avatar_url="https://i.imgur.com/T3fp9AL.png")
+            await ctx.channel.webhooks()
+            await webhook.delete()
+        except:
+            ctx.send("> Webhook permission not available")
         
     
 

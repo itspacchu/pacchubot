@@ -197,6 +197,7 @@ class Emotes:
     PACPAUSE = '<:pacpause:860273984218464267>'
     PACDEPRESS = "<:pacdepression:860277067730649135>"
     LOFISPARKO = "<:lofisparko:858551929977962547>"
+    ANGRYPING = "<:Angryping:869550989328400434>"
 
 
 class bcolors:

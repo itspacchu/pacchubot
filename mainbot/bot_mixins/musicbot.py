@@ -201,7 +201,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                 ind = 0 + 5*start
                 for episode_ in currentpod.ListEpisodes()[start:start+5]:
                     currentEpisodeDetail = currentpod.GetEpisodeDetails(ind)
-                    embed.add_field(name=f"{ind} : " + currentEpisodeDetail['title'],value=f"currentEpisodeDetail['published'][:16]\n ```{currentEpisodeDetail['summary'][:70]}...```\n" ,inline=False)
+                    embed.add_field(name=f"{ind} : " + currentEpisodeDetail['title'],value=f"{currentEpisodeDetail['published'][:16]}\n ```{currentEpisodeDetail['summary'][:70]}...```\n" ,inline=False)
                     ind += 1
                 embed.set_footer(text=f"Page {start+1}/{paginationsize}", icon_url=self.avatar)
                 try:

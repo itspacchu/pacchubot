@@ -32,12 +32,19 @@ class MusicMixin(DiscordInit, commands.Cog):
         flavoururls = {
             'study':'https://www.youtube.com/watch?v=5qap5aO4i9A',
             'sleep': 'https://www.youtube.com/watch?v=DWcJFNfaw9c',
+            'violet':'https://www.youtube.com/watch?v=8mY3Udau4sE',
+            'silentvoice':'https://www.youtube.com/watch?v=Fu9hLWfOups',
+            'yourname':'https://www.youtube.com/watch?v=H9yfuYDoGf4',
+            'minecraft':'https://www.youtube.com/watch?v=Dg0IjOzopYU',
+            'disco':'https://www.youtube.com/watch?v=qz_Yzt_9ZbY',
+            'sad':'https://www.youtube.com/watch?v=yf18K9g-XV0',
+            'avec':'https://www.youtube.com/watch?v=tcjxT3m5UDE'
         }
         async with ctx.typing():
             with youtube_dl.YoutubeDL(ytdl_format_options) as ydl:
                 info = ydl.extract_info(flavoururls[flavour], download=False)
                 url = info['formats'][0]['url']
-        embed = discord.Embed(title=f"Playing {flavour} + lofi", colour=discord.Colour(0xff5065), url=url)
+        embed = discord.Embed(title=f"Playing {flavour}", colour=discord.Colour(0xff5065), url=url)
         embed.set_image(url=f"https://i.ytimg.com/vi/{flavoururls[flavour][-11:]}/maxresdefault.jpg")
         embed.set_author(name=ctx.message.author.name,icon_url=ctx.message.author.avatar_url)
         embed.set_footer(text=self.name, icon_url=self.avatar)
@@ -194,7 +201,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                 ind = 0 + 5*start
                 for episode_ in currentpod.ListEpisodes()[start:start+5]:
                     currentEpisodeDetail = currentpod.GetEpisodeDetails(ind)
-                    embed.add_field(name=f"{ind} >> " + currentEpisodeDetail['title'],value=f"\n ```{currentEpisodeDetail['summary'][:70]}...```" + currentEpisodeDetail['published'][:16],inline=False)
+                    embed.add_field(name=f"{ind} : " + currentEpisodeDetail['title'],value=f"currentEpisodeDetail['published'][:16]\n ```{currentEpisodeDetail['summary'][:70]}...```\n" ,inline=False)
                     ind += 1
                 embed.set_footer(text=f"Page {start+1}/{paginationsize}", icon_url=self.avatar)
                 try:

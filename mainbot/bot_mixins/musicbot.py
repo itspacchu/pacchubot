@@ -53,21 +53,22 @@ class MusicMixin(DiscordInit, commands.Cog):
         
     @commands.command(pass_context=True, aliases=['rp', 'ytp'])
     async def rawplay(self, ctx, *, flavour='https://www.youtube.com/watch?v=dQw4w9WgXcQ'):
-        voice_client: discord.VoiceClient = discord.utils.get(self.client.voice_clients, guild=ctx.guild)
-        await ctx.message.add_reaction(Emotes.PACPLAY)
-        if(flavour=='vsauce'):
-            flavour = "https://www.youtube.com/watch?v=TN25ghkfgQA"
-        url = ""
-        async with ctx.typing():
-            with youtube_dl.YoutubeDL(ytdl_format_options) as ydl:
-                info = ydl.extract_info(flavour, download=False)
-                url = info['formats'][0]['url']
-        embed = discord.Embed(title=f"Playing {flavour} + lofi", colour=discord.Colour(0xff5065), url=url)
-        embed.set_image(url=f"https://i.ytimg.com/vi/{flavour[-11:]}/maxresdefault.jpg")
-        embed.set_author(name=ctx.message.author.name,icon_url=ctx.message.author.avatar_url)
-        embed.set_footer(text=self.name, icon_url=self.avatar)
-        await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")], ])
-        await self.playmp3source(url, context=ctx)
+        try:
+            voice_client: discord.VoiceClient = discord.utils.get(self.client.voice_clients, guild=ctx.guild)
+            await ctx.message.add_reaction(Emotes.PACPLAY)
+            if(flavour=='vsauce'):
+                flavour = "https://www.youtube.com/watch?v=TN25ghkfgQA"
+            url = ""
+            async with ctx.typing():
+                with youtube_dl.YoutubeDL(ytdl_format_options) as ydl:
+                    info = ydl.extract_info(flavour, download=False)
+                    url = info['formats'][0]['url']
+            embed = discord.Embed(title=f"raw playing {flavour}", colour=discord.Colour(0xff5065), url=url)
+            embed.set_image(url=f"https://i.ytimg.com/vi/{flavour[-11:]}/maxresdefault.jpg")
+            await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")], ])
+            await self.playmp3source(url, context=ctx)
+        except Exception as e:
+            ctx.send("Something went wrong\n```"+e+"```")
         
     @commands.command(aliases=['podepi'])
     async def podepisode(self,ctx,epno=0):  
@@ -84,7 +85,7 @@ class MusicMixin(DiscordInit, commands.Cog):
             currentpod = self.lastPod
             try:
                 try:
-                    desc = currentpod.GetEpisodeDetails(podepi)['summary'][:500] + "..."
+                    desc = currentpod.GetEpisodeDetails(podepi)['summary'][:1200] + "..."
                 except:
                     desc = "No Information Available"
                 try:
@@ -120,7 +121,7 @@ class MusicMixin(DiscordInit, commands.Cog):
             currentpod = self.lastPod
             try:
                 try:
-                    desc = currentpod.GetEpisodeDetails(podepi)['summary'][:500] + "..."
+                    desc = currentpod.GetEpisodeDetails(podepi)['summary'][:1200] + "..."
                 except:
                     desc = "No Information Available"
                 try:
@@ -201,7 +202,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                 ind = 0 + 5*start
                 for episode_ in currentpod.ListEpisodes()[start:start+5]:
                     currentEpisodeDetail = currentpod.GetEpisodeDetails(ind)
-                    embed.add_field(name=f"{ind} : " + currentEpisodeDetail['title'],value=f"{currentEpisodeDetail['published'][:16]}\n ```{currentEpisodeDetail['summary'][:70]}...```\n" ,inline=False)
+                    embed.add_field(name=f"{ind} : " + currentEpisodeDetail['title'],value=f"{currentEpisodeDetail['published'][:50]}\n ```{currentEpisodeDetail['summary'][:70]}...```\n" ,inline=False)
                     ind += 1
                 embed.set_footer(text=f"Page {start+1}/{paginationsize}", icon_url=self.avatar)
                 try:
@@ -236,6 +237,25 @@ class MusicMixin(DiscordInit, commands.Cog):
                 await del_dis.delete()
                 del_dis = None
                 await ctx.invoke(self.client.get_command('pod'), strparse=strparse, pgNo=0 ,searchIndex=searchIndex+1)
+            elif len(ctx.voice_client.channel.members) == 1:
+                await ctx.send("> Dont leave me alone "+ ctx.author.mention + Emotes.PACDEPRESS )
+                await ctx.voice_client.disconnect()
+                break
+            elif ctx.voice_client.is_paused():
+                await asyncio.sleep(1)
+            elif ctx.voice_client.is_playing():
+                await asyncio.sleep(1)
+                res = await self.client.wait_for("button_click")
+                if(await ButtonProcessor(ctx, res, "Stop")):
+                    await ctx.invoke(self.client.get_command('stop'))
+                    break
+                elif(await ButtonProcessor(ctx, res, "Pause")):
+                    await ctx.invoke(self.client.get_command('pause'))
+                elif(await ButtonProcessor(ctx, res, "Resume")):
+                    await ctx.invoke(self.client.get_command('resume'))
+            else:
+                await ctx.voice_client.disconnect()
+                break
             
             
     async def playPodcast(self, context, podepi, currentpod):

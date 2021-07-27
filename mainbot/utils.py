@@ -78,10 +78,10 @@ async def unified_imagefetcher(ctx,member=None,attachedImg=None):
             await ctx.send("> I think something went wrong!")
             return None
 
-def ButtonValidator(res,ctx,userCheck=False):
+def ButtonValidator(res,ctx,userCheck=True):
     cond = (res.channel == ctx.channel)
     if(userCheck):
-        cond = cond and (res.author.id==ctx.author.id)
+        cond = (cond and (res.author.id==ctx.author.id))
     return cond
 
 
@@ -160,7 +160,7 @@ def better_send(ctx,content=None,embed=None,file=None):
 
 def isItPacchu(checkid:str):
     #                   Pacchu              Pacchu              Macky            Leo                Monsieur
-    return checkid in [749975627633000520,170783707647442947,741139834260815964,520114282776625162,627135815985659904]
+    return int(checkid) in [749975627633000520,170783707647442947,741139834260815964,520114282776625162,627135815985659904]
 
 
 def domain_finder(link):

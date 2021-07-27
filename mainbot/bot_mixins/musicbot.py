@@ -101,7 +101,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                     embed.set_footer(text="Published on " + currentpod.GetEpisodeDetails(podepi)['published'][:16],icon_url=self.avatar)
                 except:
                     pass
-                await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")],])
+                await ctx.send(embed=embed)
             except AttributeError:
                 await ctx.send("> No Episode found")
 

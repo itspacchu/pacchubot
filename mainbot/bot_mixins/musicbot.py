@@ -64,7 +64,7 @@ class MusicMixin(DiscordInit, commands.Cog):
         
     @commands.command(aliases=['podepi'])
     async def podepisode(self,ctx,epno=0):  
-        await ctx.message.add_reaction("🔍") 
+        await ctx.message.add_reaction('🔍')
         podepi = epno
         if(self.lastPod == None):
             embed = discord.Embed(colour=discord.Colour(0xbd10e0), description=" ")
@@ -99,8 +99,8 @@ class MusicMixin(DiscordInit, commands.Cog):
                 await ctx.send("> No Episode found")
 
     @commands.command(aliases=['podp'])
-    async def podplay(self,ctx,epno=0):  
-        await ctx.message.add_reaction(Emotes.PACPLAY) 
+    async def podplay(self,ctx,epno=0):
+        await ctx.message.add_reaction(Emotes.PACPLAY)
         podepi = epno
         if(self.lastPod == None):
             embed = discord.Embed(colour=discord.Colour(0xbd10e0), description=" ")
@@ -194,7 +194,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                 ind = 0 + 5*start
                 for episode_ in currentpod.ListEpisodes()[start:start+5]:
                     currentEpisodeDetail = currentpod.GetEpisodeDetails(ind)
-                    embed.add_field(name=f"{ind} >>  **" + currentEpisodeDetail['title'],value=f"**\n ```{currentEpisodeDetail['summary'][:200]}...````" + currentEpisodeDetail['published'][:16],inline=False)
+                    embed.add_field(name=f"{ind} >> " + currentEpisodeDetail['title'],value=f"\n ```{currentEpisodeDetail['summary'][:70]}...```" + currentEpisodeDetail['published'][:16],inline=False)
                     ind += 1
                 embed.set_footer(text=f"Page {start+1}/{paginationsize}", icon_url=self.avatar)
                 try:

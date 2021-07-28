@@ -17,12 +17,6 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
         query = queryToName(lquery)
         reply = g2a.gptquery(query)
         await ctx.reply(g2a.sanitize(reply))
-        dbStore = {
-            "query": query,
-            "username": ctx.message.author.name,
-            "reply": reply
-        }
-        self.gptDb.insert_one(dbStore)
         
     @commands.command(aliases=['wpotd', 'potd','wikipic'])
     async def wikipediapotd(self, ctx , *qdate):
@@ -49,8 +43,6 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
             await ctx.send(embed=embed , components = [
                 Button(style=ButtonStyle.URL, label="Visit wiki",url=response['image_page_url']),
             ])
-            self.MiscCollection.find_one_and_update({'_id': ObjectId(
-                "60be497c826104950c8ea5d6")}, {'$inc': {'wikipedia_fetches': 1}})
         except:
             await ctx.message.add_reaction('‼')
             await ctx.reply("> Something went wrong processing the image or is the date in proper format? [DD-MM-YYYY]")
@@ -80,9 +72,6 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
             Button(style=ButtonStyle.URL, label="Visit Source",
                    url=img["hubble-url"]),
         ])
-        self.MiscCollection.find_one_and_update({'_id': ObjectId(
-            "60be497c826104950c8ea5d6")}, {'$inc': {'nasa_fetches': 1}})
-
 
 
     @commands.command(pass_context=True, aliases=['q', 'que'])
@@ -91,42 +80,6 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
         query = queryToName(lquery)
         reply = g2a.questionreply(query)
         await ctx.reply(reply)
-        dbStore = {
-            "query": query,
-            "username": ctx.message.author.name,
-            "reply": reply
-        }
-        self.gptDb.insert_one(dbStore)
-
-    @commands.command()
-    async def stats(self, ctx):
-        embed = discord.Embed(color=0xf3d599)
-        embed.set_author(name=self.client.user.name,
-                         icon_url=self.client.user.avatar_url)
-        try:
-            #60be497c826104950c8ea5d6
-            misc_collection = self.MiscCollection.find_one({'_id':ObjectId("60be497c826104950c8ea5d6")})
-            embed.add_field(name="Pacchu's Slave stat counter",
-                            value="shows all the statistics of the bot", inline=False)
-            embed.add_field(name="Weebo Anime searches", value=str(
-                self.animeSearch.count_documents({"guild": ctx.message.guild.id})), inline=True)
-            embed.add_field(name="Weebo Manga searches", value=str(
-                self.mangaSearch.count_documents({"guild": ctx.message.guild.id})), inline=True)
-            embed.add_field(name="Anime images delivered for simps", value=str(
-                self.animePics.count_documents({"guild": ctx.message.guild.id})), inline=True)
-            embed.add_field(name="Images Cartoonized",value=misc_collection['images_cartoonized'],inline=True)
-            embed.add_field(name="Images Distorted",value=misc_collection['images_distorted'], inline=True)
-            embed.add_field(name="Bruh's Delivered", value=misc_collection['bruhs_delivered'], inline=True)
-
-            embed.set_footer(
-                text=f"i'm Alive 🟢", icon_url=self.avatar)
-            await ctx.send(embed=embed)
-        except KeyError:
-            embed.add_field(name="Database API cannot be reachable 🔴",
-                            value="404?", inline=True)
-            embed.set_footer(
-                text=f"Facebook doesnt sponser this btw", icon_url=self.avatar)
-            await ctx.send(embed=embed)
 
     @commands.command()
     async def spotify(self , ctx, user:discord.Member = None):
@@ -189,7 +142,7 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
                         pass
                 await ctx.message.delete()
             except Exception as e:
-                await ctx.message.add_reaction('<:pacDoubleExclaim:858677949775872010>')
+                await ctx.message.add_reaction(Emotes.PACEXCLAIM)
                 print(e)
         except requests.ConnectionError as exception:
             pass
@@ -247,11 +200,12 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
             await ctx.send(f"> Something went wrong!```{e}```")
         
         while True:
-            res = await self.client.wait_for("button_click", timeout=500)
+            res = await self.client.wait_for("button_click", timeout=200)
             if(await ButtonProcessor(ctx,res,"Next Result")):
                 await del_dis.delete()
                 del_dis = None
                 await ctx.invoke(self.client.get_command('book_search'), name_of_book, index=index+1)
+                break
         
         
     

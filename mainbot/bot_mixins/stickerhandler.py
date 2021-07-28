@@ -72,13 +72,9 @@ class stickerHandler(DiscordInit, commands.Cog):
     
     @commands.command(aliases=['fp', 'fakeperson'])
     async def rawimp(self, ctx, *, message=None):
-        text = queryToName(message)
-        try:
-            msg,dname,avatarurl = text.split('$$')
-        except:
-            dname = "Marendra Nodi"
-            avatarurl = "https://cdn.discordapp.com/emojis/847462444758597673.png"
-            msg = text
+        dname = "Marendra Nodi"
+        avatarurl = "https://cdn.discordapp.com/emojis/847462444758597673.png"
+        msg = message
         try:
             webhook = await ctx.channel.create_webhook(name=f"{ctx.author.id}")
             await webhook.send(str(msg), username=dname, avatar_url=avatarurl)

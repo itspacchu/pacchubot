@@ -38,7 +38,7 @@ distortionTypes = [lambda i, j:[2*np.sin(i/100) + 2, 2*np.sin(j/100) + 2],
 
 async def ButtonProcessor(ctx,res,label:str,userCheck=True):
     try:
-        if(res.component.label == label):
+        if(res.component.label == label and res.channel == ctx.channel):
             if(res.author.id == ctx.author.id or not userCheck):
                 return True
             else:
@@ -55,14 +55,13 @@ async def ButtonProcessor(ctx,res,label:str,userCheck=True):
         return False
         
 async def unified_imagefetcher(ctx,member=None,attachedImg=None):
-    await ctx.message.add_reaction('🖌')
+    await ctx.message.add_reaction('🖼')
     try:
         if(attachedImg == None):
             attachment_url = ctx.message.attachments[0].url
         else:
             attachment_url = attachedImg
         await ctx.message.add_reaction('📩')
-        await ctx.send("Downloading and processing image 📩")
         return attachment_url
     except:
         try:
@@ -72,7 +71,6 @@ async def unified_imagefetcher(ctx,member=None,attachedImg=None):
                 attachment_url = ctx.message.author.avatar_url
             else:
                 attachment_url = hgp.avatar_url
-            await ctx.send("Getting User's avatar")
             return attachment_url
         except:
             await ctx.send("> I think something went wrong!")

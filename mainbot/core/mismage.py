@@ -54,7 +54,6 @@ def highpass(imgFilename,ksize = 51,whitePoint = 127,blackPoint = 61 ):
 #lsd image functions end here
 
 #line art function starts here
-
 def shadow(imgFilename,method = 0):
     img = cv2.imread(imgFilename)
     rgb_planes = cv2.split(img)

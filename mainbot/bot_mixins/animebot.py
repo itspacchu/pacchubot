@@ -2,7 +2,7 @@ from discord import channel
 from discord.utils import find
 from ..__imports__ import *
 from ..settings import *
-
+import urllib.parse
 from .discord_init import DiscordInit
 
 Anime_Embed_color = 0x54a7ff
@@ -153,6 +153,19 @@ class AnimeMixin(DiscordInit, commands.Cog):
                 await ctx.invoke(self.client.get_command('anime'), animeQuery , index=index+1)
         
 
+    @commands.command(aliases=['asearch'])
+    async def anime_search(self,ctx,user:discord.Member=None):
+        tosearchurl = unified_imagefetcher(ctx=ctx,member=user)
+        response = requests.get("https://api.trace.moe/search?url={}".format(urllib.parse.quote_plus(tosearchurl))).json()['result'][0]
+        await ctx.message.add_reaction('🔍')  
+        imgurl = response['image']  
+        embed = discord.Embed(title="Image Search Result", description="trace.moe api",color=find_dominant_color(imgurl))
+        embed.add_field(name=response['filename'], value=f"Episode : {response['episode']} \n from {response['from']} to {response['to']}", inline=False)
+        embed.set_image(url=imgurl)
+        embed.set_footer(text=self.name, icon_url=self.avatar)
+        await ctx.send(embed=embed,components=[
+                Button(style=ButtonStyle.URL, label="Watch Video", url=response['video']),
+        ])
 
     @commands.command(aliases=['man', 'm'])
     async def manga(self, ctx, *Query,index=0):

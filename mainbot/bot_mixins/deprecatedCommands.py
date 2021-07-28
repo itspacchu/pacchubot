@@ -29,7 +29,7 @@ class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
     async def simp(self,ctx):
         try:
             webhook = await ctx.channel.create_webhook(name="pacchu_webhook")
-            await webhook.send(choice(perkdict['replies']['slutty']), username="Waifuchan", avatar_url="https://i.imgur.com/T3fp9AL.png")
+            await webhook.send(choice(["Oh Dadddyio","Oniichan :3","( ͡° ͜ʖ ͡°) :3","Hey Daddy","Aw Daddy"]), username="Waifuchan", avatar_url="https://i.imgur.com/T3fp9AL.png")
             await ctx.channel.webhooks()
             await webhook.delete()
         except:

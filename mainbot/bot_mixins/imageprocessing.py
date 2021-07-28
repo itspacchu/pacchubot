@@ -9,6 +9,7 @@ from random import choice
 import mainbot.core.mismage
 
 class ImageProcessingMixin(DiscordInit, commands.Cog):
+    
     @commands.command(aliases=['ic', 'cartoon'])
     async def cartoonize(self,ctx, member: discord.Member = None,attachedImg=None):
         filname = str(round(time.time()))
@@ -33,7 +34,6 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
             pass
         await asyncio.sleep(1)
         os.remove(filname + '.png')
-        self.MiscCollection.find_one_and_update({'_id': ObjectId("60be497c826104950c8ea5d6")}, {'$inc': {'images_cartoonized': 1}})
 
     @commands.command(aliases=['idh', 'distort-help'])
     async def distortion_help(self,ctx):
@@ -67,7 +67,6 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
             except AttributeError:
                 pass
             os.remove(filname + '.png')
-            self.MiscCollection.find_one_and_update({'_id': ObjectId("60be497c826104950c8ea5d6")}, {'$inc': {'images_distorted': 1}})
         except Exception as e:
             await ctx.send(f"Something went wrong ```{self.pre}idh\n{e}```")
             return
@@ -90,8 +89,6 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
             except AttributeError:
                 pass
             os.remove(filname + '.png')
-            self.MiscCollection.find_one_and_update({'_id': ObjectId(
-                "60be497c826104950c8ea5d6")}, {'$inc': {'images_distorted': 1}})
         except Exception as e:
             await ctx.send(f"Something went wrong ```{self.pre}idh\n{e}```")
             return

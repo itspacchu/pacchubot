@@ -3,6 +3,7 @@ from discord.player import AudioPlayer, AudioSource
 from ..__imports__ import *
 from ..settings import *
 from .discord_init import DiscordInit
+from ..core.gpt2api import sanitize
 
 class YTDLSource(discord.PCMVolumeTransformer):
     def __init__(self, source, *, data, volume=0.5, ytdl_format_options=ytdl_format_options):
@@ -85,7 +86,7 @@ class MusicMixin(DiscordInit, commands.Cog):
             currentpod = self.lastPod
             try:
                 try:
-                    desc = currentpod.GetEpisodeDetails(podepi)['summary'][:1200] + "..."
+                    desc = sanitize(currentpod.GetEpisodeDetails(podepi)['summary'][:2250]) + "..."
                 except:
                     desc = "No Information Available"
                 try:
@@ -121,7 +122,7 @@ class MusicMixin(DiscordInit, commands.Cog):
             currentpod = self.lastPod
             try:
                 try:
-                    desc = currentpod.GetEpisodeDetails(podepi)['summary'][:1200] + "..."
+                    desc = sanitize(currentpod.GetEpisodeDetails(podepi)['summary'][:2200]) + "..."
                 except:
                     desc = "No Information Available"
                 try:
@@ -202,7 +203,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                 ind = 0 + 5*start
                 for episode_ in currentpod.ListEpisodes()[start:start+5]:
                     currentEpisodeDetail = currentpod.GetEpisodeDetails(ind)
-                    embed.add_field(name=f"{ind} : " + currentEpisodeDetail['title'],value=f"{currentEpisodeDetail['published'][:50]}\n ```{currentEpisodeDetail['summary'][:70]}...```\n" ,inline=False)
+                    embed.add_field(name=f"{ind} : " + currentEpisodeDetail['title'],value=f"{currentEpisodeDetail['published'][:50]}\n ```{sanitize(currentEpisodeDetail['summary'][:80])}...```\n" ,inline=False)
                     ind += 1
                 embed.set_footer(text=f"Page {start+1}/{paginationsize}", icon_url=self.avatar)
                 try:
@@ -225,35 +226,22 @@ class MusicMixin(DiscordInit, commands.Cog):
             res = await self.client.wait_for("button_click",timeout=100)
             if(await ButtonProcessor(ctx, res, "Play Latest")):
                 await ctx.invoke(self.client.get_command('podplay'))
+                await del_dis.delete()
+                break
             elif(await ButtonProcessor(ctx, res, "Next Page")):
                 await del_dis.delete()
-                del_dis = None
                 await ctx.invoke(self.client.get_command('pod'), strparse=strparse, pgNo=pgNo+1)
+                break
             elif(await ButtonProcessor(ctx, res, "Prev Page") and pgNo > 2):
                 await del_dis.delete()
-                del_dis = None
                 await ctx.invoke(self.client.get_command('pod'), strparse=strparse, pgNo=pgNo-1)
+                break
             elif(await ButtonProcessor(ctx, res, "Next Search Result")):
                 await del_dis.delete()
-                del_dis = None
                 await ctx.invoke(self.client.get_command('pod'), strparse=strparse, pgNo=0 ,searchIndex=searchIndex+1)
-            elif len(ctx.voice_client.channel.members) == 1:
-                await ctx.send("> Dont leave me alone "+ ctx.author.mention + Emotes.PACDEPRESS )
-                await ctx.voice_client.disconnect()
                 break
-            elif ctx.voice_client.is_paused():
-                await asyncio.sleep(1)
-            elif ctx.voice_client.is_playing():
-                await asyncio.sleep(1)
-                res = await self.client.wait_for("button_click")
-                if(await ButtonProcessor(ctx, res, "Stop")):
-                    await ctx.invoke(self.client.get_command('stop'))
-                    break
-                elif(await ButtonProcessor(ctx, res, "Pause")):
-                    await ctx.invoke(self.client.get_command('pause'))
-                elif(await ButtonProcessor(ctx, res, "Resume")):
-                    await ctx.invoke(self.client.get_command('resume'))
-            else:
+            elif len(ctx.voice_client.channel.members) < 2:
+                await ctx.send("> Dont leave me alone "+ ctx.author.mention + Emotes.PACDEPRESS )
                 await ctx.voice_client.disconnect()
                 break
             

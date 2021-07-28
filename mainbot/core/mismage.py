@@ -23,8 +23,6 @@ def whitePointSelect(img,whitePoint):
 	return img
 
 def highPassFilter(img,kSize=51):
-	print("applying high pass filter")
-	
 	if not kSize%2:
 		kSize +=1
 

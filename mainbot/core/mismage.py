@@ -53,7 +53,16 @@ def highpass(imgFilename,ksize = 51,whitePoint = 127,blackPoint = 61 ):
 
 #line art function starts here
 def shadow(imgFilename,method = 0):
-    img = cv2.imread(imgFilename)
+    try:
+        img = cv2.imread(imgFilename)
+        img.shape
+    except AttributeError:
+        theim = cv2.VideoCapture(imgFilename)
+        ret, img = theim.read()
+    if(img.shape[0] > 1024 or img.shape[1] > 1024):
+        img = cv2.resize(img, (0, 0), fx=0.5, fy=0.5)
+
+
     rgb_planes = cv2.split(img)
     result_planes = []
     result_norm_planes = []

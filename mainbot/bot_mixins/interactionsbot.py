@@ -43,6 +43,8 @@ class InteractionsMixin(DiscordInit, commands.Cog):
                     await ctx.invoke(self.client.get_command('distortion'), attachedImg=url_link)
                 elif(await ButtonProcessor(ctx, res, "Edge")):
                     await ctx.invoke(self.client.get_command('edgeDetect'), attachedImg=url_link)
+                elif(await ButtonProcessor(ctx, res, "LineArt")):
+                    await ctx.invoke(self.client.get_command('imla'), attachedImg=url_link)
         
     @commands.command(aliases=['gb'])
     async def guild_banner(self, ctx):

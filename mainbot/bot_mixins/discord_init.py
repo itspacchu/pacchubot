@@ -47,7 +47,9 @@ class DiscordInit:
 
         for x in message.mentions:
             if(x == self.client.user and len(message.content)):
-                await message.channel.send(mention_convo(message.content.replace("<@709426015759368282>", "") + " " + message.author.mention))
+                print("> Initating Chatbot for query" +
+                      message.content.replace("<@709426015759368282>", ""))
+                await message.channel.send(mention_convo(message.content.replace("<@709426015759368282>", "")) + " " + message.author.mention)
 
         if(botReadyToRespond):  # or isItPacchu(str(message.author.id))):
             await self.client.process_commands(message)

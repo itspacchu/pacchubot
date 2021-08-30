@@ -1,7 +1,7 @@
 from ..__imports__ import *
 from ..settings import *
 from .discord_init import DiscordInit
-from discord import commands
+from discord.ext import commands
 
 Discord_init_Color = 0xffbb54
 

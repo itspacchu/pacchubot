@@ -5,9 +5,12 @@ PROJECT_PACKAGE = Path(__file__).resolve().parent.parent
 
 load_dotenv(PROJECT_PACKAGE.joinpath('.env'))
 print(PROJECT_PACKAGE)
+
+
 def env_to_bool(env, default):
     str_val = os.environ.get(env)
     return default if str_val is None else str_val == 'True'
+
 
 # file imports
 # db init
@@ -21,7 +24,7 @@ ani = Jikan()
 self_name = "Pacchu's Bot"
 self_avatar = "https://raw.githubusercontent.com/itspacchu/Pacchu-s-Slave/master/Screenshot%202021-04-09%20225421.png"
 command_prefix = "p."
-command_prefix_use = ['p.','_','>','69.']
+command_prefix_use = ['p.', '_', '>', '69.']
 
 guild_ids = [685469328929587268, 705682250460823602, 737504783937830924]
 
@@ -30,18 +33,18 @@ ffmpeg_options = '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -log
 
 ytdl_format_options = {
     'format': 'bestaudio/best',
-        'extractaudio': True,
-        'audioformat': 'mp3',
-        'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
-        'restrictfilenames': True,
-        'noplaylist': True,
-        'nocheckcertificate': True,
-        'ignoreerrors': False,
-        'logtostderr': False,
-        'quiet': True,
-        'no_warnings': True,
-        'default_search': 'auto',
-        'source_address': '0.0.0.0',
+    'extractaudio': True,
+    'audioformat': 'mp3',
+    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
+    'restrictfilenames': True,
+    'noplaylist': True,
+    'nocheckcertificate': True,
+    'ignoreerrors': False,
+    'logtostderr': False,
+    'quiet': True,
+    'no_warnings': True,
+    'default_search': 'auto',
+    'source_address': '0.0.0.0',
 }
 
 __all__ = [

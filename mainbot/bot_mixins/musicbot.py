@@ -4,6 +4,10 @@ from ..__imports__ import *
 from ..settings import *
 from .discord_init import DiscordInit
 from ..core.gpt2api import sanitize
+from discord.ext import commands
+from discord.utils import get
+from discord import FFmpegPCMAudio
+from youtube_dl import YoutubeDL
 
 
 class YTDLSource(discord.PCMVolumeTransformer):
@@ -60,25 +64,38 @@ class MusicMixin(DiscordInit, commands.Cog):
 
     @commands.command(pass_context=True, aliases=['rp', 'ytp'])
     async def rawplay(self, ctx, *, flavour='https://www.youtube.com/watch?v=dQw4w9WgXcQ'):
-        try:
-            voice_client: discord.VoiceClient = discord.utils.get(
-                self.client.voice_clients, guild=ctx.guild)
-            await ctx.message.add_reaction(Emotes.PACPLAY)
-            if(flavour == 'vsauce'):
-                flavour = "https://www.youtube.com/watch?v=TN25ghkfgQA"
-            url = ""
+        voice = get(self.client.voice_clients, guild=ctx.guild)
+        YDL_OPTIONS = {
+            'format': 'bestaudio',
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': '192',
+            }],
+            'outtmpl': 'song.%(ext)s',
+        }
+
+        with YoutubeDL(YDL_OPTIONS) as ydl:
+            ydl.download("URL", download=True)
+
+        if not voice.is_playing():
+            voice.play(FFmpegPCMAudio("song.mp3"))
+            voice.is_playing()
             async with ctx.typing():
                 with youtube_dl.YoutubeDL(ytdl_format_options) as ydl:
                     info = ydl.extract_info(flavour, download=False)
                     url = info['formats'][0]['url']
-            embed = discord.Embed(
-                title=f"raw youtube scrapping {flavour} [alpha]", colour=discord.Colour(0xff5065), url=url)
-            embed.set_image(
-                url=f"https://i.ytimg.com/vi/{flavour[-11:]}/maxresdefault.jpg")
-            await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")], ])
-            await self.playmp3source(url, context=ctx)
-        except Exception as e:
-            ctx.send("Something went wrong\n```"+e+"```")
+                embed = discord.Embed(
+                    title=f"Playing raw from youtube", colour=discord.Colour(0xff5065), url=url)
+                embed.set_image(
+                    url=f"https://i.ytimg.com/vi/{flavour[-11:]}/maxresdefault.jpg")
+                embed.set_author(name=ctx.message.author.name,
+                                 icon_url=ctx.message.author.avatar_url)
+                embed.set_footer(text=self.name, icon_url=self.avatar)
+                await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")], ])
+        else:
+            await ctx.send("> Something is playing?")
+            return
 
     @commands.command(aliases=['podepi'])
     async def podepisode(self, ctx, epno=0):

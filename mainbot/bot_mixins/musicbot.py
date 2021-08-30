@@ -69,26 +69,28 @@ class MusicMixin(DiscordInit, commands.Cog):
             'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
         voice = get(self.client.voice_clients, guild=ctx.guild)
 
+        await ctx.message.delete()
+
         if not voice.is_playing():
             with YoutubeDL(YDL_OPTIONS) as ydl:
                 info = ydl.extract_info(flavour, download=False)
             URL = info['formats'][0]['url']
             async with ctx.typing():
                 embed = discord.Embed(
-                    title=f"Playing {flavour}", colour=discord.Colour(0xff5065), url=URL)
+                    title=f"**Playing** {info['title']}", colour=discord.Colour(0xff5065), url=URL, description=f"**{info['uploader']}**\n```{info['description']}```")
                 embed.set_image(
-                    url=f"https://i.ytimg.com/vi/{flavour[-11:]}/maxresdefault.jpg")
+                    url=info['thumbnails'][0]['url'])
                 embed.set_author(name=ctx.message.author.name,
                                  icon_url=ctx.message.author.avatar_url)
                 embed.set_footer(text=self.name, icon_url=self.avatar)
-                await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")], ])
+                await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")], Button(style=ButtonStyle.disabled, label="Loop")])
             voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
             voice.is_playing()
         else:
             await ctx.send("Already playing song")
             return
 
-    @commands.command(aliases=['podepi'])
+    @ commands.command(aliases=['podepi'])
     async def podepisode(self, ctx, epno=0):
         await ctx.message.add_reaction('🔍')
         podepi = epno

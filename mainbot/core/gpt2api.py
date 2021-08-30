@@ -28,7 +28,10 @@ def query(payload, what=DIALOG_API, RECURSIVE_LIMIT=5):
 def mention_convo(text_in: str = "Hello"):
     return query({'inputs': {'past_user_inputs': ['What is your name', 'What are you called as', 'Who are you'],
                              'generated_responses': ["I am Pacchu's bot", "I am Pacchu's Bot", "I am Pacchu's Bot"],
-                             'text': text_in}})
+                             'text': text_in},
+                  'parameters': {'min_length': 15, 'max_length': 50}
+
+                  })
 
 
 def gptquery(text_in: str):

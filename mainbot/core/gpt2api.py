@@ -17,14 +17,15 @@ def query(payload, what=DIALOG_API, RECURSIVE_LIMIT=5):
     if(RECURSIVE_LIMIT == 0):
         return "hmm something went wrong"
     data = json.dumps(payload)
-    response = requests.request("POST", what, headers=headers, data=data)
+    response = requests.request(
+        "POST", what, headers=headers, data=data, timeout=3)
     resj = json.loads(response.content.decode("utf-8"))
-    if("estimated_time" in resj.keys() and resj["estimated_time"] > 0):
+    if("estimated_time" in resj.keys() and RECURSIVE_LIMIT > 0):
         return choice(perks.perkdict['replies']['pings'])  # backup
     return resj
 
 
-def mention_convo(text_in: str):
+def mention_convo(text_in: str = "Hello"):
     return query({'inputs': {'past_user_inputs': ['What is your name', 'What are you called as', 'Who are you'],
                              'generated_responses': ["I am Pacchu's bot", "I am Pacchu's Bot", "I am Pacchu's Bot"],
                              'text': text_in}})

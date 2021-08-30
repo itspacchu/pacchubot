@@ -83,7 +83,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                 embed.set_image(url=info['thumbnails'][-1]['url'])
 
                 embed.add_field(name="Duration",
-                                value=info['duration'] + " seconds", inline=True)
+                                value=str(info['duration']/60) + " mins", inline=True)
                 embed.add_field(name="Uploader",
                                 value=info['uploader'], inline=True)
 

@@ -54,6 +54,7 @@ class DiscordInit:
                     payload_to_send = choice(
                         perkdict['replies']['pings_no_response'])
                 try:
+                    print("> Chatbot query -"+payload_to_send)
                     await message.channel.send(mention_convo(payload_to_send)["generated_text"] + " " + message.author.mention)
                 except:
                     await message.channel.send(choice(perkdict['replies']['pings']))

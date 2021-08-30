@@ -64,37 +64,28 @@ class MusicMixin(DiscordInit, commands.Cog):
 
     @commands.command(pass_context=True, aliases=['rp', 'ytp'])
     async def rawplay(self, ctx, *, flavour='https://www.youtube.com/watch?v=dQw4w9WgXcQ'):
+        YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
+        FFMPEG_OPTIONS = {
+            'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
         voice = get(self.client.voice_clients, guild=ctx.guild)
-        YDL_OPTIONS = {
-            'format': 'bestaudio',
-            'postprocessors': [{
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',
-                'preferredquality': '192',
-            }],
-            'outtmpl': 'song.%(ext)s',
-        }
-
-        with YoutubeDL(YDL_OPTIONS) as ydl:
-            ydl.download("URL", download=True)
 
         if not voice.is_playing():
-            voice.play(FFmpegPCMAudio("song.mp3"))
-            voice.is_playing()
+            with YoutubeDL(YDL_OPTIONS) as ydl:
+                info = ydl.extract_info(flavour, download=False)
+            URL = info['formats'][0]['url']
             async with ctx.typing():
-                with youtube_dl.YoutubeDL(ytdl_format_options) as ydl:
-                    info = ydl.extract_info(flavour, download=False)
-                    url = info['formats'][0]['url']
                 embed = discord.Embed(
-                    title=f"Playing raw from youtube", colour=discord.Colour(0xff5065), url=url)
+                    title=f"Playing {flavour}", colour=discord.Colour(0xff5065), url=URL)
                 embed.set_image(
                     url=f"https://i.ytimg.com/vi/{flavour[-11:]}/maxresdefault.jpg")
                 embed.set_author(name=ctx.message.author.name,
                                  icon_url=ctx.message.author.avatar_url)
                 embed.set_footer(text=self.name, icon_url=self.avatar)
                 await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")], ])
+            voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
+            voice.is_playing()
         else:
-            await ctx.send("> Something is playing?")
+            await ctx.send("Already playing song")
             return
 
     @commands.command(aliases=['podepi'])

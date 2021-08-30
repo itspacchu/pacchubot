@@ -79,9 +79,14 @@ class MusicMixin(DiscordInit, commands.Cog):
             URL = info['formats'][0]['url']
             async with ctx.typing():
                 embed = discord.Embed(
-                    title=f"**Playing** {info['title']}", colour=discord.Colour(0xff5065), url=URL, description=f"**{info['uploader']}**\n```{info['description']}```")
-                embed.set_image(
-                    url=info['thumbnails'][0]['url'])
+                    title=f"**Playing** {info['title']}", colour=discord.Colour(0xff5065), url=URL, description=f"```{info['description'][:200]} ...```")
+                embed.set_image(url=info['thumbnails'][-1]['url'])
+
+                embed.add_field(name="Duration",
+                                value=info['duration'] + " seconds", inline=True)
+                embed.add_field(name="Uploader",
+                                value=info['uploader'], inline=True)
+
                 embed.set_author(name=ctx.message.author.name,
                                  icon_url=ctx.message.author.avatar_url)
                 embed.set_footer(text=self.name, icon_url=self.avatar)

@@ -5,6 +5,7 @@ from ..settings import *
 from .discord_init import DiscordInit
 from ..core.gpt2api import sanitize
 
+
 class YTDLSource(discord.PCMVolumeTransformer):
     def __init__(self, source, *, data, volume=0.5, ytdl_format_options=ytdl_format_options):
         super().__init__(source, volume)
@@ -19,88 +20,102 @@ class MusicMixin(DiscordInit, commands.Cog):
     lastPod = None
     source = None
     Aplayer = None
+
     @commands.command()
     async def join(self, ctx, *, channel: discord.VoiceChannel):
         if ctx.voice_client is not None:
             return await ctx.voice_client.move_to(channel)
         await channel.connect()
 
-    @commands.command(pass_context=True, aliases=['pl','plf','lf'])
-    async def lofi(self, ctx,*,flavour='study'):
-        voice_client: discord.VoiceClient = discord.utils.get(self.client.voice_clients, guild=ctx.guild)
+    @commands.command(pass_context=True, aliases=['pl', 'plf', 'lf'])
+    async def lofi(self, ctx, *, flavour='study'):
+        voice_client: discord.VoiceClient = discord.utils.get(
+            self.client.voice_clients, guild=ctx.guild)
         await ctx.message.add_reaction(Emotes.LOFISPARKO)
         url = ""
         flavoururls = {
-            'study':'https://www.youtube.com/watch?v=5qap5aO4i9A',
+            'study': 'https://www.youtube.com/watch?v=5qap5aO4i9A',
             'sleep': 'https://www.youtube.com/watch?v=DWcJFNfaw9c',
-            'violet':'https://www.youtube.com/watch?v=8mY3Udau4sE',
-            'silentvoice':'https://www.youtube.com/watch?v=Fu9hLWfOups',
-            'yourname':'https://www.youtube.com/watch?v=H9yfuYDoGf4',
-            'minecraft':'https://www.youtube.com/watch?v=Dg0IjOzopYU',
-            'disco':'https://www.youtube.com/watch?v=qz_Yzt_9ZbY',
-            'sad':'https://www.youtube.com/watch?v=yf18K9g-XV0',
-            'avec':'https://www.youtube.com/watch?v=tcjxT3m5UDE'
+            'violet': 'https://www.youtube.com/watch?v=8mY3Udau4sE',
+            'silentvoice': 'https://www.youtube.com/watch?v=Fu9hLWfOups',
+            'yourname': 'https://www.youtube.com/watch?v=H9yfuYDoGf4',
+            'minecraft': 'https://www.youtube.com/watch?v=Dg0IjOzopYU',
+            'disco': 'https://www.youtube.com/watch?v=qz_Yzt_9ZbY',
+            'sad': 'https://www.youtube.com/watch?v=yf18K9g-XV0',
+            'avec': 'https://www.youtube.com/watch?v=tcjxT3m5UDE'
         }
         async with ctx.typing():
             with youtube_dl.YoutubeDL(ytdl_format_options) as ydl:
                 info = ydl.extract_info(flavoururls[flavour], download=False)
                 url = info['formats'][0]['url']
-        embed = discord.Embed(title=f"Playing {flavour}", colour=discord.Colour(0xff5065), url=url)
-        embed.set_image(url=f"https://i.ytimg.com/vi/{flavoururls[flavour][-11:]}/maxresdefault.jpg")
-        embed.set_author(name=ctx.message.author.name,icon_url=ctx.message.author.avatar_url)
+        embed = discord.Embed(
+            title=f"Playing {flavour}", colour=discord.Colour(0xff5065), url=url)
+        embed.set_image(
+            url=f"https://i.ytimg.com/vi/{flavoururls[flavour][-11:]}/maxresdefault.jpg")
+        embed.set_author(name=ctx.message.author.name,
+                         icon_url=ctx.message.author.avatar_url)
         embed.set_footer(text=self.name, icon_url=self.avatar)
-        await ctx.send(embed=embed,components=[[Button(style=ButtonStyle.red, label="Stop")],])
+        await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")], ])
         await self.playmp3source(url, context=ctx)
-        
+
     @commands.command(pass_context=True, aliases=['rp', 'ytp'])
     async def rawplay(self, ctx, *, flavour='https://www.youtube.com/watch?v=dQw4w9WgXcQ'):
         try:
-            voice_client: discord.VoiceClient = discord.utils.get(self.client.voice_clients, guild=ctx.guild)
+            voice_client: discord.VoiceClient = discord.utils.get(
+                self.client.voice_clients, guild=ctx.guild)
             await ctx.message.add_reaction(Emotes.PACPLAY)
-            if(flavour=='vsauce'):
+            if(flavour == 'vsauce'):
                 flavour = "https://www.youtube.com/watch?v=TN25ghkfgQA"
             url = ""
             async with ctx.typing():
                 with youtube_dl.YoutubeDL(ytdl_format_options) as ydl:
                     info = ydl.extract_info(flavour, download=False)
                     url = info['formats'][0]['url']
-            embed = discord.Embed(title=f"raw playing {flavour}", colour=discord.Colour(0xff5065), url=url)
-            embed.set_image(url=f"https://i.ytimg.com/vi/{flavour[-11:]}/maxresdefault.jpg")
+            embed = discord.Embed(
+                title=f"raw youtube scrapping {flavour} [alpha]", colour=discord.Colour(0xff5065), url=url)
+            embed.set_image(
+                url=f"https://i.ytimg.com/vi/{flavour[-11:]}/maxresdefault.jpg")
             await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")], ])
             await self.playmp3source(url, context=ctx)
         except Exception as e:
             ctx.send("Something went wrong\n```"+e+"```")
-        
+
     @commands.command(aliases=['podepi'])
-    async def podepisode(self,ctx,epno=0):  
+    async def podepisode(self, ctx, epno=0):
         await ctx.message.add_reaction('🔍')
         podepi = epno
         if(self.lastPod == None):
-            embed = discord.Embed(colour=discord.Colour(0xbd10e0), description=" ")
+            embed = discord.Embed(
+                colour=discord.Colour(0xbd10e0), description=" ")
             embed.set_thumbnail(url=self.avatar)
-            embed.set_author(name=self.name, url=self.avatar,icon_url=self.avatar)
-            embed.add_field(name=f"No Recent Podcast Searches",value=f"search for podcast using {self.pre}pod",inline=False)
+            embed.set_author(name=self.name, url=self.avatar,
+                             icon_url=self.avatar)
+            embed.add_field(name=f"No Recent Podcast Searches",
+                            value=f"search for podcast using {self.pre}pod", inline=False)
             embed.set_thumbnail(url=self.avatar)
             await ctx.send(embed=embed)
         else:
             currentpod = self.lastPod
             try:
                 try:
-                    desc = sanitize(currentpod.GetEpisodeDetails(podepi)['summary'][:2250]) + "..."
+                    desc = sanitize(currentpod.GetEpisodeDetails(
+                        podepi)['summary'][:2250]) + "..."
                 except:
                     desc = "No Information Available"
                 try:
                     title = currentpod.GetEpisodeDetails(podepi)['title']
                 except:
                     title = "404"
-                    
-                embed = discord.Embed(title=title,colour=find_dominant_color(currentpod.PodcastImage(podepi)), url=currentpod.GetEpisodeDetails(podepi)['link'],description=desc,inline=False)
+
+                embed = discord.Embed(title=title, colour=find_dominant_color(currentpod.PodcastImage(
+                    podepi)), url=currentpod.GetEpisodeDetails(podepi)['link'], description=desc, inline=False)
                 try:
                     embed.set_thumbnail(url=currentpod.PodcastImage(podepi))
                 except:
                     pass
                 try:
-                    embed.set_footer(text="Published on " + currentpod.GetEpisodeDetails(podepi)['published'][:16],icon_url=self.avatar)
+                    embed.set_footer(text="Published on " + currentpod.GetEpisodeDetails(
+                        podepi)['published'][:16], icon_url=self.avatar)
                 except:
                     pass
                 await ctx.send(embed=embed)
@@ -108,50 +123,55 @@ class MusicMixin(DiscordInit, commands.Cog):
                 await ctx.send("> No Episode found")
 
     @commands.command(aliases=['podp'])
-    async def podplay(self,ctx,epno=0):
+    async def podplay(self, ctx, epno=0):
         await ctx.message.add_reaction(Emotes.PACPLAY)
         podepi = epno
         if(self.lastPod == None):
-            embed = discord.Embed(colour=discord.Colour(0xbd10e0), description=" ")
+            embed = discord.Embed(
+                colour=discord.Colour(0xbd10e0), description=" ")
             embed.set_thumbnail(url=self.avatar)
-            embed.set_author(name=self.name, url=self.avatar,icon_url=self.avatar)
-            embed.add_field(name=f"No Recent Podcast Searches",value=f"search for podcast using {self.pre}pod",inline=False)
+            embed.set_author(name=self.name, url=self.avatar,
+                             icon_url=self.avatar)
+            embed.add_field(name=f"No Recent Podcast Searches",
+                            value=f"search for podcast using {self.pre}pod", inline=False)
             embed.set_thumbnail(url=self.avatar)
             await ctx.send(embed=embed)
         else:
             currentpod = self.lastPod
             try:
                 try:
-                    desc = sanitize(currentpod.GetEpisodeDetails(podepi)['summary'][:2200]) + "..."
+                    desc = sanitize(currentpod.GetEpisodeDetails(
+                        podepi)['summary'][:2200]) + "..."
                 except:
                     desc = "No Information Available"
                 try:
                     title = currentpod.GetEpisodeDetails(podepi)['title']
                 except:
                     title = "404"
-                    
-                embed = discord.Embed(title=title,colour=find_dominant_color(currentpod.PodcastImage(podepi)), url=currentpod.GetEpisodeDetails(podepi)['link'],description=desc,inline=False)
+
+                embed = discord.Embed(title=title, colour=find_dominant_color(currentpod.PodcastImage(
+                    podepi)), url=currentpod.GetEpisodeDetails(podepi)['link'], description=desc, inline=False)
                 try:
                     embed.set_thumbnail(url=currentpod.PodcastImage(podepi))
                 except:
                     pass
                 try:
-                    embed.set_footer(text="Published on " + currentpod.GetEpisodeDetails(podepi)['published'][:16],icon_url=self.avatar)
+                    embed.set_footer(text="Published on " + currentpod.GetEpisodeDetails(
+                        podepi)['published'][:16], icon_url=self.avatar)
                 except:
                     pass
-                await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")],])
+                await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")], ])
                 await self.playPodcast(ctx, podepi=podepi, currentpod=currentpod)
             except AttributeError:
                 await ctx.send("> No Episode found")
 
-
     @commands.command(aliases=['podcast'])
-    async def pod(self,ctx , * , strparse = " ",pgNo=0,searchIndex=0):        
+    async def pod(self, ctx, *, strparse=" ", pgNo=0, searchIndex=0):
         if(':' in strparse):
-            podname_,num = strparse.replace(' ','').split(':')
+            podname_, num = strparse.replace(' ', '').split(':')
             podepi = int(num)
         elif(not strparse == ' '):
-            podname_ = strparse.replace(' ','')
+            podname_ = strparse.replace(' ', '')
             podepi = None
         else:
             podname_ = ' '
@@ -164,56 +184,74 @@ class MusicMixin(DiscordInit, commands.Cog):
             start = 0
             podname = podname_
         if(podname == " "):
-            embed = discord.Embed(colour=discord.Colour(0x91ff), description="Podcast Section")
+            embed = discord.Embed(colour=discord.Colour(
+                0x91ff), description="Podcast Section")
             embed.set_thumbnail(url=self.avatar)
             embed.set_author(name=self.name, icon_url=self.avatar)
-            embed.add_field(name=f"{self.pre}pod", value="This very command you ran",inline=False)
-            embed.add_field(name=f"{self.pre}pod [Name of Podcast]",value="Searches for the Podcast and shows Episodes related to it.", inline=False)
-            embed.add_field(name=f"{self.pre}pod [Name of Podcast] : [Selection Number] or {self.pre}podp [Selection No]", value="Play the podcast selection , default 0 plays the latest available episode",inline=False)
-            embed.add_field(name=f"{self.pre}stop or {self.pre}dc",value="Stop and Disconnect\n", inline=False)
-            embed.add_field(name=f"{self.pre}pause or {self.pre}resume",value="Pause and Resume\n (Havent Implemented Seeking and queueing yet)", inline=False)
+            embed.add_field(
+                name=f"{self.pre}pod", value="This very command you ran", inline=False)
+            embed.add_field(name=f"{self.pre}pod [Name of Podcast]",
+                            value="Searches for the Podcast and shows Episodes related to it.", inline=False)
+            embed.add_field(
+                name=f"{self.pre}podp [Selection No]", value="Play the podcast selection , plays the latest available episode", inline=False)
+            embed.add_field(name=f"{self.pre}podepi [Selection No]",
+                            value="Shows the Episode Details for selected episode", inline=False)
+            embed.add_field(name=f"{self.pre}stop or {self.pre}dc",
+                            value="Stop and Disconnect\n", inline=False)
+            embed.add_field(name=f"{self.pre}pause or {self.pre}resume",
+                            value="Pause and Resume\n (Havent Implemented Seeking and queueing yet)", inline=False)
         if(podepi == None and not podname == " "):
-            await ctx.message.add_reaction('🔍') 
+            await ctx.message.add_reaction('🔍')
             try:
-                k = ph.PodSearch(podname,searchIndex=searchIndex)
+                k = ph.PodSearch(podname, searchIndex=searchIndex)
             except json.JSONDecodeError as e:
-                embed = discord.Embed(colour=discord.Colour(0x120012), description=" ")
+                embed = discord.Embed(
+                    colour=discord.Colour(0x120012), description=" ")
                 embed.set_thumbnail(url=self.avatar)
-                embed.set_author(name=self.name, url=self.avatar,icon_url=self.avatar)
-                embed.add_field(name=f"Corrupted Feed",value=e,inline=False)
+                embed.set_author(
+                    name=self.name, url=self.avatar, icon_url=self.avatar)
+                embed.add_field(name=f"Corrupted Feed", value=e, inline=False)
                 return
             except:
-                embed = discord.Embed(colour=discord.Colour(0x120012), description=" ")
+                embed = discord.Embed(
+                    colour=discord.Colour(0x120012), description=" ")
                 embed.set_thumbnail(url=self.avatar)
-                embed.set_author(name=self.name, url=self.avatar, icon_url=self.avatar)
-                embed.add_field(name=f"Somewhere Something went wrong",value=r"I have 0 clue what the hell happened rn ¯\_(ツ)_/¯", inline=False)
+                embed.set_author(
+                    name=self.name, url=self.avatar, icon_url=self.avatar)
+                embed.add_field(name=f"Somewhere Something went wrong",
+                                value=r"I have 0 clue what the hell happened rn ¯\_(ツ)_/¯", inline=False)
                 return
             await ctx.message.add_reaction('⏳')
             if(not k['name'] == "Podcast Not Found"):
                 currentpod = ph.Podcast(k['name'], k['rss'])
                 self.lastPod = currentpod
-                paginationsize = ph.Pagination(k['count'],5)
+                paginationsize = ph.Pagination(k['count'], 5)
                 try:
                     thiscol = find_dominant_color(k['image'])
                 except:
                     thiscol = 0xffffff
                 embed = discord.Embed(colour=thiscol, description=" ")
                 embed.set_thumbnail(url=self.avatar)
-                embed.set_author(name=k['name'], url=k['rss'], icon_url=k['image'])
+                embed.set_author(
+                    name=k['name'], url=k['rss'], icon_url=k['image'])
                 ind = 0 + 5*start
                 for episode_ in currentpod.ListEpisodes()[start:start+5]:
                     currentEpisodeDetail = currentpod.GetEpisodeDetails(ind)
-                    embed.add_field(name=f"{ind} : " + currentEpisodeDetail['title'],value=f"{currentEpisodeDetail['published'][:50]}\n ```{sanitize(currentEpisodeDetail['summary'][:80])}...```\n" ,inline=False)
+                    embed.add_field(
+                        name=f"{ind} : " + currentEpisodeDetail['title'], value=f"{currentEpisodeDetail['published'][:50]}\n ```{sanitize(currentEpisodeDetail['summary'][:80])}...```\n", inline=False)
                     ind += 1
-                embed.set_footer(text=f"Page {start+1}/{paginationsize}", icon_url=self.avatar)
+                embed.set_footer(
+                    text=f"Page {start+1}/{paginationsize}", icon_url=self.avatar)
                 try:
                     embed.set_thumbnail(url=k['image'])
                 except:
                     embed.set_thumbnail(url=self.avatar)
             else:
-                embed = discord.Embed(colour=discord.Colour(0x120012), description=" ")
+                embed = discord.Embed(
+                    colour=discord.Colour(0x120012), description=" ")
                 embed.set_thumbnail(url=self.avatar)
-                embed.add_field(name=f"No Podcasts Found",value="No Results",inline=False)
+                embed.add_field(name=f"No Podcasts Found",
+                                value="No Results", inline=False)
                 embed.set_thumbnail(url=self.avatar)
             try:
                 embed.set_thumbnail(url=currentpod.PodcastImage(podepi))
@@ -221,9 +259,9 @@ class MusicMixin(DiscordInit, commands.Cog):
                 pass
 
         del_dis = await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.green, label="Play Latest"), Button(style=ButtonStyle.red, label="Prev Page"), Button(style=ButtonStyle.blue, label="Next Page"), Button(style=ButtonStyle.grey, label="Next Search Result")]])
-        
+
         while True:
-            res = await self.client.wait_for("button_click",timeout=100)
+            res = await self.client.wait_for("button_click", timeout=100)
             if(await ButtonProcessor(ctx, res, "Play Latest")):
                 await ctx.invoke(self.client.get_command('podplay'))
                 await del_dis.delete()
@@ -238,35 +276,36 @@ class MusicMixin(DiscordInit, commands.Cog):
                 break
             elif(await ButtonProcessor(ctx, res, "Next Search Result")):
                 await del_dis.delete()
-                await ctx.invoke(self.client.get_command('pod'), strparse=strparse, pgNo=0 ,searchIndex=searchIndex+1)
+                await ctx.invoke(self.client.get_command('pod'), strparse=strparse, pgNo=0, searchIndex=searchIndex+1)
                 break
             elif len(ctx.voice_client.channel.members) < 2:
-                await ctx.send("> Dont leave me alone "+ ctx.author.mention + Emotes.PACDEPRESS )
+                await ctx.send("> Dont leave me alone " + ctx.author.mention + Emotes.PACDEPRESS)
                 await ctx.voice_client.disconnect()
                 break
-            
-            
+
     async def playPodcast(self, context, podepi, currentpod):
         try:
             await context.voice_client.disconnect()
         except:
             pass
-        
+
         if context.voice_client is None:
             if context.author.voice.channel:
                 await context.author.voice.channel.connect()
-                
+
         _source_ = currentpod.GetEpisodeMp3(podepi)
-        await self.playmp3source(_source_,context=context)
-            
-    async def playmp3source(self,mp3link:str,context):
+        await self.playmp3source(_source_, context=context)
+
+    async def playmp3source(self, mp3link: str, context):
         ctx = context
-        voice_client: discord.VoiceClient = discord.utils.get(self.client.voice_clients, guild=ctx.guild)
+        voice_client: discord.VoiceClient = discord.utils.get(
+            self.client.voice_clients, guild=ctx.guild)
         audio_source = discord.FFmpegPCMAudio(mp3link)
-        self.source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(mp3link, before_options=ffmpeg_options), volume=100)
+        self.source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(
+            mp3link, before_options=ffmpeg_options), volume=100)
         if not voice_client.is_playing():
             voice_client.play(audio_source, after=None)
-            
+
         while ctx.voice_client.is_connected():
             if len(ctx.voice_client.channel.members) == 1:
                 await ctx.send("> Dont leave me alone " + Emotes.PACDEPRESS)
@@ -287,12 +326,8 @@ class MusicMixin(DiscordInit, commands.Cog):
             else:
                 await ctx.voice_client.disconnect()
                 break
-            
-            
-            
 
-    
-    @commands.command(aliases=['pau','p'])
+    @commands.command(aliases=['pau'])
     async def pause(self, ctx):
         try:
             ctx.voice_client.pause()
@@ -300,7 +335,7 @@ class MusicMixin(DiscordInit, commands.Cog):
         except:
             await ctx.send(f"> {ctx.author.mention} I see-eth nothing playin")
 
-    @commands.command(aliases=['r'])
+    @commands.command(aliases=['res'])
     async def resume(self, ctx):
         try:
             await ctx.message.add_reaction(Emotes.PACPLAY)
@@ -308,9 +343,8 @@ class MusicMixin(DiscordInit, commands.Cog):
         except:
             await ctx.send(f"> {ctx.author.mention} Nothing's playing")
 
-    
-    @commands.command(aliases=['fuckoff', 'dc' , 'disconnect','stfu'])
-    async def stop(self, ctx ):
+    @commands.command(aliases=['fuckoff', 'dc', 'disconnect', 'stfu'])
+    async def stop(self, ctx):
         if(ctx.author.voice.channel):
             await ctx.message.add_reaction(Emotes.PACSTOP)
             await ctx.voice_client.disconnect()
@@ -319,6 +353,7 @@ class MusicMixin(DiscordInit, commands.Cog):
             await ctx.message.add_reaction(Emotes.PACEXCLAIM)
             return await ctx.reply("> You're not in voice channel")
 
+    @rawplay.before_invoke
     @lofi.before_invoke
     async def ensure_voice(self, ctx):
         if ctx.voice_client is None:
@@ -326,13 +361,17 @@ class MusicMixin(DiscordInit, commands.Cog):
                 await ctx.author.voice.channel.connect()
                 await ctx.guild.change_voice_state(channel=ctx.author.voice.channel, self_mute=False, self_deaf=True)
             else:
-                embed = discord.Embed(title=f"> {ctx.message.author.mention} isn't in any voice channel that I can see mate", colour=discord.Colour(0xff5065))
-                embed.set_author(name=ctx.message.author.name,icon_url=ctx.message.author.avatar_url)
-                embed.set_footer(text=self.client.user.name,icon_url=self.client.user.avatar_url)
+                embed = discord.Embed(
+                    title=f"> {ctx.message.author.mention} isn't in any voice channel that I can see mate", colour=discord.Colour(0xff5065))
+                embed.set_author(name=ctx.message.author.name,
+                                 icon_url=ctx.message.author.avatar_url)
+                embed.set_footer(text=self.client.user.name,
+                                 icon_url=self.client.user.avatar_url)
                 return await ctx.send(embed=embed)
 
         elif ctx.voice_client.is_playing():
             ctx.voice_client.stop()
+
 
 def setup(bot):
     bot.add_cog(MusicMixin(bot))

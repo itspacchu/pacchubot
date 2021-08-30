@@ -1,4 +1,4 @@
-#deprecated by mongo db ill remove it later
+# deprecated by mongo db ill remove it later
 
 from __future__ import print_function
 import binascii
@@ -9,22 +9,24 @@ import numpy as np
 import scipy
 import scipy.misc
 import scipy.cluster
-import urllib3,os
+import urllib3
+import os
 import requests
 from tqdm import tqdm
 from . import __imports__ as internalImports
 
 
-lifeChoice = [True,False]
+lifeChoice = [True, False]
 
 botReadyToRespond = True
 
-async def report_errors_to_channel(client,error):
+
+async def report_errors_to_channel(client, error):
     pass
     """print(repr(error))
     channel = await client.get_channel(501237046854287365)
     await client.send(f"```{str(repr(error))}```")"""
-    
+
 
 distortionTypes = [lambda i, j:[2*np.sin(i/100) + 2, 2*np.sin(j/100) + 2],
                    lambda i, j:[2*np.sin(i/100) + 2, 0],
@@ -36,9 +38,9 @@ distortionTypes = [lambda i, j:[2*np.sin(i/100) + 2, 2*np.sin(j/100) + 2],
                    ]
 
 
-async def ButtonProcessor(ctx,res,label:str,userCheck=True):
+async def ButtonProcessor(ctx, res, label: str, userCheck=True):
     try:
-        if(res.component.label == label and res.channel == ctx.channel):
+        if(res.component.label == label and res.channel == ctx.channel and res.id == ctx.message.id):
             if(res.author.id == ctx.author.id or not userCheck):
                 return True
             else:
@@ -53,8 +55,9 @@ async def ButtonProcessor(ctx,res,label:str,userCheck=True):
             content="That Button expired mate"
         )
         return False
-        
-async def unified_imagefetcher(ctx,member=None,attachedImg=None):
+
+
+async def unified_imagefetcher(ctx, member=None, attachedImg=None):
     await ctx.message.add_reaction('🖼')
     try:
         if(attachedImg == None):
@@ -76,44 +79,48 @@ async def unified_imagefetcher(ctx,member=None,attachedImg=None):
             await ctx.send("> I think something went wrong!")
             return None
 
-def ButtonValidator(res,ctx,userCheck=True):
+
+def ButtonValidator(res, ctx, userCheck=True):
     cond = (res.channel == ctx.channel)
     if(userCheck):
-        cond = (cond and (res.author.id==ctx.author.id))
+        cond = (cond and (res.author.id == ctx.author.id))
     return cond
 
 
-def find_dominant_color(imageurl:str,local=False):
+def find_dominant_color(imageurl: str, local=False):
     try:
         NUM_CLUSTERS = 10
         if(local):
             im = Image.open(imageurl)
         else:
             im = Image.open(requests.get(imageurl, stream=True).raw)
-        im = im.resize((25, 25))    
+        im = im.resize((25, 25))
         ar = np.asarray(im)
         shape = ar.shape
         ar = ar.reshape(scipy.product(shape[:2]), shape[2]).astype(float)
         codes, dist = scipy.cluster.vq.kmeans(ar, NUM_CLUSTERS)
-        vecs, dist = scipy.cluster.vq.vq(ar, codes)        
-        counts, bins = scipy.histogram(vecs, len(codes))   
-        index_max = scipy.argmax(counts)                   
+        vecs, dist = scipy.cluster.vq.vq(ar, codes)
+        counts, bins = scipy.histogram(vecs, len(codes))
+        index_max = scipy.argmax(counts)
         peak = codes[index_max]
-        colour = binascii.hexlify(bytearray(int(c) for c in peak)).decode('ascii')
+        colour = binascii.hexlify(bytearray(int(c)
+                                  for c in peak)).decode('ascii')
         try:
             return int(hex(int(colour, 16))[:8], 0)
         except:
-            return  0xffffff
+            return 0xffffff
     except IndexError:
         return 0xffffff
+
 
 def hasNumbers(inputString):
     return any(char.isdigit() for char in inputString)
 
+
 bot_avatar_url = "https://cdn.discordapp.com/attachments/715107506187272234/850379532459573288/pacslav.png"
 
 
-def mentionToId(mention:str):
+def mentionToId(mention: str):
     print(mention)
     return int(mention[3:-1])
 
@@ -124,20 +131,23 @@ def queryToName(var):
         name += " " + _
     return name
 
-def list_to_string(the_list,no_of_items:int):
+
+def list_to_string(the_list, no_of_items: int):
     returnstr = ''
     count = 0
     for _ in the_list:
         if(count > no_of_items):
             break
-        count+= 1
+        count += 1
         returnstr += str(_ + "\n")
     return returnstr
 
-def embed_generator(embedContents,thumbUrl,imgUrl):
+
+def embed_generator(embedContents, thumbUrl, imgUrl):
     pass
 
-def get_file_or_link(ctx,qlink=None):
+
+def get_file_or_link(ctx, qlink=None):
     try:
         return ctx.message.attachments[0].url
     except:
@@ -146,7 +156,8 @@ def get_file_or_link(ctx,qlink=None):
         else:
             return ctx.message.author.avatar_url
 
-def better_send(ctx,content=None,embed=None,file=None):
+
+def better_send(ctx, content=None, embed=None, file=None):
     try:
         try:
             return ctx.reply(content, embed=embed, file=file)
@@ -156,9 +167,9 @@ def better_send(ctx,content=None,embed=None,file=None):
         return ctx.send("Coudn't send the message.. something went wrong!!")
 
 
-def isItPacchu(checkid:str):
+def isItPacchu(checkid: str):
     #                   Pacchu              Pacchu              Macky            Leo                Monsieur
-    return int(checkid) in [749975627633000520,170783707647442947,741139834260815964,520114282776625162,627135815985659904]
+    return int(checkid) in [749975627633000520, 170783707647442947, 741139834260815964, 520114282776625162, 627135815985659904]
 
 
 def domain_finder(link):
@@ -208,6 +219,5 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
-    DEFAULT = CGREY  = '\33[90m'
-    CWHITE2  = '\33[97m'
-
+    DEFAULT = CGREY = '\33[90m'
+    CWHITE2 = '\33[97m'

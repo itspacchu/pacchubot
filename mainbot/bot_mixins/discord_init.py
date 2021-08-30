@@ -47,7 +47,7 @@ class DiscordInit:
 
         for x in message.mentions:
             if(x == self.client.user and len(message.content)):
-                if(len(message.content) > 2):
+                if(len(message.content) > 25):
                     payload_to_send = message.content.replace(
                         "<@!709426015759368282>", "")
                 else:

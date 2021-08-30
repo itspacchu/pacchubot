@@ -85,7 +85,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                 embed.set_author(name=ctx.message.author.name,
                                  icon_url=ctx.message.author.avatar_url)
                 embed.set_footer(text=self.name, icon_url=self.avatar)
-                await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")], Button(style=ButtonStyle.disabled, label="Loop")])
+                await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")], Button(style=ButtonStyle.gray, label="Loop")])
             voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
             voice.is_playing()
         else:

@@ -1,11 +1,13 @@
 from ..__imports__ import *
 from ..settings import *
 from .discord_init import DiscordInit
+from discord import commands
 
 Discord_init_Color = 0xffbb54
 
+
 class InteractionsMixin(DiscordInit, commands.Cog):
-    
+
     @commands.command(aliases=['av', 'pic', 'dp'])
     async def avatar(self, ctx, member: discord.Member = None):
         hgp = member
@@ -28,16 +30,16 @@ class InteractionsMixin(DiscordInit, commands.Cog):
                              icon_url=ctx.message.author.avatar_url)
         embed.set_footer(text=f"{self.client.user.name}",
                          icon_url=self.client.user.avatar_url)
-        
+
         await ctx.send(embed=embed, components=[[
             Button(style=ButtonStyle.blue, label="Cartoonize"),
             Button(style=ButtonStyle.blue, label="Distort"),
             Button(style=ButtonStyle.blue, label="Edge"),
-        ],])
+        ], ])
         while True:
             res = await self.client.wait_for("button_click", timeout=100)
             if(res.channel == ctx.channel):
-                if(await ButtonProcessor(ctx,res,"Cartoonize")):
+                if(await ButtonProcessor(ctx, res, "Cartoonize")):
                     await ctx.invoke(self.client.get_command('cartoonize'), attachedImg=url_link)
                 elif(await ButtonProcessor(ctx, res, "Distort")):
                     await ctx.invoke(self.client.get_command('distortion'), attachedImg=url_link)
@@ -45,31 +47,34 @@ class InteractionsMixin(DiscordInit, commands.Cog):
                     await ctx.invoke(self.client.get_command('edgeDetect'), attachedImg=url_link)
                 elif(await ButtonProcessor(ctx, res, "LineArt")):
                     await ctx.invoke(self.client.get_command('imla'), attachedImg=url_link)
-        
+
     @commands.command(aliases=['gb'])
     async def guild_banner(self, ctx):
         await ctx.message.add_reaction(Emotes.PACEXCLAIM)
         try:
-            embed = discord.Embed(title="", colour=find_dominant_color(ctx.message.guild.banner_url))
+            embed = discord.Embed(title="", colour=find_dominant_color(
+                ctx.message.guild.banner_url))
             embed.set_image(url=ctx.message.guild.banner_url)
         except:
-            embed = discord.Embed(title="Server Doesn't have a banner", colour=0xff2020)
+            embed = discord.Embed(
+                title="Server Doesn't have a banner", colour=0xff2020)
         await better_send(ctx, embed=embed)
-    
+
     @commands.command()
-    async def hug(self,ctx, member: discord.Member):
+    async def hug(self, ctx, member: discord.Member):
         hgp = member
         await ctx.message.add_reaction('🤗')
         if(ctx.message.author == hgp or hgp == None):
-            embed = discord.Embed(title=f"{ctx.message.author.mention} hugs themselves",description=f"Don't worry {ctx.message.author.mention}.. {choice(self.perks['replies']['sadhugs'])}", colour=discord.Colour(0x00ffb7))
+            embed = discord.Embed(title=f"{ctx.message.author.mention} hugs themselves",
+                                  description=f"Don't worry {ctx.message.author.mention}.. {choice(self.perks['replies']['sadhugs'])}", colour=discord.Colour(0x00ffb7))
             embed.set_image(url=choice(self.perks['links']['sadhugs']))
         else:
-            embed = discord.Embed(title=" ", description=f"{ctx.message.author.mention} hugs {hgp.mention}", colour=discord.Colour(0x00ffb7))
+            embed = discord.Embed(
+                title=" ", description=f"{ctx.message.author.mention} hugs {hgp.mention}", colour=discord.Colour(0x00ffb7))
             embed.set_image(url=choice(self.perks['links']['hugs']))
         embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
         embed.set_footer(text=f"{self.name}", icon_url=self.avatar)
         await ctx.send(embed=embed)
-
 
     @commands.command()
     async def kiss(self, ctx, member: discord.Member):
@@ -85,7 +90,7 @@ class InteractionsMixin(DiscordInit, commands.Cog):
             embed.set_image(url=choice(self.perks['links']['kiss']))
         embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
         embed.set_footer(text=f"{self.client.user.name}",
-                        icon_url=self.client.user.avatar_url)
+                         icon_url=self.client.user.avatar_url)
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -93,13 +98,17 @@ class InteractionsMixin(DiscordInit, commands.Cog):
         hgp = member
         await ctx.message.add_reaction('🔪')
         if(ctx.message.author == hgp or hgp == None):
-            embed = discord.Embed(title=" ", description=f"{ctx.message.author.mention} you know there are better ways for than .. than to ask me", colour=discord.Colour(0x00ffb7))
-            embed.set_image(url="https://i.pinimg.com/originals/53/4d/f2/534df2eed76c2b48bc9f892086f1e749.jpg")
+            embed = discord.Embed(
+                title=" ", description=f"{ctx.message.author.mention} you know there are better ways for than .. than to ask me", colour=discord.Colour(0x00ffb7))
+            embed.set_image(
+                url="https://i.pinimg.com/originals/53/4d/f2/534df2eed76c2b48bc9f892086f1e749.jpg")
         else:
-            embed = discord.Embed(title=" ", description=f"{ctx.message.author.mention} kills {hgp.mention}", colour=discord.Colour(0x00ffb7))
+            embed = discord.Embed(
+                title=" ", description=f"{ctx.message.author.mention} kills {hgp.mention}", colour=discord.Colour(0x00ffb7))
             embed.set_image(url=choice(self.perks['links']['kill']))
         embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
-        embed.set_footer(text=f"{self.client.user.name}",icon_url=self.client.user.avatar_url)
+        embed.set_footer(text=f"{self.client.user.name}",
+                         icon_url=self.client.user.avatar_url)
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -108,17 +117,19 @@ class InteractionsMixin(DiscordInit, commands.Cog):
         await ctx.message.add_reaction('👋')
         print(hgp)
         if(ctx.message.author == hgp or hgp == None):
-            embed = discord.Embed(title=" ", description=f"{ctx.message.author.mention} pats themselves", colour=discord.Colour(0x00ffb7))
-            embed.add_field(name="👋", value=f"{ctx.message.author.mention}.. i'll pat you :3")
+            embed = discord.Embed(
+                title=" ", description=f"{ctx.message.author.mention} pats themselves", colour=discord.Colour(0x00ffb7))
+            embed.add_field(
+                name="👋", value=f"{ctx.message.author.mention}.. i'll pat you :3")
             embed.set_image(url=choice(self.perks['links']['pats']))
         else:
-            embed = discord.Embed(title=" ", description=f"{ctx.message.author.mention} pats {hgp.mention}", colour=discord.Colour(0x00ffb7))
+            embed = discord.Embed(
+                title=" ", description=f"{ctx.message.author.mention} pats {hgp.mention}", colour=discord.Colour(0x00ffb7))
             embed.set_image(url=choice(self.perks['links']['pats']))
         embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
         embed.set_footer(text=f"{self.client.user.name}",
-                        icon_url=self.client.user.avatar_url)
+                         icon_url=self.client.user.avatar_url)
         await ctx.send(embed=embed)
-
 
     @commands.command(aliases=['sk'])
     async def sike(self, ctx, *qlink):
@@ -134,7 +145,8 @@ class InteractionsMixin(DiscordInit, commands.Cog):
                 embed = discord.Embed(color=0x00ff00)
                 embed.add_field(name="No Sike! found",
                                 value=f"add sike {command_prefix}sike <value> ; Value can be Link , Text  ...", inline=False)
-                embed.set_footer(text=f" {self_name} {version}", icon_url=self_avatar)
+                embed.set_footer(
+                    text=f" {self_name} {version}", icon_url=self_avatar)
                 await ctx.message.channel.send(embed=embed)
         else:
             if(self.bruhs.find_one({"guild": ctx.message.author.id}) == None):
@@ -142,33 +154,38 @@ class InteractionsMixin(DiscordInit, commands.Cog):
                     "guild": ctx.message.author.id,
                     "link": link
                 }
-                self.bruhs.insert_one({"guild": ctx.message.author.id}, dbStore)
+                self.bruhs.insert_one(
+                    {"guild": ctx.message.author.id}, dbStore)
             else:
                 dbStore = {
                     "guild": ctx.message.author.id,
                     "link": link
                 }
-                self.bruhs.replace_one({"guild": ctx.message.author.id}, dbStore)
+                self.bruhs.replace_one(
+                    {"guild": ctx.message.author.id}, dbStore)
             if(self.bruhs.find_one({"guild": ctx.message.author.id}) == None):
                 dbStore = {
                     "guild": ctx.message.author.id,
                     "link": link
                 }
-                self.bruhs.insert_one({"guild": ctx.message.author.id}, dbStore)
+                self.bruhs.insert_one(
+                    {"guild": ctx.message.author.id}, dbStore)
             else:
                 dbStore = {
                     "guild": ctx.message.author.id,
                     "link": link
                 }
-                self.bruhs.replace_one({"guild": ctx.message.author.id}, dbStore)
+                self.bruhs.replace_one(
+                    {"guild": ctx.message.author.id}, dbStore)
             embed = discord.Embed(color=0x00ff00)
             embed.add_field(name="Sike! Updated",
                             value="Sike! has been sucessfully updated", inline=False)
-            embed.set_footer(text=f" {self_name} {version}", icon_url=self_avatar)
-            await ctx.message.channel.send(embed=embed)  
-    
+            embed.set_footer(
+                text=f" {self_name} {version}", icon_url=self_avatar)
+            await ctx.message.channel.send(embed=embed)
+
     @commands.command(aliases=['br'])
-    async def bruh(self,ctx, *qlink):
+    async def bruh(self, ctx, *qlink):
         try:
             link = ctx.message.attachments[0].url
         except:
@@ -184,7 +201,8 @@ class InteractionsMixin(DiscordInit, commands.Cog):
                     embed = discord.Embed(color=0x00ff00)
                     embed.add_field(name="No Bruh found",
                                     value=f"Consider adding Bruh using {command_prefix}Bruh <value> ; Value can be Link , Text  ...", inline=False)
-                    embed.set_footer(text=f" {self_name} {version}", icon_url=self_avatar)
+                    embed.set_footer(
+                        text=f" {self_name} {version}", icon_url=self_avatar)
                     await ctx.message.channel.send(embed=embed)
             else:
                 if(self.bruhs.find_one({"guild": ctx.message.guild.id}) == None):
@@ -218,10 +236,10 @@ class InteractionsMixin(DiscordInit, commands.Cog):
                 embed = discord.Embed(color=0x00ff00)
                 embed.add_field(name="Bruh Updated",
                                 value="Bruh has been sucessfully updated", inline=False)
-                embed.set_footer(text=f" {self_name} {version}", icon_url=self_avatar)
+                embed.set_footer(
+                    text=f" {self_name} {version}", icon_url=self_avatar)
                 await ctx.message.channel.send(embed=embed)
-    
-        
- 
+
+
 def setup(bot):
     bot.add_cog(InteractionsMixin(bot))

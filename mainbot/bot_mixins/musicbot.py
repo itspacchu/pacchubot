@@ -68,8 +68,10 @@ class MusicMixin(DiscordInit, commands.Cog):
         FFMPEG_OPTIONS = {
             'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
         voice = get(self.client.voice_clients, guild=ctx.guild)
-
-        await ctx.message.delete()
+        try:
+            await ctx.message.delete()
+        except:
+            pass
 
         if not voice.is_playing():
             with YoutubeDL(YDL_OPTIONS) as ydl:

@@ -47,45 +47,44 @@ class DiscordInit:
 
         for x in message.mentions:
             if(x == self.client.user and len(message.content)):
-                await message.channel.send(mention_convo(message.content.replace("<@709426015759368282>", "") + " " + message.author.mention)
+                await message.channel.send(mention_convo(message.content.replace("<@709426015759368282>", "") + " " + message.author.mention))
 
         if(botReadyToRespond):  # or isItPacchu(str(message.author.id))):
             await self.client.process_commands(message)
 
-
         if('pacchu' in message.content.lower() and len(message.content) > 5):
             await message.add_reaction(Emotes.PACCHU)
 
-        qq=message.content.lower().split(' ')[0]
+        qq = message.content.lower().split(' ')[0]
         if(len(qq) >= 3 and qq != None):
-            query={'search': qq}  # exact match here
+            query = {'search': qq}  # exact match here
             try:
-                match=self.MemberTaunt.find_one(query)['taunt']
+                match = self.MemberTaunt.find_one(query)['taunt']
                 await message.channel.send(match)
             except Exception as e:
                 pass  # this error is on every goddamn message ffs
 
-
     def init_db(self):
-        self.serverstat=self.db['serverstat']
-        self.bruhs=self.db['bruh']
-        self.animeSearch=self.db['animeSearch']
-        self.charSearch=self.db['charSearch']
-        self.animePics=self.db['animePics']
-        self.mangaSearch=self.db['mangaSearch']
-        self.gptDb=self.db['gptQuery']
-        self.PodcastSuggest=self.db['PodSuggest']
-        self.VoiceUsage=self.db['VoiceActivity']
-        self.MemberTaunt=self.db['memberTaunt']
-        self.MiscCollection=self.db['miscCollection']
-        self.discordStickers=self.db['discordStickers']
+        self.serverstat = self.db['serverstat']
+        self.bruhs = self.db['bruh']
+        self.animeSearch = self.db['animeSearch']
+        self.charSearch = self.db['charSearch']
+        self.animePics = self.db['animePics']
+        self.mangaSearch = self.db['mangaSearch']
+        self.gptDb = self.db['gptQuery']
+        self.PodcastSuggest = self.db['PodSuggest']
+        self.VoiceUsage = self.db['VoiceActivity']
+        self.MemberTaunt = self.db['memberTaunt']
+        self.MiscCollection = self.db['miscCollection']
+        self.discordStickers = self.db['discordStickers']
+
 
 class BaseBot(DiscordInit, commands.Cog):
 
     @ commands.command()
     async def ping(self, ctx):
         await ctx.message.add_reaction('⌚')
-        embed=discord.Embed(colour=discord.Colour(0x27ce89))
+        embed = discord.Embed(colour=discord.Colour(0x27ce89))
         embed.add_field(
             name="Latency", value=f"{round(self.client.latency,2)} ms")
         embed.add_field(name="CPU Load",
@@ -96,11 +95,10 @@ class BaseBot(DiscordInit, commands.Cog):
             name="Servers", value=f"Active in {str(len(self.client.guilds))} Servers", inline=True)
         await better_send(ctx, embed=embed)
 
-
     @ commands.command()
     async def invite(self, ctx):
         await ctx.message.add_reaction(Emotes.PACPILOVE)
-        embed=discord.Embed(title="Click here", url="https://discord.com/api/oauth2/authorize?client_id=709426015759368282&permissions=8&scope=bot",
+        embed = discord.Embed(title="Click here", url="https://discord.com/api/oauth2/authorize?client_id=709426015759368282&permissions=8&scope=bot",
                               description="Invite link for this bot", color=Discord_init_Color)
         embed.set_thumbnail(url=self.avatar)
         await ctx.send(embed=embed, components=[
@@ -120,7 +118,7 @@ class BaseBot(DiscordInit, commands.Cog):
     async def statuschange(self, ctx, *, newstatus):
         await ctx.message.add_reaction(Emotes.PACPLAY)
         if(isItPacchu(str(ctx.author.id))):
-            statustxt=newstatus
+            statustxt = newstatus
             await self.client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=statustxt))
         else:
             await ctx.send("> Only my creator has the authority over that!!" + ctx.author.mention)
@@ -133,15 +131,14 @@ class BaseBot(DiscordInit, commands.Cog):
         else:
             await ctx.send("> Who are you? " + ctx.author.mention)
 
-
-
     # add pagination to this
+
     @ commands.command(aliases=['h', 'halp', 'hel'])
     async def help(self, ctx, pgno=0):
         # save avatar of user into a variable
-        embedColor=find_dominant_color(ctx.author.avatar_url_as(
+        embedColor = find_dominant_color(ctx.author.avatar_url_as(
             format=None, static_format='png', size=64))
-        embed=discord.Embed(
+        embed = discord.Embed(
             color=embedColor, description=f"Created by Pacchu & Leo {pgno+1}/2")
         embed.set_thumbnail(url=self.avatar)
         if(pgno == 0):
@@ -199,20 +196,19 @@ class BaseBot(DiscordInit, commands.Cog):
                             value="isnt it obvious :o", inline=False)
         embed.set_footer(
             text=f"{self.name} {self.VERSION}", icon_url=self.avatar)
-        del_dis=await ctx.send(embed=embed, components=[[
+        del_dis = await ctx.send(embed=embed, components=[[
             Button(style=ButtonStyle.gray, label="More help"),
         ], ])
 
-        res=await self.client.wait_for("button_click", timeout=100)
+        res = await self.client.wait_for("button_click", timeout=100)
         if(await ButtonProcessor(ctx, res, "More help", userCheck=True)):
             await del_dis.delete()
-            del_dis=None
+            del_dis = None
             if(pgno == 0):
-                pgnoToGo=1
+                pgnoToGo = 1
             else:
-                pgnoToGo=0
+                pgnoToGo = 0
             await ctx.invoke(self.client.get_command('help'), pgno=pgnoToGo)
-
 
 
 def setup(bot):

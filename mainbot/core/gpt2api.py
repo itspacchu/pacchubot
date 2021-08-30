@@ -20,9 +20,7 @@ def query(payload, what=DIALOG_API, RECURSIVE_LIMIT=5):
     response = requests.request("POST", what, headers=headers, data=data)
     resj = json.loads(response.content.decode("utf-8"))
     if("estimated_time" in resj.keys() and resj["estimated_time"] > 0):
-        print(f"{resj['estimated_time']} seconds")
-        time.sleep(1)
-        query(payload, what, RECURSIVE_LIMIT=RECURSIVE_LIMIT-1)
+        return choice(perks.perkdict['replies']['pings'])  # backup
     return resj
 
 

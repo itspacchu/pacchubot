@@ -47,10 +47,14 @@ class DiscordInit:
 
         for x in message.mentions:
             if(x == self.client.user and len(message.content)):
-                print("> Initating Chatbot for query" +
-                      message.content.replace("<@!709426015759368282>", ""))
+                if(len(message.content) > 2):
+                    payload_to_send = message.content.replace(
+                        "<@!709426015759368282>", "")
+                else:
+                    payload_to_send = choice(
+                        perkdict['replies']['pings_no_response'])
                 try:
-                    await message.channel.send(mention_convo(message.content.replace("<@!709426015759368282>", ""))["generated_text"] + " " + message.author.mention)
+                    await message.channel.send(mention_convo(payload_to_send)["generated_text"] + " " + message.author.mention)
                 except:
                     await message.channel.send(choice(perkdict['replies']['pings']))
 

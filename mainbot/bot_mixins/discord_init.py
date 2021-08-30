@@ -52,7 +52,7 @@ class DiscordInit:
                         "<@!709426015759368282>", "")
                 else:
                     payload_to_send = choice(
-                        perkdict['replies']['pings_no_response'])
+                        ["How are you", "Sup", "Hi there", "How are you doing", "Nice to meet you", "Heya"])
                 try:
                     print("> Chatbot query -"+payload_to_send)
                     await message.channel.send(mention_convo(payload_to_send)["generated_text"] + " " + message.author.mention)

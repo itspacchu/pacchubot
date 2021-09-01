@@ -53,11 +53,8 @@ class DiscordInit:
                 else:
                     payload_to_send = choice(
                         ["Hey", "Sup", "Hi there", "Hi", "Nice to meet you", "Hello"])
-                try:
-                    print("> Chatbot query -"+payload_to_send)
-                    await message.channel.send(mention_convo(payload_to_send)["generated_text"] + " " + message.author.mention)
-                except:
-                    await message.channel.send(choice(perkdict['replies']['pings']))
+
+                await message.channel.send(mention_convo(payload_to_send)["generated_text"] + " " + message.author.mention)
 
         if(botReadyToRespond):  # or isItPacchu(str(message.author.id))):
             await self.client.process_commands(message)

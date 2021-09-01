@@ -25,6 +25,9 @@ class MusicMixin(DiscordInit, commands.Cog):
     source = None
     Aplayer = None
 
+    PREV_SONG = None
+    SONG_QUEUE = []
+
     @commands.command()
     async def join(self, ctx, *, channel: discord.VoiceChannel):
         if ctx.voice_client is not None:
@@ -62,7 +65,19 @@ class MusicMixin(DiscordInit, commands.Cog):
         await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")], ])
         await self.playmp3source(url, context=ctx)
 
-    @commands.command(pass_context=True, aliases=['rp', 'ytp'])
+    @commands.command(pass_context=True, aliases=['qq', 'q'])
+    async def queue(self, ctx, *, query: str):
+        embed = discord.Embed(title=f"{ctx.guild.name}'s music Queue")
+        totquetime = 0
+        for SONGURL in self.SONG_QUEUE:
+            totquetime += SONGURL[3]
+            embed.add_field(
+                name="{SONGURL[1]}", value=f"{SONGURL[3]}\nRequested by {SONGURL[2]}", inline=True)
+        embed.set_footer(
+            text=f"Runtime {totquetime} minutes", icon_url=self.avatar)
+        await ctx.send(embed=embed)
+
+    @commands.command(pass_context=True, aliases=['play', 'ytp', 'pl'])
     async def rawplay(self, ctx, *, flavour='https://www.youtube.com/watch?v=dQw4w9WgXcQ'):
         YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
         FFMPEG_OPTIONS = {
@@ -81,9 +96,12 @@ class MusicMixin(DiscordInit, commands.Cog):
                 embed = discord.Embed(
                     title=f"**Playing** {info['title']}", colour=find_dominant_color(info['thumbnails'][0]['url']), url=URL, description=f"```{info['description'][:200]} ...```")
                 embed.set_image(url=info['thumbnails'][-1]['url'])
-
-                embed.add_field(name="Duration",
-                                value=f"{int(info['duration']/60)}:{int(info['duration']%60)} mins", inline=True)
+                try:
+                    embed.add_field(
+                        name="Duration", value=f"{int(info['duration']/60)}:{int(info['duration']%60)} mins", inline=True)
+                except:
+                    embed.add_field(
+                        name="Duration", value=f"Streaming Live", inline=True)
                 embed.add_field(name="Uploader",
                                 value=info['uploader'], inline=True)
 
@@ -93,11 +111,29 @@ class MusicMixin(DiscordInit, commands.Cog):
                 await ctx.send(embed=embed)
             voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
             voice.is_playing()
+
+            # make some hacky queue system for songs OwO
+            if(len(self.SONG_QUEUE) > 1):
+                self.SONG_QUEUE.pop(0)
+                flavour = self.SONG_QUEUE[0][0]
+                await ctx.invoke(self.client.get_command('rawplay'), flavour=flavour)
+
         else:
-            await ctx.send("Already playing song")
+            with YoutubeDL(YDL_OPTIONS) as ydl:
+                info = ydl.extract_info(flavour, download=False)
+            URL = info['formats'][0]['url']
+            TITLE = info['title']
+            self.SONG_QUEUE.append(
+                [URL, TITLE, ctx.author.nick, round(info['duration']/60)])
             return
 
-    @ commands.command(aliases=['podepi'])
+    @commands.command(pass_context=True, aliases=['skip', 'n'])
+    async def next(self, ctx):
+        self.SONG_QUEUE.pop(0)
+        flavour = self.SONG_QUEUE[0][0]
+        await ctx.invoke(self.client.get_command('rawplay'), flavour=flavour)
+
+    @commands.command(aliases=['podepi'])
     async def podepisode(self, ctx, epno=0):
         await ctx.message.add_reaction('🔍')
         podepi = epno
@@ -180,7 +216,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                 await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")], ])
                 await self.playPodcast(ctx, podepi=podepi, currentpod=currentpod)
             except AttributeError:
-                await ctx.send("> No Episode found")
+                pass
 
     @commands.command(aliases=['podcast'])
     async def pod(self, ctx, *, strparse=" ", pgNo=0, searchIndex=0):

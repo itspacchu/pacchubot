@@ -77,7 +77,7 @@ class MusicMixin(DiscordInit, commands.Cog):
             text=f"Runtime {totquetime} minutes", icon_url=self.avatar)
         await ctx.send(embed=embed)
 
-    @commands.command(pass_context=True, aliases=['play', 'ytp', 'pl'])
+    @commands.command(pass_context=True, aliases=['play', 'ytp', 'p'])
     async def rawplay(self, ctx, *, flavour='https://www.youtube.com/watch?v=dQw4w9WgXcQ'):
         YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
         FFMPEG_OPTIONS = {

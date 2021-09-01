@@ -66,16 +66,19 @@ class MusicMixin(DiscordInit, commands.Cog):
         await self.playmp3source(url, context=ctx)
 
     @commands.command(pass_context=True, aliases=['q'])
-    async def queue(self, ctx, *, query: str):
+    async def queue(self, ctx):
         embed = discord.Embed(title=f"{ctx.guild.name}'s music Queue")
         totquetime = 0
-        for SONGURL in self.SONG_QUEUE:
-            totquetime += SONGURL[3]
-            embed.add_field(
-                name="{SONGURL[1]}", value=f"{SONGURL[3]}\nRequested by {SONGURL[2]}", inline=True)
-        embed.set_footer(
-            text=f"Runtime {totquetime} minutes", icon_url=self.avatar)
-        await ctx.send(embed=embed)
+        if(len(self.SONG_QUEUE) > 0):
+            for SONGURL in self.SONG_QUEUE:
+                totquetime += SONGURL[3]
+                embed.add_field(
+                    name="{SONGURL[1]}", value=f"{SONGURL[3]}\nRequested by {SONGURL[2]}", inline=True)
+            embed.set_footer(
+                text=f"Runtime {totquetime} minutes", icon_url=self.avatar)
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send("> Queue is empty", delete_after=5.0)
 
     @commands.command(pass_context=True, aliases=['play', 'ytp', 'p'])
     async def rawplay(self, ctx, *, flavour='https://www.youtube.com/watch?v=dQw4w9WgXcQ'):
@@ -117,6 +120,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                 self.SONG_QUEUE.pop(0)
                 flavour = self.SONG_QUEUE[0][0]
                 await ctx.invoke(self.client.get_command('rawplay'), flavour=flavour)
+                await ctx.send("> Queue is empty", delete_after=5.0)
 
         else:
             with YoutubeDL(YDL_OPTIONS) as ydl:
@@ -125,6 +129,7 @@ class MusicMixin(DiscordInit, commands.Cog):
             TITLE = info['title']
             self.SONG_QUEUE.append(
                 [URL, TITLE, ctx.author.nick, round(info['duration']/60)])
+            await ctx.send(f"> Added {TITLE} to queue", delete_after=5.0)
             return
 
     @commands.command(pass_context=True, aliases=['skip', 'n'])

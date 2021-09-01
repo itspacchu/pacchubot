@@ -24,7 +24,7 @@ class MusicMixin(DiscordInit, commands.Cog):
     lastPod = None
     source = None
     Aplayer = None
-
+    IS_PLAYING = False
     PREV_SONG = None
     SONG_QUEUE = []
 
@@ -112,6 +112,8 @@ class MusicMixin(DiscordInit, commands.Cog):
                                  icon_url=ctx.message.author.avatar_url)
                 embed.set_footer(text=self.name, icon_url=self.avatar)
                 await ctx.send(embed=embed)
+
+            voice.is_playing()
             voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
             voice.is_playing()
 

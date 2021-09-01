@@ -122,7 +122,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                 await ctx.invoke(self.client.get_command('rawplay'), flavour=flavour)
                 await ctx.send("> Queue is empty", delete_after=5.0)
 
-        else:
+        if(voice.is_playing()):
             with YoutubeDL(YDL_OPTIONS) as ydl:
                 info = ydl.extract_info(flavour, download=False)
             URL = info['formats'][0]['url']
@@ -131,6 +131,8 @@ class MusicMixin(DiscordInit, commands.Cog):
                 [URL, TITLE, ctx.author.nick, round(info['duration']/60)])
             await ctx.send(f"> Added {TITLE} to queue", delete_after=5.0)
             return
+        else:
+            await ctx.send("> Nothing is playing", delete_after=5.0)
 
     @commands.command(pass_context=True, aliases=['skip', 'n'])
     async def next(self, ctx):
@@ -406,10 +408,10 @@ class MusicMixin(DiscordInit, commands.Cog):
         if(ctx.author.voice.channel):
             await ctx.message.add_reaction(Emotes.PACSTOP)
             await ctx.voice_client.disconnect()
-            return await ctx.send(f"> {ctx.author.mention} stopped playback")
+            return await ctx.send(f"> {ctx.author.mention} stopped playback", delete_after=5.0)
         else:
             await ctx.message.add_reaction(Emotes.PACEXCLAIM)
-            return await ctx.reply("> You're not in voice channel")
+            return await ctx.reply("> You're not in voice channel", delete_after=5.0)
 
     @rawplay.before_invoke
     @lofi.before_invoke

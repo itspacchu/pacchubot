@@ -91,7 +91,7 @@ class MusicMixin(DiscordInit, commands.Cog):
         except:
             pass
 
-        if not voice.is_playing():
+        if(not voice.is_playing() and (not self.IS_PLAYING)):
             with YoutubeDL(YDL_OPTIONS) as ydl:
                 info = ydl.extract_info(flavour, download=False)
             URL = info['formats'][0]['url']
@@ -113,18 +113,19 @@ class MusicMixin(DiscordInit, commands.Cog):
                 embed.set_footer(text=self.name, icon_url=self.avatar)
                 await ctx.send(embed=embed)
 
-            voice.is_playing()
+            self.IS_PLAYING = True
             voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
+            self.IS_PLAYING = False
             voice.is_playing()
 
             # make some hacky queue system for songs OwO
-            if(len(self.SONG_QUEUE) > 1):
+            if(len(self.SONG_QUEUE) > 0):
                 self.SONG_QUEUE.pop(0)
                 flavour = self.SONG_QUEUE[0][0]
                 await ctx.invoke(self.client.get_command('rawplay'), flavour=flavour)
                 await ctx.send("> Queue is empty", delete_after=5.0)
 
-        elif(voice.is_playing()):
+        elif(self.IS_PLAYING):
             with YoutubeDL(YDL_OPTIONS) as ydl:
                 info = ydl.extract_info(flavour, download=False)
             URL = info['formats'][0]['url']

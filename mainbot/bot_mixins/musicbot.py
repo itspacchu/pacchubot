@@ -73,7 +73,7 @@ class MusicMixin(DiscordInit, commands.Cog):
             for SONGURL in self.SONG_QUEUE:
                 totquetime += SONGURL[3]
                 embed.add_field(
-                    name="{SONGURL[1]}", value=f"{SONGURL[3]}\nRequested by {SONGURL[2]}", inline=True)
+                    name="{SONGURL[1]}", value=f"{SONGURL[3]} mins \nRequested by {SONGURL[2]}", inline=False)
             embed.set_footer(
                 text=f"Runtime {totquetime} minutes", icon_url=self.avatar)
             await ctx.send(embed=embed)
@@ -122,7 +122,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                 await ctx.invoke(self.client.get_command('rawplay'), flavour=flavour)
                 await ctx.send("> Queue is empty", delete_after=5.0)
 
-        if(voice.is_playing()):
+        elif(voice.is_playing()):
             with YoutubeDL(YDL_OPTIONS) as ydl:
                 info = ydl.extract_info(flavour, download=False)
             URL = info['formats'][0]['url']

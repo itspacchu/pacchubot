@@ -65,7 +65,7 @@ class MusicMixin(DiscordInit, commands.Cog):
         await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")], ])
         await self.playmp3source(url, context=ctx)
 
-    @commands.command(pass_context=True, aliases=['qq', 'q'])
+    @commands.command(pass_context=True, aliases=['q'])
     async def queue(self, ctx, *, query: str):
         embed = discord.Embed(title=f"{ctx.guild.name}'s music Queue")
         totquetime = 0

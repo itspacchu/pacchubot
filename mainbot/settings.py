@@ -31,6 +31,9 @@ guild_ids = [685469328929587268, 705682250460823602, 737504783937830924]
 
 ffmpeg_options = '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -loglevel quiet'
 
+FFMPEG_OPTIONS = {
+    'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+
 ytdl_format_options = {
     'format': 'bestaudio/best',
     'extractaudio': True,

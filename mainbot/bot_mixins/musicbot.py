@@ -21,6 +21,9 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
 
 class MusicMixin(DiscordInit, commands.Cog):
+    YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
+    FFMPEG_OPTIONS = {
+        'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
     lastPod = None
     source = None
     Aplayer = None
@@ -83,10 +86,7 @@ class MusicMixin(DiscordInit, commands.Cog):
     @commands.command(pass_context=True, aliases=['pnq', 'skip', 'next'])
     async def playNextQ(self, ctx):
         if(len(self.SONG_QUEUE) > 0):
-            self.SONG_QUEUE.pop(0)
-            flavour = self.SONG_QUEUE[0][0]
-            await ctx.send(f"> Playing Next Song from queue {self.SONG_QUEUE[0][1]}", delete_after=5.0)
-            await ctx.invoke(self.client.get_command('rawplay'), ctx=ctx, temp_flavour=flavour)
+            await self.SimplifiedRecursiveNextSongPlayback(self, ctx)
         else:
             await ctx.send("> Queue is empty", delete_after=5.0)
 
@@ -103,19 +103,30 @@ class MusicMixin(DiscordInit, commands.Cog):
         await ctx.send(f"> Added {TITLE} to queue", delete_after=5.0)
         return
 
+    async def SimplifiedRecursiveNextSongPlayback(self, ctx):
+        if(len(self.SONG_QUEUE) > 0):
+            self.SONG_QUEUE.pop(0)
+            flavour = self.SONG_QUEUE[0][0]
+            await ctx.send(f"> Playing Next Song from queue {self.SONG_QUEUE[0][1]}")
+            voice = get(self.client.voice_clients, guild=ctx.guild)
+            voice.play(FFmpegPCMAudio(flavour, **self.FFMPEG_OPTIONS))
+            self.SimplifiedRecursiveNextSongPlayback(self, ctx)
+
     @commands.command(pass_context=True, aliases=['play', 'ytp', 'p'])
     async def rawplay(self, ctx, *, flavour='https://www.youtube.com/watch?v=dQw4w9WgXcQ', temp_flavour=None):
-        YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
-        FFMPEG_OPTIONS = {
-            'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
         voice = get(self.client.voice_clients, guild=ctx.guild)
+        await ctx.message.add_reaction(Emotes.PACPLAY)
+        try:
+            ctx.message.suppressEmbeds(True)
+        except:
+            pass
         if(temp_flavour == None):
             pass
         else:
             flavour = temp_flavour
 
         if(not voice.is_playing()):
-            with YoutubeDL(YDL_OPTIONS) as ydl:
+            with YoutubeDL(self.YDL_OPTIONS) as ydl:
                 info = ydl.extract_info(flavour, download=False)
             URL = info['formats'][0]['url']
             async with ctx.typing():
@@ -137,20 +148,15 @@ class MusicMixin(DiscordInit, commands.Cog):
                     text=f"Requested by {ctx.author.name}", icon_url=ctx.author.avatar_url)
                 await ctx.reply(embed=embed)
 
-            voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
+            voice.play(FFmpegPCMAudio(URL, **self.FFMPEG_OPTIONS))
             voice.is_playing()
 
             # make some hacky queue system for songs OwO
             if(len(self.SONG_QUEUE) > 0):
-                self.SONG_QUEUE.pop(0)
-                flavour = self.SONG_QUEUE[0][0]
-                await ctx.invoke(self.client.get_command('rawplay'), flavour=flavour)
-            else:
-                await ctx.message.add_reaction(Emotes.PACEXCLAIM)
-                await ctx.reply("> Queue is empty", delete_after=5.0)
+                self.SimplifiedRecursiveNextSongPlayback(self, ctx)
 
         elif(self.IS_PLAYING):
-            with YoutubeDL(YDL_OPTIONS) as ydl:
+            with YoutubeDL(self.YDL_OPTIONS) as ydl:
                 info = ydl.extract_info(flavour, download=False)
             URL = info['formats'][0]['url']
             TITLE = info['title']
@@ -418,6 +424,8 @@ class MusicMixin(DiscordInit, commands.Cog):
         try:
             ctx.voice_client.pause()
             await ctx.message.add_reaction(Emotes.PACPAUSE)
+            await asyncio.sleep(2)
+            await ctx.message.delete()
         except:
             await ctx.send(f"> {ctx.author.mention} I see-eth nothing playin")
 
@@ -426,6 +434,8 @@ class MusicMixin(DiscordInit, commands.Cog):
         try:
             await ctx.message.add_reaction(Emotes.PACPLAY)
             ctx.voice_client.resume()
+            await asyncio.sleep(2)
+            await ctx.message.delete()
         except:
             await ctx.send(f"> {ctx.author.mention} Nothing's playing")
 
@@ -435,7 +445,11 @@ class MusicMixin(DiscordInit, commands.Cog):
             await ctx.message.add_reaction(Emotes.PACSTOP)
             await ctx.voice_client.disconnect()
             self.SONG_QUEUE = []
-            return await ctx.reply(f"> stopped playback", delete_after=5.0)
+
+            await ctx.reply(f"> stopped playback", delete_after=5.0)
+            await asyncio.sleep(2)
+            await ctx.message.delete()
+
         else:
             await ctx.message.add_reaction(Emotes.PACEXCLAIM)
             return await ctx.reply("> You're not in voice channel", delete_after=5.0)

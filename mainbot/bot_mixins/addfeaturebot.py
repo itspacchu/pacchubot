@@ -152,6 +152,7 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
     @commands.command(aliases=['clear'])
     async def clr(self, ctx, amount=10):
         count = 0
+        await ctx.message.add_reaction(Emotes.PACEXCLAIM)
         if(isItPacchu(ctx.message.author) or ctx.message.author.server_permissions.administrator):
             del_dis = await ctx.send(f"> Deleting last few messages sent by me")
             try:

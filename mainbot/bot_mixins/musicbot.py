@@ -11,16 +11,6 @@ from youtube_dl import YoutubeDL
 import urllib
 
 
-class YTDLSource(discord.PCMVolumeTransformer):
-    def __init__(self, source, *, data, volume=0.5, ytdl_format_options=ytdl_format_options):
-        super().__init__(source, volume)
-        youtube_dl.utils.bug_reports_message = lambda: ''
-        self.ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
-        self.data = data
-        self.title = data.get('title')
-        self.url = data.get('url')
-
-
 class MusicMixin(DiscordInit, commands.Cog):
     YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
     FFMPEG_OPTIONS = {
@@ -112,8 +102,7 @@ class MusicMixin(DiscordInit, commands.Cog):
             await ctx.send("> Searching on Youtube ...", delete_after=2.0)
             flavour = self.basicYTSearch(flavour)
 
-        YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
-        with YoutubeDL(YDL_OPTIONS) as ydl:
+        with YoutubeDL(ytdl_format_options) as ydl:
             info = ydl.extract_info(flavour, download=False)
         URL = info['formats'][0]['url']
         TITLE = info['title']

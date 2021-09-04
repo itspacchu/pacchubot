@@ -117,7 +117,7 @@ class MusicMixin(DiscordInit, commands.Cog):
             await ctx.send(f"> Playing Next Song from queue {self.SONG_QUEUE[0][1]}")
             voice = get(self.client.voice_clients, guild=ctx.guild)
             voice.play(FFmpegPCMAudio(flavour, **self.FFMPEG_OPTIONS))
-            self.SimplifiedRecursiveNextSongPlayback(self, ctx)
+            self.SimplifiedRecursiveNextSongPlayback(ctx)
 
     @commands.command(pass_context=True, aliases=['play', 'ytp', 'p'])
     async def rawplay(self, ctx, *, flavour='https://www.youtube.com/watch?v=dQw4w9WgXcQ', temp_flavour=None):

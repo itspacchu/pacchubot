@@ -449,7 +449,6 @@ class MusicMixin(DiscordInit, commands.Cog):
             await ctx.message.add_reaction(Emotes.PACEXCLAIM)
             return await ctx.reply("> You're not in voice channel", delete_after=5.0)
 
-    @SimplifiedRecursiveNextSongPlayback.before_invoke
     @playNextQ.before_invoke
     @rawplay.before_invoke
     @lofi.before_invoke

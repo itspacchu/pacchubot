@@ -132,8 +132,8 @@ class BaseBot(DiscordInit, commands.Cog):
 
     @ commands.command(aliases=['asbot'])
     async def impbot(self, ctx, *, msgtosend):
-        if(isItPacchu(str(ctx.author.id)) or ctx.message.author.server_permissions.administrator):
-            if(ctx.message.author.server_permissions.administrator):
+        if(isItPacchu(str(ctx.author.id)) or ctx.author.guild_permissions.administrator):
+            if(ctx.author.guild_permissions.administrator):
                 msgtosend += " [Admin]"
             await ctx.send(msgtosend)
             await ctx.message.delete()

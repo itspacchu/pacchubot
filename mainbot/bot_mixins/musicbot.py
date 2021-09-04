@@ -80,6 +80,27 @@ class MusicMixin(DiscordInit, commands.Cog):
         else:
             await ctx.send("> Queue is empty", delete_after=5.0)
 
+    @commands.command(pass_context=True, aliases=['pnq'])
+    async def playNextQ(self, ctx):
+        if(len(self.SONG_QUEUE) > 0):
+            self.SONG_QUEUE.pop(0)
+            flavour = self.SONG_QUEUE[0][0]
+            await ctx.invoke(self.client.get_command('rawplay'), flavour=flavour)
+        else:
+            await ctx.send("> Queue is empty", delete_after=5.0)
+
+    @commands.command(pass_context=True, aliases=['paq'])
+    async def addQ(self, ctx, *, flavour):
+        YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
+        with YoutubeDL(YDL_OPTIONS) as ydl:
+            info = ydl.extract_info(flavour, download=False)
+        URL = info['formats'][0]['url']
+        TITLE = info['title']
+        self.SONG_QUEUE.append(
+            [URL, TITLE, ctx.author.nick, round(info['duration']/60)])
+        await ctx.send(f"> Added {TITLE} to queue", delete_after=5.0)
+        return
+
     @commands.command(pass_context=True, aliases=['play', 'ytp', 'p'])
     async def rawplay(self, ctx, *, flavour='https://www.youtube.com/watch?v=dQw4w9WgXcQ'):
         YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
@@ -91,7 +112,7 @@ class MusicMixin(DiscordInit, commands.Cog):
         except:
             pass
 
-        if(not voice.is_playing() and (not self.IS_PLAYING)):
+        if(not voice.is_playing()):
             with YoutubeDL(YDL_OPTIONS) as ydl:
                 info = ydl.extract_info(flavour, download=False)
             URL = info['formats'][0]['url']
@@ -113,9 +134,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                 embed.set_footer(text=self.name, icon_url=self.avatar)
                 await ctx.send(embed=embed)
 
-            self.IS_PLAYING = True
             voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
-            self.IS_PLAYING = False
             voice.is_playing()
 
             # make some hacky queue system for songs OwO
@@ -123,6 +142,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                 self.SONG_QUEUE.pop(0)
                 flavour = self.SONG_QUEUE[0][0]
                 await ctx.invoke(self.client.get_command('rawplay'), flavour=flavour)
+            else:
                 await ctx.send("> Queue is empty", delete_after=5.0)
 
         elif(self.IS_PLAYING):
@@ -223,6 +243,8 @@ class MusicMixin(DiscordInit, commands.Cog):
                         podepi)['published'][:16], icon_url=self.avatar)
                 except:
                     pass
+                embed.set_footer(
+                    text=f"Requested by {ctx.author.name}", icon_url=ctx.author.avatar_url)
                 await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")], ])
                 await self.playPodcast(ctx, podepi=podepi, currentpod=currentpod)
             except AttributeError:
@@ -301,7 +323,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                 for episode_ in currentpod.ListEpisodes()[start:start+5]:
                     currentEpisodeDetail = currentpod.GetEpisodeDetails(ind)
                     embed.add_field(
-                        name=f"{ind} : " + currentEpisodeDetail['title'], value=f"{currentEpisodeDetail['published'][:50]}\n ```{sanitize(currentEpisodeDetail['summary'][:80])}...```\n", inline=False)
+                        name=f"{ind} : " + currentEpisodeDetail['title'], value=f"_{currentEpisodeDetail['published'][:15]}_\n ```{sanitize(currentEpisodeDetail['summary'][:80])}...```\n", inline=False)
                     ind += 1
                 embed.set_footer(
                     text=f"Page {start+1}/{paginationsize}", icon_url=self.avatar)
@@ -411,7 +433,8 @@ class MusicMixin(DiscordInit, commands.Cog):
         if(ctx.author.voice.channel):
             await ctx.message.add_reaction(Emotes.PACSTOP)
             await ctx.voice_client.disconnect()
-            return await ctx.send(f"> {ctx.author.mention} stopped playback", delete_after=5.0)
+            self.SONG_QUEUE = []
+            return await ctx.reply(f"> stopped playback", delete_after=5.0)
         else:
             await ctx.message.add_reaction(Emotes.PACEXCLAIM)
             return await ctx.reply("> You're not in voice channel", delete_after=5.0)

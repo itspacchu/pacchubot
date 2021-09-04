@@ -73,7 +73,7 @@ class MusicMixin(DiscordInit, commands.Cog):
             for SONGURL in self.SONG_QUEUE:
                 totquetime += SONGURL[3]
                 embed.add_field(
-                    name="{SONGURL[1]}", value=f"{SONGURL[3]} mins \nRequested by {SONGURL[2]}", inline=False)
+                    name=f"{SONGURL[1]}", value=f"{SONGURL[3]} mins \nRequested by {SONGURL[2]}", inline=False)
             embed.set_footer(
                 text=f"Runtime {totquetime} minutes", icon_url=self.avatar)
             await ctx.send(embed=embed)
@@ -85,7 +85,7 @@ class MusicMixin(DiscordInit, commands.Cog):
         if(len(self.SONG_QUEUE) > 0):
             self.SONG_QUEUE.pop(0)
             flavour = self.SONG_QUEUE[0][0]
-            await ctx.invoke(self.client.get_command('rawplay'), flavour=flavour)
+            await ctx.invoke(self.client.get_command('rawplay'), ctx=ctx, flavour=flavour)
         else:
             await ctx.send("> Queue is empty", delete_after=5.0)
 

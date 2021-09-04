@@ -8,6 +8,7 @@ from discord.ext import commands
 from discord.utils import get
 from discord import FFmpegPCMAudio
 from youtube_dl import YoutubeDL
+import urllib
 
 
 class YTDLSource(discord.PCMVolumeTransformer):
@@ -31,6 +32,14 @@ class MusicMixin(DiscordInit, commands.Cog):
     PREV_SONG = None
     SONG_QUEUE = []
     SERVER_SPLIT_QUEUEING = {}
+
+    def basicYTSearch(self, search):
+        query_string = urllib.parse.urlencode({'search_query': search})
+        htm_content = urllib.request.urlopen(
+            'http://www.youtube.com/results?' + query_string)
+        search_results = re.findall(
+            r"/watch\?v=(.{11})", htm_content.read().decode())
+        return 'http://www.youtube.com/watch?v=' + search_results[0]
 
     @commands.command()
     async def join(self, ctx, *, channel: discord.VoiceChannel):
@@ -87,27 +96,7 @@ class MusicMixin(DiscordInit, commands.Cog):
     @commands.command(pass_context=True, aliases=['pnq', 'skip', 'next'])
     async def playNextQ(self, ctx):
         if(len(self.SONG_QUEUE) > 0):
-            info = self.SONG_QUEUE[0][4]
-            URL = info['formats'][0]['url']
-            async with ctx.typing():
-                embed = discord.Embed(
-                    title=f"**Playing** {info['title']}", colour=find_dominant_color(info['thumbnails'][0]['url']), url=URL, description=f"```{info['description'][:200]} ...```")
-                embed.set_image(url=info['thumbnails'][-1]['url'])
-                try:
-                    embed.add_field(
-                        name="Duration", value=f"{int(info['duration']/60)}:{int(info['duration']%60)} mins", inline=True)
-                except:
-                    embed.add_field(
-                        name="Duration", value=f"Streaming Live", inline=True)
-                embed.add_field(name="Uploader",
-                                value=info['uploader'], inline=True)
-
-                embed.set_author(name=ctx.message.author.name,
-                                 icon_url=ctx.message.author.avatar_url)
-                embed.set_footer(
-                    text=f"Requested by {ctx.author.name}", icon_url=ctx.author.avatar_url)
-                await ctx.reply(embed=embed)
-                await self.SimplifiedRecursiveNextSongPlayback(ctx)
+            await self.SimplifiedRecursiveNextSongPlayback(ctx)
         else:
             await ctx.send("> Queue is empty", delete_after=5.0)
 
@@ -133,7 +122,7 @@ class MusicMixin(DiscordInit, commands.Cog):
     async def SimplifiedRecursiveNextSongPlayback(self, ctx):
         if(len(self.SONG_QUEUE) > 0):
             flavour = self.SONG_QUEUE[0][0]
-            await ctx.send(f"> Playing Next Song from queue {self.SONG_QUEUE[0][1]}")
+            await ctx.send(f"> Playing Next Song from queue {self.SONG_QUEUE[0][1]} ~ _Req by {self.SONG_QUEUE[0][2]}_")
             voice = get(self.client.voice_clients, guild=ctx.guild)
             voice.play(FFmpegPCMAudio(flavour, **self.FFMPEG_OPTIONS))
             self.SONG_QUEUE.pop(0)
@@ -141,6 +130,10 @@ class MusicMixin(DiscordInit, commands.Cog):
 
     @commands.command(pass_context=True, aliases=['play', 'ytp', 'p'])
     async def rawplay(self, ctx, *, flavour='https://www.youtube.com/watch?v=dQw4w9WgXcQ', temp_flavour=None):
+        if('http' not in flavour):
+            await ctx.send("> Fetching Youtube Results ...", delete_after=2.0)
+            flavour = self.basicYTSearch(flavour)
+
         voice = get(self.client.voice_clients, guild=ctx.guild)
         await ctx.message.add_reaction(Emotes.PACPLAY)
         try:

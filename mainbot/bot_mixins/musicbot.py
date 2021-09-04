@@ -87,7 +87,7 @@ class MusicMixin(DiscordInit, commands.Cog):
     @commands.command(pass_context=True, aliases=['pnq', 'skip', 'next'])
     async def playNextQ(self, ctx):
         if(len(self.SONG_QUEUE) > 0):
-            await self.SimplifiedRecursiveNextSongPlayback(self, ctx)
+            await self.SimplifiedRecursiveNextSongPlayback(ctx)
         else:
             await ctx.send("> Queue is empty", delete_after=5.0)
 

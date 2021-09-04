@@ -30,6 +30,7 @@ class MusicMixin(DiscordInit, commands.Cog):
     IS_PLAYING = False
     PREV_SONG = None
     SONG_QUEUE = []
+    SERVER_SPLIT_QUEUEING = {}
 
     @commands.command()
     async def join(self, ctx, *, channel: discord.VoiceChannel):
@@ -90,7 +91,13 @@ class MusicMixin(DiscordInit, commands.Cog):
         else:
             await ctx.send("> Queue is empty", delete_after=5.0)
 
-    @commands.command(pass_context=True, aliases=['paq'])
+    # looping
+    @commands.command(pass_context=True, aliases=['loop'])
+    async def LoopDaMoosik(self, ctx):
+        await ctx.send(f"> Looping {self.SONG_QUEUE[0][1]}", delete_after=5.0)
+        ctx.voice_state.loop = not ctx.voice_state.loop
+
+    @commands.command(pass_context=True, aliases=['paq', 'addQueue', 'addq'])
     async def addQ(self, ctx, *, flavour):
         YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
         with YoutubeDL(YDL_OPTIONS) as ydl:
@@ -125,7 +132,7 @@ class MusicMixin(DiscordInit, commands.Cog):
         else:
             flavour = temp_flavour
 
-        if(not voice.is_playing()):
+        if(not ctx.voice.is_playing()):
             with YoutubeDL(self.YDL_OPTIONS) as ydl:
                 info = ydl.extract_info(flavour, download=False)
             URL = info['formats'][0]['url']
@@ -150,20 +157,8 @@ class MusicMixin(DiscordInit, commands.Cog):
 
             voice.play(FFmpegPCMAudio(URL, **self.FFMPEG_OPTIONS))
             voice.is_playing()
-
-            # make some hacky queue system for songs OwO
-            if(len(self.SONG_QUEUE) > 0):
-                self.SimplifiedRecursiveNextSongPlayback(self, ctx)
-
-        elif(self.IS_PLAYING):
-            with YoutubeDL(self.YDL_OPTIONS) as ydl:
-                info = ydl.extract_info(flavour, download=False)
-            URL = info['formats'][0]['url']
-            TITLE = info['title']
-            self.SONG_QUEUE.append(
-                [URL, TITLE, ctx.author.nick, round(info['duration']/60)])
-            await ctx.send(f"> Added {TITLE} to queue", delete_after=5.0)
-            return
+        elif(ctx.voice.is_playing()):
+            self.SimplifiedRecursiveNextSongPlayback(self, ctx)
         else:
             await ctx.message.add_reaction(Emotes.PACEXCLAIM)
             await ctx.send("> Nothing is playing", delete_after=5.0)
@@ -454,6 +449,8 @@ class MusicMixin(DiscordInit, commands.Cog):
             await ctx.message.add_reaction(Emotes.PACEXCLAIM)
             return await ctx.reply("> You're not in voice channel", delete_after=5.0)
 
+    @SimplifiedRecursiveNextSongPlayback.before_invoke
+    @playNextQ.before_invoke
     @rawplay.before_invoke
     @lofi.before_invoke
     async def ensure_voice(self, ctx):

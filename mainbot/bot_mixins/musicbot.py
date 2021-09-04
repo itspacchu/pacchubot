@@ -87,8 +87,7 @@ class MusicMixin(DiscordInit, commands.Cog):
     @commands.command(pass_context=True, aliases=['pnq', 'skip', 'next'])
     async def playNextQ(self, ctx):
         if(len(self.SONG_QUEUE) > 0):
-            with YoutubeDL(self.YDL_OPTIONS) as ydl:
-                info = ydl.extract_info(self.SONG_QUEUE[1][0], download=False)
+            info = self.SONG_QUEUE[0][4]
             URL = info['formats'][0]['url']
             async with ctx.typing():
                 embed = discord.Embed(
@@ -126,7 +125,7 @@ class MusicMixin(DiscordInit, commands.Cog):
         URL = info['formats'][0]['url']
         TITLE = info['title']
         self.SONG_QUEUE.append(
-            [URL, TITLE, ctx.author.nick, round(info['duration']/60)])
+            [URL, TITLE, ctx.author.nick, round(info['duration']/60), info])
         await ctx.message.add_reaction("👍")
         await ctx.send(f"> Added {TITLE} to queue", delete_after=5.0)
         return

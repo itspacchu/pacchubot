@@ -129,7 +129,7 @@ class MusicMixin(DiscordInit, commands.Cog):
             voice = get(self.client.voice_clients, guild=ctx.guild)
             voice.play(FFmpegPCMAudio(flavour, **self.FFMPEG_OPTIONS))
             self.SONG_QUEUE.pop(0)
-            self.SimplifiedRecursiveNextSongPlayback(ctx)
+            await self.SimplifiedRecursiveNextSongPlayback(ctx)
         else:
             await ctx.send(f"> End of queue reached !")
 

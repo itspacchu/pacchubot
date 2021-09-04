@@ -106,8 +106,11 @@ class MusicMixin(DiscordInit, commands.Cog):
             info = ydl.extract_info(flavour, download=False)
         URL = info['formats'][0]['url']
         TITLE = info['title']
-        self.SONG_QUEUE.append(
-            [URL, TITLE, ctx.author.nick, round(info['duration']/60), info])
+        try:
+            self.SONG_QUEUE.append(
+                [URL, TITLE, ctx.author.nick, round(info['duration']/60), info])
+        except:
+            self.SONG_QUEUE.append([URL, TITLE, ctx.author.nick, "LIVE", info])
         await ctx.message.add_reaction("👍")
         await ctx.send(f"> Added {TITLE} to queue")
 
@@ -140,7 +143,7 @@ class MusicMixin(DiscordInit, commands.Cog):
             flavour = temp_flavour
 
         if(not voice.is_playing()):
-            with YoutubeDL(self.YDL_OPTIONS) as ydl:
+            with YoutubeDL(ytdl_format_options) as ydl:
                 info = ydl.extract_info(flavour, download=False)
             URL = info['formats'][0]['url']
             async with ctx.typing():

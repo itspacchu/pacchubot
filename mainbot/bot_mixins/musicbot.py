@@ -107,7 +107,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                 embed.set_footer(
                     text=f"Requested by {ctx.author.name}", icon_url=ctx.author.avatar_url)
                 await ctx.reply(embed=embed)
-            await self.SimplifiedRecursiveNextSongPlayback(ctx)
+                await self.SimplifiedRecursiveNextSongPlayback(ctx)
         else:
             await ctx.send("> Queue is empty", delete_after=5.0)
 

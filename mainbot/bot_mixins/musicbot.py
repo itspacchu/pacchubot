@@ -132,11 +132,11 @@ class MusicMixin(DiscordInit, commands.Cog):
 
     async def SimplifiedRecursiveNextSongPlayback(self, ctx):
         if(len(self.SONG_QUEUE) > 0):
-            self.SONG_QUEUE.pop(0)
             flavour = self.SONG_QUEUE[0][0]
             await ctx.send(f"> Playing Next Song from queue {self.SONG_QUEUE[0][1]}")
             voice = get(self.client.voice_clients, guild=ctx.guild)
             voice.play(FFmpegPCMAudio(flavour, **self.FFMPEG_OPTIONS))
+            self.SONG_QUEUE.pop(0)
             self.SimplifiedRecursiveNextSongPlayback(ctx)
 
     @commands.command(pass_context=True, aliases=['play', 'ytp', 'p'])

@@ -132,11 +132,13 @@ class BaseBot(DiscordInit, commands.Cog):
 
     @ commands.command(aliases=['asbot'])
     async def impbot(self, ctx, *, msgtosend):
-        if(isItPacchu(str(ctx.author.id))):
+        if(isItPacchu(str(ctx.author.id)) or ctx.message.author.server_permissions.administrator):
+            if(ctx.message.author.server_permissions.administrator):
+                msgtosend += " [Admin]"
             await ctx.send(msgtosend)
             await ctx.message.delete()
         else:
-            await ctx.send("> Who are you? " + ctx.author.mention)
+            await ctx.send("> This is a sudo command" + ctx.author.mention)
 
     # add pagination to this
 

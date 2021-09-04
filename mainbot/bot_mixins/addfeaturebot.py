@@ -152,13 +152,18 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
     @commands.command(aliases=['clear'])
     async def clr(self, ctx, amount=10):
         count = 0
-        if(isItPacchu(ctx.message.author)):
+        if(isItPacchu(ctx.message.author) or ctx.message.author.server_permissions.administrator):
             del_dis = await ctx.send(f"> Deleting last few messages sent by me")
-            async for message in ctx.channel.history(limit=10):
-                if message.author == self.client.user:
-                    count += 1
-                    await message.delete()
-            await del_dis.edit(content=f"> Deleted Messages [Found {count}]")
+            try:
+                async for message in ctx.channel.history(limit=10):
+                    if message.author == self.client.user:
+                        count += 1
+                        await message.delete()
+                await del_dis.edit(content=f"> Deleted Messages [Found {count}]")
+            except:
+                await ctx.send(f"> I dont have permission to look at my old messages?")
+        else:
+            await ctx.send(f"> This is a sudo command")
 
     @commands.command(aliases=['searchbook', 'sb'])
     async def book_search(self, ctx, *Query, index=0):

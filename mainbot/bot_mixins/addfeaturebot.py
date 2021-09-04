@@ -149,6 +149,17 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
         except requests.ConnectionError as exception:
             pass
 
+    @commands.command(aliases=['clear'])
+    async def clr(self, ctx, amount=10):
+        count = 0
+        if(isItPacchu(ctx.message.author)):
+            del_dis = await ctx.send(f"> Deleting last few messages sent by me")
+            async for message in ctx.channel.history(limit=10):
+                if message.author == self.client.user:
+                    count += 1
+                    await message.delete()
+            await del_dis.edit(content=f"> Deleted Messages [Found {count}]")
+
     @commands.command(aliases=['searchbook', 'sb'])
     async def book_search(self, ctx, *Query, index=0):
         await ctx.message.add_reaction('🔎')

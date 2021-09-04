@@ -132,7 +132,7 @@ class MusicMixin(DiscordInit, commands.Cog):
         else:
             flavour = temp_flavour
 
-        if(not ctx.voice.is_playing()):
+        if(not voice.is_playing()):
             with YoutubeDL(self.YDL_OPTIONS) as ydl:
                 info = ydl.extract_info(flavour, download=False)
             URL = info['formats'][0]['url']
@@ -158,7 +158,15 @@ class MusicMixin(DiscordInit, commands.Cog):
             voice.play(FFmpegPCMAudio(URL, **self.FFMPEG_OPTIONS))
             voice.is_playing()
         elif(ctx.voice.is_playing()):
-            self.SimplifiedRecursiveNextSongPlayback(self, ctx)
+            YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
+            with YoutubeDL(YDL_OPTIONS) as ydl:
+                info = ydl.extract_info(flavour, download=False)
+            URL = info['formats'][0]['url']
+            TITLE = info['title']
+            self.SONG_QUEUE.append(
+                [URL, TITLE, ctx.author.nick, round(info['duration']/60)])
+            await ctx.message.add_reaction("👍")
+            await ctx.send(f"> Added {TITLE} to queue", delete_after=5.0)
         else:
             await ctx.message.add_reaction(Emotes.PACEXCLAIM)
             await ctx.send("> Nothing is playing", delete_after=5.0)

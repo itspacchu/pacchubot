@@ -134,6 +134,8 @@ class MusicMixin(DiscordInit, commands.Cog):
             voice.play(FFmpegPCMAudio(flavour, **self.FFMPEG_OPTIONS))
             self.SONG_QUEUE.pop(0)
             self.SimplifiedRecursiveNextSongPlayback(ctx)
+        else:
+            await ctx.send(f"> End of queue reached !")
 
     @commands.command(pass_context=True, aliases=['play', 'ytp', 'p'])
     async def rawplay(self, ctx, *, flavour='https://www.youtube.com/watch?v=dQw4w9WgXcQ', temp_flavour=None):
@@ -177,6 +179,8 @@ class MusicMixin(DiscordInit, commands.Cog):
 
             voice.play(FFmpegPCMAudio(URL, **self.FFMPEG_OPTIONS))
             voice.is_playing()
+            self.SimplifiedRecursiveNextSongPlayback(ctx)
+
         elif(ctx.voice.is_playing()):
             YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
             with YoutubeDL(YDL_OPTIONS) as ydl:

@@ -120,16 +120,12 @@ class MusicMixin(DiscordInit, commands.Cog):
         self.SONG_QUEUE.append(
             [URL, TITLE, ctx.author.nick, round(info['duration']/60), info])
         await ctx.message.add_reaction("👍")
-        await ctx.send(f"> Added {TITLE} to queue", components=[
-            Button(style=ButtonStyle.URL, label="Youtube",
-                   url=URL),
-        ])
-        return
+        await ctx.send(f"> Added {TITLE} to queue")
 
     async def SimplifiedRecursiveNextSongPlayback(self, ctx):
         if(len(self.SONG_QUEUE) > 0):
             flavour = self.SONG_QUEUE[0][0]
-            await ctx.send(f"> Playing Next Song from queue {self.SONG_QUEUE[0][1]} ~ _Req by {self.SONG_QUEUE[0][2]}_")
+            await ctx.send(f"> Playing Next Song from queue {self.SONG_QUEUE[0][1]} ~ Req by {self.SONG_QUEUE[0][2]}")
             voice = get(self.client.voice_clients, guild=ctx.guild)
             voice.play(FFmpegPCMAudio(flavour, **self.FFMPEG_OPTIONS))
             self.SONG_QUEUE.pop(0)

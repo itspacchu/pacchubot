@@ -87,6 +87,27 @@ class MusicMixin(DiscordInit, commands.Cog):
     @commands.command(pass_context=True, aliases=['pnq', 'skip', 'next'])
     async def playNextQ(self, ctx):
         if(len(self.SONG_QUEUE) > 0):
+            with YoutubeDL(self.YDL_OPTIONS) as ydl:
+                info = ydl.extract_info(self.SONG_QUEUE[1][0], download=False)
+            URL = info['formats'][0]['url']
+            async with ctx.typing():
+                embed = discord.Embed(
+                    title=f"**Playing** {info['title']}", colour=find_dominant_color(info['thumbnails'][0]['url']), url=URL, description=f"```{info['description'][:200]} ...```")
+                embed.set_image(url=info['thumbnails'][-1]['url'])
+                try:
+                    embed.add_field(
+                        name="Duration", value=f"{int(info['duration']/60)}:{int(info['duration']%60)} mins", inline=True)
+                except:
+                    embed.add_field(
+                        name="Duration", value=f"Streaming Live", inline=True)
+                embed.add_field(name="Uploader",
+                                value=info['uploader'], inline=True)
+
+                embed.set_author(name=ctx.message.author.name,
+                                 icon_url=ctx.message.author.avatar_url)
+                embed.set_footer(
+                    text=f"Requested by {ctx.author.name}", icon_url=ctx.author.avatar_url)
+                await ctx.reply(embed=embed)
             await self.SimplifiedRecursiveNextSongPlayback(ctx)
         else:
             await ctx.send("> Queue is empty", delete_after=5.0)

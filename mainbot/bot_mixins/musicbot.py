@@ -108,6 +108,10 @@ class MusicMixin(DiscordInit, commands.Cog):
 
     @commands.command(pass_context=True, aliases=['paq', 'addQueue', 'addq'])
     async def addQ(self, ctx, *, flavour):
+        if('http' not in flavour):
+            await ctx.send("> Searching on Youtube ...", delete_after=2.0)
+            flavour = self.basicYTSearch(flavour)
+
         YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
         with YoutubeDL(YDL_OPTIONS) as ydl:
             info = ydl.extract_info(flavour, download=False)
@@ -116,7 +120,10 @@ class MusicMixin(DiscordInit, commands.Cog):
         self.SONG_QUEUE.append(
             [URL, TITLE, ctx.author.nick, round(info['duration']/60), info])
         await ctx.message.add_reaction("👍")
-        await ctx.send(f"> Added {TITLE} to queue", delete_after=5.0)
+        await ctx.send(f"> Added {TITLE} to queue", components=[
+            Button(style=ButtonStyle.URL, label="Youtube",
+                   url=URL),
+        ])
         return
 
     async def SimplifiedRecursiveNextSongPlayback(self, ctx):
@@ -166,7 +173,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                                  icon_url=ctx.message.author.avatar_url)
                 embed.set_footer(
                     text=f"Requested by {ctx.author.name}", icon_url=ctx.author.avatar_url)
-                await ctx.reply(embed=embed)
+                await ctx.send(embed=embed)
 
             voice.play(FFmpegPCMAudio(URL, **self.FFMPEG_OPTIONS))
             voice.is_playing()
@@ -182,7 +189,7 @@ class MusicMixin(DiscordInit, commands.Cog):
             await ctx.send(f"> Added {TITLE} to queue", delete_after=5.0)
         else:
             await ctx.message.add_reaction(Emotes.PACEXCLAIM)
-            await ctx.send("> Nothing is playing", delete_after=5.0)
+            await ctx.send("> Nothing's playing", delete_after=5.0)
 
     @commands.command(aliases=['podepi'])
     async def podepisode(self, ctx, epno=0):
@@ -384,10 +391,6 @@ class MusicMixin(DiscordInit, commands.Cog):
             elif(await ButtonProcessor(ctx, res, "Next Search Result")):
                 await del_dis.delete()
                 await ctx.invoke(self.client.get_command('pod'), strparse=strparse, pgNo=0, searchIndex=searchIndex+1)
-                break
-            elif len(ctx.voice_client.channel.members) < 2:
-                await ctx.send("> Dont leave me alone " + ctx.author.mention + Emotes.PACDEPRESS)
-                await ctx.voice_client.disconnect()
                 break
 
     async def playPodcast(self, context, podepi, currentpod):

@@ -80,12 +80,13 @@ class MusicMixin(DiscordInit, commands.Cog):
         else:
             await ctx.send("> Queue is empty", delete_after=5.0)
 
-    @commands.command(pass_context=True, aliases=['pnq'])
+    @commands.command(pass_context=True, aliases=['pnq', 'skip', 'next'])
     async def playNextQ(self, ctx):
         if(len(self.SONG_QUEUE) > 0):
             self.SONG_QUEUE.pop(0)
             flavour = self.SONG_QUEUE[0][0]
-            await ctx.invoke(self.client.get_command('rawplay'), ctx=ctx, flavour=flavour)
+            await ctx.send(f"> Playing Next Song from queue {self.SONG_QUEUE[0][1]}", delete_after=5.0)
+            await ctx.invoke(self.client.get_command('rawplay'), ctx=ctx, temp_flavour=flavour)
         else:
             await ctx.send("> Queue is empty", delete_after=5.0)
 
@@ -98,19 +99,20 @@ class MusicMixin(DiscordInit, commands.Cog):
         TITLE = info['title']
         self.SONG_QUEUE.append(
             [URL, TITLE, ctx.author.nick, round(info['duration']/60)])
+        await ctx.message.add_reaction("👍")
         await ctx.send(f"> Added {TITLE} to queue", delete_after=5.0)
         return
 
     @commands.command(pass_context=True, aliases=['play', 'ytp', 'p'])
-    async def rawplay(self, ctx, *, flavour='https://www.youtube.com/watch?v=dQw4w9WgXcQ'):
+    async def rawplay(self, ctx, *, flavour='https://www.youtube.com/watch?v=dQw4w9WgXcQ', temp_flavour=None):
         YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
         FFMPEG_OPTIONS = {
             'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
         voice = get(self.client.voice_clients, guild=ctx.guild)
-        try:
-            await ctx.message.delete()
-        except:
+        if(temp_flavour == None):
             pass
+        else:
+            flavour = temp_flavour
 
         if(not voice.is_playing()):
             with YoutubeDL(YDL_OPTIONS) as ydl:
@@ -131,8 +133,9 @@ class MusicMixin(DiscordInit, commands.Cog):
 
                 embed.set_author(name=ctx.message.author.name,
                                  icon_url=ctx.message.author.avatar_url)
-                embed.set_footer(text=self.name, icon_url=self.avatar)
-                await ctx.send(embed=embed)
+                embed.set_footer(
+                    text=f"Requested by {ctx.author.name}", icon_url=ctx.author.avatar_url)
+                await ctx.reply(embed=embed)
 
             voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
             voice.is_playing()
@@ -143,7 +146,8 @@ class MusicMixin(DiscordInit, commands.Cog):
                 flavour = self.SONG_QUEUE[0][0]
                 await ctx.invoke(self.client.get_command('rawplay'), flavour=flavour)
             else:
-                await ctx.send("> Queue is empty", delete_after=5.0)
+                await ctx.message.add_reaction(Emotes.PACEXCLAIM)
+                await ctx.reply("> Queue is empty", delete_after=5.0)
 
         elif(self.IS_PLAYING):
             with YoutubeDL(YDL_OPTIONS) as ydl:
@@ -155,13 +159,8 @@ class MusicMixin(DiscordInit, commands.Cog):
             await ctx.send(f"> Added {TITLE} to queue", delete_after=5.0)
             return
         else:
+            await ctx.message.add_reaction(Emotes.PACEXCLAIM)
             await ctx.send("> Nothing is playing", delete_after=5.0)
-
-    @commands.command(pass_context=True, aliases=['skip', 'n'])
-    async def next(self, ctx):
-        self.SONG_QUEUE.pop(0)
-        flavour = self.SONG_QUEUE[0][0]
-        await ctx.invoke(self.client.get_command('rawplay'), flavour=flavour)
 
     @commands.command(aliases=['podepi'])
     async def podepisode(self, ctx, epno=0):
@@ -203,6 +202,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                     pass
                 await ctx.send(embed=embed)
             except AttributeError:
+                await ctx.message.add_reaction(Emotes.PACEXCLAIM)
                 await ctx.send("> No Episode found")
 
     @commands.command(aliases=['podp'])
@@ -390,6 +390,7 @@ class MusicMixin(DiscordInit, commands.Cog):
             mp3link, before_options=ffmpeg_options), volume=100)
         if not voice_client.is_playing():
             voice_client.play(audio_source, after=None)
+            await ctx.guild.change_voice_state(channel=ctx.author.voice.channel, self_mute=False, self_deaf=True)
 
         while ctx.voice_client.is_connected():
             if len(ctx.voice_client.channel.members) == 1:

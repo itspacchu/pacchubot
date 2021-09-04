@@ -173,10 +173,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                                  icon_url=ctx.message.author.avatar_url)
                 embed.set_footer(
                     text=f"Requested by {ctx.author.name}", icon_url=ctx.author.avatar_url)
-                await ctx.send(embed=embed, components=[[
-                    Button(style=ButtonStyle.URL, label="Youtube",
-                           url=URL),
-                ]])
+                await ctx.send(embed=embed)
 
             voice.play(FFmpegPCMAudio(URL, **self.FFMPEG_OPTIONS))
             voice.is_playing()

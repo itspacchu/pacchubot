@@ -175,7 +175,8 @@ class MusicMixin(DiscordInit, commands.Cog):
 
             voice.play(FFmpegPCMAudio(URL, **self.FFMPEG_OPTIONS))
             voice.is_playing()
-            self.SimplifiedRecursiveNextSongPlayback(ctx)
+            # check for queue
+            await self.SimplifiedRecursiveNextSongPlayback(ctx)
 
         elif(ctx.voice.is_playing()):
             YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}

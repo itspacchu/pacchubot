@@ -29,9 +29,9 @@ class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
     @commands.command()
     async def sigma(self, ctx):
         await ctx.send("Calculating chance you you having a partner")
-        progbar = await ctx.send("[>          ]")
+        progbar = await ctx.send("```[>          ]```")
         for i in range(5):
-            await progbar.edit(content="[" + "="*i*2 + ">" + " "*(11-(i*2)) + "]")
+            await progbar.edit(content="```[" + "="*i*2 + ">" + " "*(11-(i*2)) + "]```")
             await asyncio.sleep(2)
         await progbar.delete()
         await ctx.send(f"> You have a {randint(0,950)/10}% of finding a partner partner")

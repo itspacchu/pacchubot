@@ -33,7 +33,9 @@ class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
         progbar = await ctx.send("```[>          ]```")
         for i in range(5):
             await progbar.edit(content="```[" + "="*i*2 + ">" + " "*(11-(i*2)) + "]```")
-            await asyncio.sleep(2)
+            await asyncio.sleep(1.3)
+        await progbar.edit(content="```[===========]```")
+        await asyncio.sleep(1.3)
         await progbar.delete()
         await ctx.send(f"> You have a {randint(0,950)/10}% of finding a partner partner")
 

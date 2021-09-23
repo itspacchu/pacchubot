@@ -100,6 +100,7 @@ class MusicMixin(DiscordInit, commands.Cog):
     @commands.command(pass_context=True, aliases=['pnq', 'skip', 'next'])
     async def playNextQ(self, ctx):
         if(len(self.SONG_QUEUE[ctx.guild.id]) > 0):
+            self.CURRENT_SONG = self.SONG_QUEUE[ctx.guild.id][0]
             await self.SimplifiedRecursiveNextSongPlayback(ctx)
         else:
             await ctx.send("> Queue is empty", delete_after=5.0)
@@ -146,8 +147,9 @@ class MusicMixin(DiscordInit, commands.Cog):
             wait_for = self.SONG_QUEUE[ctx.guild.id][0][3]
             if(self.LOOP_SONG == False):
                 self.SONG_QUEUE[ctx.guild.id].pop(0)
-            await asyncio.sleep(wait_for+1.5)
+            await asyncio.sleep(wait_for+5)
             if(len(self.SONG_QUEUE[ctx.guild.id]) > 0):
+                self.CURRENT_SONG = self.SONG_QUEUE[ctx.guild.id][0]
                 await self.SimplifiedRecursiveNextSongPlayback(ctx)
         else:
             await ctx.send(f"> Reached End of Queue!")

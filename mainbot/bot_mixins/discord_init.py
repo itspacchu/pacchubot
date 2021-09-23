@@ -94,12 +94,16 @@ class BaseBot(DiscordInit, commands.Cog):
         embed = discord.Embed(colour=discord.Colour(0x27ce89))
         embed.add_field(
             name="Latency", value=f"{round(self.client.latency,2)} ms")
+
+        embed.add_field(
+            name="Host Location", value=f"South East Asia MUMBAI Oracle")
+
         embed.add_field(name="CPU Load",
-                        value=f"{round(psutil.cpu_freq().current/1024,2)}Ghz")
+                        value=f"{round(psutil.cpu_percent(4))}% Usage")
         embed.add_field(
-            name="Memory Load", value=f'{round(psutil.virtual_memory().available/1024**2,2)} MB')
+            name="Memory Load", value=f'{round(psutil.virtual_memory().available/1024**2,2)} MB / 900MB')
         embed.add_field(
-            name="Servers", value=f"Active in {str(len(self.client.guilds))} Servers", inline=True)
+            name="Servers", value=f"Sneaking in {str(len(self.client.guilds))} Servers", inline=True)
         await better_send(ctx, embed=embed)
 
     @ commands.command()
@@ -128,7 +132,7 @@ class BaseBot(DiscordInit, commands.Cog):
             statustxt = newstatus
             await self.client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=statustxt))
         else:
-            await ctx.send("> Only my creator has the authority over that!!" + ctx.author.mention)
+            await ctx.send("> **SUDO COMMAND** Only my creator has the authority over that!!" + ctx.author.mention)
 
     @ commands.command(aliases=['asbot'])
     async def impbot(self, ctx, *, msgtosend):
@@ -138,7 +142,7 @@ class BaseBot(DiscordInit, commands.Cog):
             await ctx.send(msgtosend)
             await ctx.message.delete()
         else:
-            await ctx.send("> This is a sudo command" + ctx.author.mention)
+            await ctx.send("> **SUDO COMMAND** This is a sudo command " + ctx.author.mention)
 
     # add pagination to this
 

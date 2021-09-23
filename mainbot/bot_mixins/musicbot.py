@@ -80,11 +80,14 @@ class MusicMixin(DiscordInit, commands.Cog):
         try:
             embed = discord.Embed(title=f"{ctx.guild.name}'s music Queue")
             totquetime = 0
-            embed.add_field(name=f"**{self.CURRENT_SONG[ctx.guild.id][1]}** Now Playing",
-                            value=f"{self.CURRENT_SONG[ctx.guild.id][3]} mins \nRequested by {self.CURRENT_SONG[ctx.guild.id][2]}", inline=False)
+            try:
+                embed.add_field(name=f"**{self.CURRENT_SONG[ctx.guild.id][1]}** Now Playing",
+                                value=f"{self.CURRENT_SONG[ctx.guild.id][3]/60} mins \nRequested by {self.CURRENT_SONG[ctx.guild.id][2]}", inline=False)
+            except:
+                pass
             if(len(self.SONG_QUEUE[ctx.guild.id]) > 0):
                 for SONGURL in self.SONG_QUEUE[ctx.guild.id]:
-                    totquetime += SONGURL[3]
+                    totquetime += SONGURL[3]/60
                     embed.add_field(
                         name=f"{SONGURL[1]}", value=f"{SONGURL[3]} mins \nRequested by {SONGURL[2]}", inline=False)
                 embed.set_footer(
@@ -100,10 +103,41 @@ class MusicMixin(DiscordInit, commands.Cog):
     @commands.command(pass_context=True, aliases=['pnq', 'skip', 'next'])
     async def playNextQ(self, ctx):
         if(len(self.SONG_QUEUE[ctx.guild.id]) > 0):
-            self.CURRENT_SONG = self.SONG_QUEUE[ctx.guild.id][0]
+            try:
+                self.CURRENT_SONG = self.SONG_QUEUE[ctx.guild.id][0]
+            except:
+                pass
             await self.SimplifiedRecursiveNextSongPlayback(ctx)
         else:
             await ctx.send("> Queue is empty", delete_after=5.0)
+
+# ==========================================================================================
+
+    @commands.command()
+    async def nowplaying(self, ctx):
+        info = self.CURRENT_SONG[ctx.guild.id][-1]
+        async with ctx.typing():
+            embed = discord.Embed(
+                title=f"**Playing** {info['title']}", colour=find_dominant_color(info['thumbnails'][0]['url']), url=URL, description=f"```{info['description'][:200]} ...```")
+            embed.set_image(url=info['thumbnails'][-1]['url'])
+            try:
+                if(info['duration'] > 0):
+                    embed.add_field(
+                        name="Duration", value=f"{int(info['duration']/60)}:{int(info['duration']%60)} mins", inline=True)
+                else:
+                    embed.add_field(
+                        name="Duration", value=f"Streaming Live", inline=True)
+            except:
+                embed.add_field(
+                    name="Duration", value=f"Streaming Live", inline=True)
+                embed.add_field(name="Uploader",
+                                value=info['uploader'], inline=True)
+
+                embed.set_author(name=ctx.message.author.name,
+                                 icon_url=ctx.message.author.avatar_url)
+                embed.set_footer(
+                    text=f"Requested by {ctx.author.name}", icon_url=ctx.author.avatar_url)
+            await ctx.send(embed=embed)
 
 # ==========================================================================================
 
@@ -199,9 +233,10 @@ class MusicMixin(DiscordInit, commands.Cog):
                 embed.set_footer(
                     text=f"Requested by {ctx.author.name}", icon_url=ctx.author.avatar_url)
                 await ctx.send(embed=embed)
-            self.SONG_QUEUE[ctx.guild.id] = []
-            self.CURRENT_SONG[ctx.guild.id] = [
-                URL, info['title'], ctx.author.nick, info['duration'], info]  # making new list
+                if(self.SONG_QUEUE == 0):
+                    self.SONG_QUEUE[ctx.guild.id] = []
+                    self.CURRENT_SONG[ctx.guild.id] = [
+                        URL, info['title'], ctx.author.nick, info['duration'], info]  # making new list
             voice.play(FFmpegPCMAudio(URL, **self.FFMPEG_OPTIONS))
             voice.is_playing()
             # check for queue

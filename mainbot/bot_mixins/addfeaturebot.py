@@ -107,7 +107,7 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
                                url=le_url + activity.track_id),
                         Button(style=ButtonStyle.green, label="Spotify",
                                url=song_url_if_exists),
-                    ], ], delete_after=20)
+                    ], ])
         if(flag == 0):
             embed = discord.Embed(
                 title=f"{user.name}'s Spotify",

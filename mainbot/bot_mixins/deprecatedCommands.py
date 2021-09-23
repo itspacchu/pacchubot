@@ -22,13 +22,13 @@ class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
     async def quote(self, ctx):
         try:
             webhook = await ctx.channel.create_webhook(name="pacchu_webhook")
-            SOMESTUFF = requests.get(
-                "https://api.quotable.io/random").json()
-            await webhook.send(SOMESTUFF['content'], username=SOMESTUFF['author'], avatar_url="https://i.imgur.com/vWgiDHR.png")
+            SOMESTUFF = requests.get("https://api.quotable.io/random").json()
+            await asyncio.sleep(0.5)
+            await webhook.send(str(SOMESTUFF['content']), username=SOMESTUFF['author'], avatar_url="https://i.imgur.com/vWgiDHR.png")
             await ctx.channel.webhooks()
             await webhook.delete()
         except Exception as e:
-            await ctx.send(f"That no longer exists :( rip ecchichan 2020-2020 {e}")
+            await ctx.send(f"Failed to fetch {e}")
 
     @commands.command(aliases=['pappu', 'lundi', 'seggs', 'sex', '69'])
     async def fuck(self, ctx):

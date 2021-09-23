@@ -18,6 +18,7 @@ class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
         except:
             ctx.send("That no longer exists :( rip ecchichan 2020-2020")
 
+    @commands.command()
     async def quote(self, ctx):
         try:
             webhook = await ctx.channel.create_webhook(name="pacchu_webhook")

@@ -28,7 +28,7 @@ class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
 
     @commands.command()
     async def sigma(self, ctx):
-        await ctx.add_reaction("♎")
+        await ctx.message.add_reaction("♎")
         await ctx.send("Calculating chance you you having a partner")
         progbar = await ctx.send("```[>          ]```")
         for i in range(5):

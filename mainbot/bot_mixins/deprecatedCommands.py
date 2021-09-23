@@ -20,15 +20,15 @@ class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
 
     @commands.command()
     async def quote(self, ctx):
+        SOMESTUFF = requests.get("https://api.quotable.io/random").json()
         try:
             webhook = await ctx.channel.create_webhook(name="pacchu_webhook")
-            SOMESTUFF = requests.get("https://api.quotable.io/random").json()
             await asyncio.sleep(0.5)
             await webhook.send(str(SOMESTUFF['content']), username=SOMESTUFF['author'], avatar_url="https://i.imgur.com/vWgiDHR.png")
             await ctx.channel.webhooks()
             await webhook.delete()
         except ValueError as e:
-            await ctx.send(f"Failed to fetch {e}")
+            await ctx.send(str(SOMESTUFF['content']))
 
     @commands.command(aliases=['pappu', 'lundi', 'seggs', 'sex', '69'])
     async def fuck(self, ctx):

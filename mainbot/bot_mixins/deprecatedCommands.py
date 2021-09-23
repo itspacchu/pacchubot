@@ -4,6 +4,7 @@ from ..settings import *
 from ..perks import perkdict
 from random import randint
 from .discord_init import DiscordInit
+import requests
 
 
 class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
@@ -12,6 +13,17 @@ class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
         try:
             webhook = await ctx.channel.create_webhook(name="pacchu_webhook")
             await webhook.send("That no longer exists :( rip ecchichan 2020-2020", username="ecchichan", avatar_url="https://i.redd.it/5xkpkqjoz9g11.jpg")
+            await ctx.channel.webhooks()
+            await webhook.delete()
+        except:
+            ctx.send("That no longer exists :( rip ecchichan 2020-2020")
+
+    async def quote(self, ctx):
+        try:
+            webhook = await ctx.channel.create_webhook(name="pacchu_webhook")
+            SOMESTUFF = requests.get(
+                "https://api.quotable.io/random").json()
+            await webhook.send(SOMESTUFF['content'], username=SOMESTUFF['author'], avatar_url="https://i.imgur.com/vWgiDHR.png")
             await ctx.channel.webhooks()
             await webhook.delete()
         except:
@@ -29,7 +41,7 @@ class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
     @commands.command()
     async def sigma(self, ctx):
         await ctx.message.add_reaction("♎")
-        await ctx.send("Calculating chance you you having a partner")
+        await ctx.send("Calculating chance you having a partner")
         progbar = await ctx.send("```[>          ]```")
         for i in range(5):
             await progbar.edit(content="```[" + "="*i*2 + ">" + " "*(11-(i*2)) + "]```")

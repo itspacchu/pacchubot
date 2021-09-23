@@ -88,7 +88,7 @@ class DiscordInit:
 
 class BaseBot(DiscordInit, commands.Cog):
 
-    @ commands.command()
+    @commands.command()
     async def ping(self, ctx):
         await ctx.message.add_reaction('⌚')
         embed = discord.Embed(colour=discord.Colour(0x27ce89))

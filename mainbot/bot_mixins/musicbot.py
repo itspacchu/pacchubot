@@ -201,7 +201,7 @@ class MusicMixin(DiscordInit, commands.Cog):
             await ctx.message.add_reaction(Emotes.PACEXCLAIM)
             await ctx.send("> Nothing's playing", delete_after=5.0)
 
-    @commands.command(aliases=['podepi', "podepisode"])
+    @commands.command(aliases=['podepi'])
     async def podepisode(self, ctx, epno=0):
         await ctx.message.add_reaction('🔍')
         podepi = epno

@@ -24,7 +24,7 @@ class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
         try:
             webhook = await ctx.channel.create_webhook(name="pacchu_webhook")
             await asyncio.sleep(0.5)
-            await webhook.send(str(SOMESTUFF['content']), username=SOMESTUFF['author'], avatar_url="https://i.imgur.com/vWgiDHR.png")
+            await webhook.send(str(SOMESTUFF['content']), username=str(SOMESTUFF['author'][:10]), avatar_url="https://i.imgur.com/vWgiDHR.png")
             await ctx.channel.webhooks()
             await webhook.delete()
         except ValueError as e:

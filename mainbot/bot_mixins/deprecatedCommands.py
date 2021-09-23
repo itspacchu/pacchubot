@@ -27,7 +27,7 @@ class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
             await webhook.send(str(SOMESTUFF['content']), username=SOMESTUFF['author'], avatar_url="https://i.imgur.com/vWgiDHR.png")
             await ctx.channel.webhooks()
             await webhook.delete()
-        except Exception as e:
+        except ValueError as e:
             await ctx.send(f"Failed to fetch {e}")
 
     @commands.command(aliases=['pappu', 'lundi', 'seggs', 'sex', '69'])

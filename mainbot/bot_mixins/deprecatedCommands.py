@@ -28,7 +28,7 @@ class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
             await ctx.channel.webhooks()
             await webhook.delete()
         except Exception as e:
-            await ctx.send("That no longer exists :( rip ecchichan 2020-2020 " + e)
+            await ctx.send(f"That no longer exists :( rip ecchichan 2020-2020 {e}")
 
     @commands.command(aliases=['pappu', 'lundi', 'seggs', 'sex', '69'])
     async def fuck(self, ctx):

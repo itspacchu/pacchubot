@@ -50,7 +50,7 @@ class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
         await progbar.edit(content="```[===========]```")
         await asyncio.sleep(1.3)
         await progbar.delete()
-        await ctx.send(f"> You have a {randint(0,950)/10}% of finding a partner partner")
+        await ctx.send(f"> You have a {randint(0,950)/10}% of finding a partner partner {ctx.author.mention}")
 
     @commands.command(aliases=['seski'])
     async def simp(self, ctx):

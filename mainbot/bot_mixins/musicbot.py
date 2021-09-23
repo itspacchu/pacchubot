@@ -71,20 +71,23 @@ class MusicMixin(DiscordInit, commands.Cog):
 
     @commands.command(pass_context=True, aliases=['q'])
     async def queue(self, ctx):
-        embed = discord.Embed(title=f"{ctx.guild.name}'s music Queue")
-        totquetime = 0
-        embed.add_field(name=f"**{self.CURRENT_SONG[ctx.guild.id][1]}** Now Playing",
-                        value=f"{self.CURRENT_SONG[ctx.guild.id][3]} mins \nRequested by {self.CURRENT_SONG[ctx.guild.id][2]}", inline=False)
-        if(len(self.SONG_QUEUE[ctx.guild.id]) > 0):
-            for SONGURL in self.SONG_QUEUE[ctx.guild.id]:
-                totquetime += SONGURL[3]
-                embed.add_field(
-                    name=f"{SONGURL[1]}", value=f"{SONGURL[3]} mins \nRequested by {SONGURL[2]}", inline=False)
-            embed.set_footer(
-                text=f"Runtime {totquetime} minutes", icon_url=self.avatar)
-            await ctx.send(embed=embed)
-        else:
-            await ctx.send("> Queue is empty", delete_after=5.0)
+        try:
+            embed = discord.Embed(title=f"{ctx.guild.name}'s music Queue")
+            totquetime = 0
+            embed.add_field(name=f"**{self.CURRENT_SONG[ctx.guild.id][1]}** Now Playing",
+                            value=f"{self.CURRENT_SONG[ctx.guild.id][3]} mins \nRequested by {self.CURRENT_SONG[ctx.guild.id][2]}", inline=False)
+            if(len(self.SONG_QUEUE[ctx.guild.id]) > 0):
+                for SONGURL in self.SONG_QUEUE[ctx.guild.id]:
+                    totquetime += SONGURL[3]
+                    embed.add_field(
+                        name=f"{SONGURL[1]}", value=f"{SONGURL[3]} mins \nRequested by {SONGURL[2]}", inline=False)
+                embed.set_footer(
+                    text=f"Runtime {totquetime} minutes", icon_url=self.avatar)
+                await ctx.send(embed=embed)
+            else:
+                await ctx.send("> Queue is empty", delete_after=5.0)
+        except KeyError as e:
+            await ctx.send(f"> {ctx.guild.name}'s Queue is empty", delete_after=5.0)
 
     @commands.command(pass_context=True, aliases=['pnq', 'skip', 'next'])
     async def playNextQ(self, ctx):

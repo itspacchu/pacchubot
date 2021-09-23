@@ -173,7 +173,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                 embed.set_footer(
                     text=f"Requested by {ctx.author.name}", icon_url=ctx.author.avatar_url)
                 await ctx.send(embed=embed)
-
+            self.SONG_QUEUE[ctx.guild.id] = []  # making new list
             voice.play(FFmpegPCMAudio(URL, **self.FFMPEG_OPTIONS))
             voice.is_playing()
             # check for queue

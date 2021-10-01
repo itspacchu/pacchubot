@@ -40,7 +40,7 @@ distortionTypes = [lambda i, j:[2*np.sin(i/100) + 2, 2*np.sin(j/100) + 2],
 
 async def ButtonProcessor(ctx, res, label: str, userCheck=True):
     try:
-        if(res.component.label == label and res.channel == ctx.channel and res.id == ctx.message.id):
+        if(res.component.label == label and res.channel == ctx.channel):
             if(res.author.id == ctx.author.id or not userCheck):
                 return True
             else:

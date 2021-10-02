@@ -77,9 +77,9 @@ class MusicMixin(DiscordInit, commands.Cog):
             for SONGURL in self.SONG_QUEUE[ctx.guild.id]:
                 totquetime += SONGURL[3]
                 embed.add_field(
-                    name=f"{_id_} : {SONGURL[1]}", value=f"{SONGURL[3]} mins \nRequested by {SONGURL[2]}", inline=False)
+                    name=f"{_id_} : {SONGURL[1]}", value=f"{round(SONGURL[3]/60)} mins \nRequested by {SONGURL[2]}", inline=False)
             embed.set_footer(
-                text=f"Runtime {totquetime} minutes", icon_url=self.avatar)
+                text=f"Runtime {round(totquetime/60)} minutes", icon_url=self.avatar)
             await ctx.send(embed=embed)
             _id_ += 1
         else:

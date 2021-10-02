@@ -217,9 +217,9 @@ class MusicMixin(DiscordInit, commands.Cog):
             voice.play(FFmpegPCMAudio(URL, **self.FFMPEG_OPTIONS))
             voice.is_playing()
             await asyncio.sleep(info['duration'] + 3.5)
-            await ctx.send(f"> Starting Recursive Queue Management")
             # check for queue
             if(len(self.SONG_QUEUE[ctx.guild.id]) > 0):
+                await ctx.send(f"> Starting Recursive Queue Management")
                 await self.SimplifiedRecursiveNextSongPlayback(ctx)
 
         elif(ctx.voice.is_playing()):

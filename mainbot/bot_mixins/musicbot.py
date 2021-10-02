@@ -98,12 +98,30 @@ class MusicMixin(DiscordInit, commands.Cog):
     @commands.command(pass_context=True, aliases=['npm'])
     async def nowplayingmusic(self, ctx):
         if(self.CURRENT_SONG[ctx.guild.id] is not None):
-            info = self.CURRENT_SONG[ctx.guild.id][-1]
-            embed = discord.Embed(title=f"Now Playing" + self.CURRENT_SONG[ctx.guild.id][1])
-            embed.set_image(url=info['thumbnails'][-1]['url'])
-            embed.set_footer(text=f"Runtime {self.CURRENT_SONG[ctx.guild.id][3]} minutes", icon_url=self.avatar)
-            embed.set_author(name=ctx.message.author.name,icon_url=ctx.message.author.avatar_url)
-            await ctx.send(embed=embed)
+            info = self.CURRENT_SONG[ctx.guild.id][4]
+            URL = info['formats'][0]['url']
+            async with ctx.typing():
+                embed = discord.Embed(
+                    title=f"**Playing** {info['title']}", colour=find_dominant_color(info['thumbnails'][0]['url']), url=URL, description=f"```{info['description'][:200]} ...```")
+                embed.set_image(url=info['thumbnails'][-1]['url'])
+                try:
+                    if(info['duration'] > 0):
+                        embed.add_field(
+                            name="Duration", value=f"{int(info['duration']/60)}:{int(info['duration']%60)} mins", inline=True)
+                    else:
+                        embed.add_field(
+                            name="Duration", value=f"Streaming Live", inline=True)
+                except:
+                    embed.add_field(
+                        name="Duration", value=f"Streaming Live", inline=True)
+                embed.add_field(name="Uploader",
+                                value=info['uploader'], inline=True)
+
+                embed.set_author(name=ctx.message.author.name,
+                                 icon_url=ctx.message.author.avatar_url)
+                embed.set_footer(
+                    text=f"Requested by {ctx.author.name}", icon_url=ctx.author.avatar_url)
+                await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")],])
         else:
             await ctx.send("> No song is playing", delete_after=5.0)
 
@@ -210,7 +228,7 @@ class MusicMixin(DiscordInit, commands.Cog):
 
             try:
                 self.CURRENT_SONG[ctx.guild.id] = [
-                    URL, info['title'], info['duration'], info]
+                    URL, info['title'],ctx.author.nick , info['duration'], info]
             except:
                 pass
             voice.play(FFmpegPCMAudio(URL, **self.FFMPEG_OPTIONS))
@@ -494,7 +512,7 @@ class MusicMixin(DiscordInit, commands.Cog):
         try:
             ctx.voice_client.pause()
             await ctx.message.add_reaction(Emotes.PACPAUSE)
-            await asyncio.sleep(2)
+            await asyncio.sleep(10)
             await ctx.message.delete()
         except:
             await ctx.send(f"> {ctx.author.mention} I see-eth nothing playin")
@@ -504,7 +522,7 @@ class MusicMixin(DiscordInit, commands.Cog):
         try:
             await ctx.message.add_reaction(Emotes.PACPLAY)
             ctx.voice_client.resume()
-            await asyncio.sleep(2)
+            await asyncio.sleep(10)
             await ctx.message.delete()
         except:
             await ctx.send(f"> {ctx.author.mention} Nothing's playing")

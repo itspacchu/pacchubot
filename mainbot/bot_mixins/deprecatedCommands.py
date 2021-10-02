@@ -61,6 +61,13 @@ class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
             await webhook.delete()
         except:
             ctx.send("> Webhook permission not available")
+    
+    @commands.command()
+    async def echodetails(self, ctx):
+        try:
+            await ctx.send(f"```USR : {ctx.author.name}#{ctx.author.discriminator}\n> {ctx.message.content}\n```")
+        except:
+            await ctx.send("> Wat dis should work all the time some bug")
 
 
 def setup(bot):

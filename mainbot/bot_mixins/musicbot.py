@@ -10,8 +10,6 @@ from discord import FFmpegPCMAudio
 from youtube_dl import YoutubeDL
 import urllib
 
-# ==========================================================================================
-
 
 class MusicMixin(DiscordInit, commands.Cog):
     YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
@@ -23,8 +21,6 @@ class MusicMixin(DiscordInit, commands.Cog):
     IS_PLAYING = False
     PREV_SONG = None
     SONG_QUEUE = {}
-    LOOP_SONG = False
-    CURRENT_SONG = {}
 
     def basicYTSearch(self, search):
         query_string = urllib.parse.urlencode({'search_query': search})
@@ -39,8 +35,6 @@ class MusicMixin(DiscordInit, commands.Cog):
         if ctx.voice_client is not None:
             return await ctx.voice_client.move_to(channel)
         await channel.connect()
-
-# ==========================================================================================
 
     @commands.command(pass_context=True, aliases=['pl', 'plf', 'lf'])
     async def lofi(self, ctx, *, flavour='study'):
@@ -73,81 +67,33 @@ class MusicMixin(DiscordInit, commands.Cog):
         await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")], ])
         await self.playmp3source(url, context=ctx)
 
-# ==========================================================================================
-
     @commands.command(pass_context=True, aliases=['q'])
     async def queue(self, ctx):
-        try:
-            embed = discord.Embed(title=f"{ctx.guild.name}'s music Queue")
-            totquetime = 0
-            try:
-                embed.add_field(name=f"**{self.CURRENT_SONG[ctx.guild.id][1]}** Now Playing",
-                                value=f"{self.CURRENT_SONG[ctx.guild.id][3]/60} mins \nRequested by {self.CURRENT_SONG[ctx.guild.id][2]}", inline=False)
-            except:
-                pass
-            if(len(self.SONG_QUEUE[ctx.guild.id]) > 0):
-                for SONGURL in self.SONG_QUEUE[ctx.guild.id]:
-                    totquetime += SONGURL[3]/60
-                    embed.add_field(
-                        name=f"{SONGURL[1]}", value=f"{SONGURL[3]} mins \nRequested by {SONGURL[2]}", inline=False)
-                embed.set_footer(
-                    text=f"Runtime {totquetime} minutes", icon_url=self.avatar)
-                await ctx.send(embed=embed)
-            else:
-                await ctx.send("> Queue is empty", delete_after=5.0)
-        except KeyError as e:
-            await ctx.send(f"> {ctx.guild.name}'s Queue is empty", delete_after=5.0)
-
-# ==========================================================================================
+        embed = discord.Embed(title=f"{ctx.guild.name}'s music Queue")
+        totquetime = 0
+        if(len(self.SONG_QUEUE[ctx.guild.id]) > 0):
+            for SONGURL in self.SONG_QUEUE[ctx.guild.id]:
+                totquetime += SONGURL[3]
+                embed.add_field(
+                    name=f"{SONGURL[1]}", value=f"{SONGURL[3]} mins \nRequested by {SONGURL[2]}", inline=False)
+            embed.set_footer(
+                text=f"Runtime {totquetime} minutes", icon_url=self.avatar)
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send("> Queue is empty", delete_after=5.0)
 
     @commands.command(pass_context=True, aliases=['pnq', 'skip', 'next'])
     async def playNextQ(self, ctx):
         if(len(self.SONG_QUEUE[ctx.guild.id]) > 0):
-            try:
-                self.CURRENT_SONG = self.SONG_QUEUE[ctx.guild.id][0]
-            except:
-                pass
             await self.SimplifiedRecursiveNextSongPlayback(ctx)
         else:
             await ctx.send("> Queue is empty", delete_after=5.0)
 
-# ==========================================================================================
-
-    @commands.command()
-    async def nowplaying(self, ctx):
-        info = self.CURRENT_SONG[ctx.guild.id][-1]
-        async with ctx.typing():
-            embed = discord.Embed(
-                title=f"**Playing** {info['title']}", colour=find_dominant_color(info['thumbnails'][0]['url']), url=URL, description=f"```{info['description'][:200]} ...```")
-            embed.set_image(url=info['thumbnails'][-1]['url'])
-            try:
-                if(info['duration'] > 0):
-                    embed.add_field(
-                        name="Duration", value=f"{int(info['duration']/60)}:{int(info['duration']%60)} mins", inline=True)
-                else:
-                    embed.add_field(
-                        name="Duration", value=f"Streaming Live", inline=True)
-            except:
-                embed.add_field(
-                    name="Duration", value=f"Streaming Live", inline=True)
-                embed.add_field(name="Uploader",
-                                value=info['uploader'], inline=True)
-
-                embed.set_author(name=ctx.message.author.name,
-                                 icon_url=ctx.message.author.avatar_url)
-                embed.set_footer(
-                    text=f"Requested by {ctx.author.name}", icon_url=ctx.author.avatar_url)
-            await ctx.send(embed=embed)
-
-# ==========================================================================================
-
     # looping
     @commands.command(pass_context=True, aliases=['loop'])
     async def LoopDaMoosik(self, ctx):
-        await ctx.send(f"> Looping {self.SONG_QUEUE[ctx.guild.id][0][1]}", delete_after=5.0)
-        self.LOOP_SONG = not self.LOOP_SONG
-
-# ==========================================================================================
+        await ctx.reply(f"> Looping {self.SONG_QUEUE[ctx.guild.id][0][1]} [Buggy mess]", delete_after=5.0)
+        ctx.voice_state.loop = not ctx.voice_state.loop
 
     @commands.command(pass_context=True, aliases=['paq', 'addQueue', 'addq'])
     async def addQ(self, ctx, *, flavour):
@@ -166,11 +112,9 @@ class MusicMixin(DiscordInit, commands.Cog):
                 raise ValueError("Its a live video")
         except ValueError:
             self.SONG_QUEUE[ctx.guild.id].append(
-                [URL, TITLE, ctx.author.nick, "LIVE", info])
+                [URL, TITLE, ctx.author.nick, 0, info])
         await ctx.message.add_reaction("👍")
         await ctx.send(f"> Added {TITLE} to queue")
-
-# ==========================================================================================
 
     async def SimplifiedRecursiveNextSongPlayback(self, ctx):
         if(len(self.SONG_QUEUE[ctx.guild.id]) > 0):
@@ -178,17 +122,13 @@ class MusicMixin(DiscordInit, commands.Cog):
             await ctx.send(f"> Playing Next Song from queue {self.SONG_QUEUE[ctx.guild.id][0][1]} ~ Req by {self.SONG_QUEUE[ctx.guild.id][0][2]}")
             voice = get(self.client.voice_clients, guild=ctx.guild)
             voice.play(FFmpegPCMAudio(flavour, **self.FFMPEG_OPTIONS))
-            wait_for = self.SONG_QUEUE[ctx.guild.id][0][3]
-            if(self.LOOP_SONG == False):
-                self.SONG_QUEUE[ctx.guild.id].pop(0)
-            await asyncio.sleep(wait_for+5)
+            wait_for = self.SONG_QUEUE[ctx.guild.id][3]
+            self.SONG_QUEUE[ctx.guild.id].pop(0)
+            await asyncio.sleep(wait_for+3.5)
             if(len(self.SONG_QUEUE[ctx.guild.id]) > 0):
-                self.CURRENT_SONG = self.SONG_QUEUE[ctx.guild.id][0]
                 await self.SimplifiedRecursiveNextSongPlayback(ctx)
         else:
-            await ctx.send(f"> Reached End of Queue!")
-
-# ==========================================================================================
+            await ctx.send(f"> End of queue reached !")
 
     @commands.command(pass_context=True, aliases=['play', 'ytp', 'p'])
     async def rawplay(self, ctx, *, flavour='https://www.youtube.com/watch?v=dQw4w9WgXcQ', temp_flavour=None):
@@ -232,13 +172,12 @@ class MusicMixin(DiscordInit, commands.Cog):
                                  icon_url=ctx.message.author.avatar_url)
                 embed.set_footer(
                     text=f"Requested by {ctx.author.name}", icon_url=ctx.author.avatar_url)
-                await ctx.send(embed=embed)
-                if(self.SONG_QUEUE == 0):
-                    self.SONG_QUEUE[ctx.guild.id] = []
-                    self.CURRENT_SONG[ctx.guild.id] = [
-                        URL, info['title'], ctx.author.nick, info['duration'], info]  # making new list
+                await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")],])
+            self.SONG_QUEUE[ctx.guild.id] = []  # making new list
             voice.play(FFmpegPCMAudio(URL, **self.FFMPEG_OPTIONS))
             voice.is_playing()
+            await asyncio.sleep(info['duration'] + 3.5)
+            await ctx.send(f"> Starting Recursive Queue Management")
             # check for queue
             if(len(self.SONG_QUEUE[ctx.guild.id]) > 0):
                 await self.SimplifiedRecursiveNextSongPlayback(ctx)
@@ -256,8 +195,6 @@ class MusicMixin(DiscordInit, commands.Cog):
         else:
             await ctx.message.add_reaction(Emotes.PACEXCLAIM)
             await ctx.send("> Nothing's playing", delete_after=5.0)
-
-# ==========================================================================================
 
     @commands.command(aliases=['podepi'])
     async def podepisode(self, ctx, epno=0):
@@ -302,9 +239,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                 await ctx.message.add_reaction(Emotes.PACEXCLAIM)
                 await ctx.send("> No Episode found")
 
-# ==========================================================================================
-
-    @commands.command(aliases=['podp', "podcastplay"])
+    @commands.command(aliases=['podp'])
     async def podplay(self, ctx, epno=0):
         await ctx.message.add_reaction(Emotes.PACPLAY)
         podepi = epno
@@ -348,8 +283,6 @@ class MusicMixin(DiscordInit, commands.Cog):
                 await self.playPodcast(ctx, podepi=podepi, currentpod=currentpod)
             except AttributeError:
                 pass
-
-# ==========================================================================================
 
     @commands.command(aliases=['podcast'])
     async def pod(self, ctx, *, strparse=" ", pgNo=0, searchIndex=0):
@@ -447,6 +380,13 @@ class MusicMixin(DiscordInit, commands.Cog):
         del_dis = await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.green, label="Play Latest"), Button(style=ButtonStyle.red, label="Prev Page"), Button(style=ButtonStyle.blue, label="Next Page"), Button(style=ButtonStyle.grey, label="Next Search Result")]])
 
         while True:
+            try:
+                if len(ctx.voice_client.channel.members) == 1:
+                    await ctx.send("> Dont leave me alone " + Emotes.PACDEPRESS)
+                    await ctx.voice_client.disconnect()
+                    break
+            except:
+                pass
             res = await self.client.wait_for("button_click", timeout=100)
             if(await ButtonProcessor(ctx, res, "Play Latest")):
                 await ctx.invoke(self.client.get_command('podplay'))
@@ -464,8 +404,6 @@ class MusicMixin(DiscordInit, commands.Cog):
                 await del_dis.delete()
                 await ctx.invoke(self.client.get_command('pod'), strparse=strparse, pgNo=0, searchIndex=searchIndex+1)
                 break
-
-# ==========================================================================================
 
     async def playPodcast(self, context, podepi, currentpod):
         try:
@@ -512,8 +450,6 @@ class MusicMixin(DiscordInit, commands.Cog):
                 await ctx.voice_client.disconnect()
                 break
 
-# ==========================================================================================
-
     @commands.command(aliases=['pau'])
     async def pause(self, ctx):
         try:
@@ -524,8 +460,6 @@ class MusicMixin(DiscordInit, commands.Cog):
         except:
             await ctx.send(f"> {ctx.author.mention} I see-eth nothing playin")
 
-# ==========================================================================================
-
     @commands.command(aliases=['res'])
     async def resume(self, ctx):
         try:
@@ -535,8 +469,6 @@ class MusicMixin(DiscordInit, commands.Cog):
             await ctx.message.delete()
         except:
             await ctx.send(f"> {ctx.author.mention} Nothing's playing")
-
-# ==========================================================================================
 
     @commands.command(aliases=['fuckoff', 'dc', 'disconnect', 'stfu'])
     async def stop(self, ctx):
@@ -552,8 +484,6 @@ class MusicMixin(DiscordInit, commands.Cog):
         else:
             await ctx.message.add_reaction(Emotes.PACEXCLAIM)
             return await ctx.reply("> You're not in voice channel", delete_after=5.0)
-
-# ==========================================================================================
 
     @playNextQ.before_invoke
     @rawplay.before_invoke
@@ -575,8 +505,6 @@ class MusicMixin(DiscordInit, commands.Cog):
         elif ctx.voice_client.is_playing():
             ctx.voice_client.stop()
 
-
-# ==========================================================================================
 
 def setup(bot):
     bot.add_cog(MusicMixin(bot))

@@ -98,7 +98,7 @@ class MusicMixin(DiscordInit, commands.Cog):
     @commands.command(pass_context=True, aliases=['paq', 'addQueue', 'addq'])
     async def addQ(self, ctx, *, flavour):
         if('http' not in flavour):
-            await ctx.send("> Searching on Youtube ...", delete_after=2.0)
+            await ctx.send("> Searching on Youtube ...", delete_after=1.5)
             flavour = self.basicYTSearch(flavour)
 
         with YoutubeDL(ytdl_format_options) as ydl:
@@ -424,7 +424,7 @@ class MusicMixin(DiscordInit, commands.Cog):
             self.client.voice_clients, guild=ctx.guild)
         audio_source = discord.FFmpegPCMAudio(mp3link)
         self.source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(
-            mp3link, before_options=ffmpeg_options), volume=100)
+            mp3link, before_options=ffmpeg_options), volume=80)
         if not voice_client.is_playing():
             voice_client.play(audio_source, after=None)
             await ctx.guild.change_voice_state(channel=ctx.author.voice.channel, self_mute=False, self_deaf=True)
@@ -476,8 +476,10 @@ class MusicMixin(DiscordInit, commands.Cog):
             await ctx.message.add_reaction(Emotes.PACSTOP)
             await ctx.voice_client.disconnect()
             self.SONG_QUEUE[ctx.guild.id] = {}
-
-            await ctx.reply(f"> stopped playback", delete_after=5.0)
+            if("fuckoff" in ctx.message.content):
+                await ctx.send(f"> {ctx.author.mention} Fucked off ;)")
+            else:
+                await ctx.reply(f"> stopped playback", delete_after=5.0)
             await asyncio.sleep(2)
             await ctx.message.delete()
 

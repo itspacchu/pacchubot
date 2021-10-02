@@ -77,9 +77,9 @@ class MusicMixin(DiscordInit, commands.Cog):
             for SONGURL in self.SONG_QUEUE[ctx.guild.id]:
                 totquetime += SONGURL[3]
                 embed.add_field(
-                    name=f"{_id_} : {SONGURL[1]}", value=f"{SONGURL[3]} mins \nRequested by {SONGURL[2]}", inline=False)
+                    name=f"{_id_} : {SONGURL[1]}", value=f"{round(SONGURL[3]/60)} mins \nRequested by {SONGURL[2]}", inline=False)
             embed.set_footer(
-                text=f"Runtime {totquetime} minutes", icon_url=self.avatar)
+                text=f"Runtime {round(totquetime/60)} minutes", icon_url=self.avatar)
             await ctx.send(embed=embed)
             _id_ += 1
         else:
@@ -98,12 +98,11 @@ class MusicMixin(DiscordInit, commands.Cog):
     @commands.command(pass_context=True, aliases=['npm'])
     async def nowplayingmusic(self, ctx):
         if(self.CURRENT_SONG[ctx.guild.id] is not None):
-            embed = discord.Embed(title=f"Now Playing")
-            embed.set_image(url=f"https://i.ytimg.com/vi/{self.CURRENT_SONG[ctx.guild.id][0][-11:]}/maxresdefault.jpg")
-            embed.set_footer(
-                text=f"Runtime {self.CURRENT_SONG[ctx.guild.id][1]} minutes", icon_url=self.avatar)
-            embed.set_author(name=ctx.message.author.name,
-                             icon_url=ctx.message.author.avatar_url)
+            info = self.CURRENT_SONG[ctx.guild.id][-1]
+            embed = discord.Embed(title=f"Now Playing" + self.CURRENT_SONG[ctx.guild.id][1])
+            embed.set_image(url=info['thumbnails'][-1]['url'])
+            embed.set_footer(text=f"Runtime {self.CURRENT_SONG[ctx.guild.id][3]} minutes", icon_url=self.avatar)
+            embed.set_author(name=ctx.message.author.name,icon_url=ctx.message.author.avatar_url)
             await ctx.send(embed=embed)
         else:
             await ctx.send("> No song is playing", delete_after=5.0)

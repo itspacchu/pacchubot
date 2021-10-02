@@ -102,7 +102,7 @@ class MusicMixin(DiscordInit, commands.Cog):
             URL = info['formats'][0]['url']
             async with ctx.typing():
                 embed = discord.Embed(
-                    title=f"**Playing** {info['title']}", colour=find_dominant_color(info['thumbnails'][0]['url']), url=URL, description=f"```{info['description'][:200]} ...```")
+                    title=f"**Playing** {info['title']}", colour=find_dominant_color(info['thumbnails'][0]['url']), url=self.CURRENT_SONG[ctx.guild.id][0])
                 embed.set_image(url=info['thumbnails'][-1]['url'])
                 try:
                     if(info['duration'] > 0):
@@ -121,7 +121,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                                  icon_url=ctx.message.author.avatar_url)
                 embed.set_footer(
                     text=f"Requested by {ctx.author.name}", icon_url=ctx.author.avatar_url)
-                await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")],])
+                await ctx.send(embed=embed)
         else:
             await ctx.send("> No song is playing", delete_after=5.0)
 
@@ -219,7 +219,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                                  icon_url=ctx.message.author.avatar_url)
                 embed.set_footer(
                     text=f"Requested by {ctx.author.name}", icon_url=ctx.author.avatar_url)
-                await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")],])
+                await ctx.send(embed=embed)
             try:
                 if(not len(self.SONG_QUEUE[ctx.guild.id]) > 0):
                     self.SONG_QUEUE[ctx.guild.id] = []  # making new list

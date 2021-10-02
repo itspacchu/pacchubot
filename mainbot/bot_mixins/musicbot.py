@@ -98,12 +98,11 @@ class MusicMixin(DiscordInit, commands.Cog):
     @commands.command(pass_context=True, aliases=['npm'])
     async def nowplayingmusic(self, ctx):
         if(self.CURRENT_SONG[ctx.guild.id] is not None):
-            embed = discord.Embed(title=f"Now Playing")
-            embed.set_image(url=f"https://i.ytimg.com/vi/{self.CURRENT_SONG[ctx.guild.id][0][-11:]}/maxresdefault.jpg")
-            embed.set_footer(
-                text=f"Runtime {self.CURRENT_SONG[ctx.guild.id][1]} minutes", icon_url=self.avatar)
-            embed.set_author(name=ctx.message.author.name,
-                             icon_url=ctx.message.author.avatar_url)
+            info = self.CURRENT_SONG[ctx.guild.id][-1]
+            embed = discord.Embed(title=f"Now Playing" + self.CURRENT_SONG[ctx.guild.id][1])
+            embed.set_image(url=info['thumbnails'][-1]['url'])
+            embed.set_footer(text=f"Runtime {self.CURRENT_SONG[ctx.guild.id][3]} minutes", icon_url=self.avatar)
+            embed.set_author(name=ctx.message.author.name,icon_url=ctx.message.author.avatar_url)
             await ctx.send(embed=embed)
         else:
             await ctx.send("> No song is playing", delete_after=5.0)

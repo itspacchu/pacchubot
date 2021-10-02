@@ -512,7 +512,7 @@ class MusicMixin(DiscordInit, commands.Cog):
         try:
             ctx.voice_client.pause()
             await ctx.message.add_reaction(Emotes.PACPAUSE)
-            await asyncio.sleep(2)
+            await asyncio.sleep(10)
             await ctx.message.delete()
         except:
             await ctx.send(f"> {ctx.author.mention} I see-eth nothing playin")
@@ -522,7 +522,7 @@ class MusicMixin(DiscordInit, commands.Cog):
         try:
             await ctx.message.add_reaction(Emotes.PACPLAY)
             ctx.voice_client.resume()
-            await asyncio.sleep(2)
+            await asyncio.sleep(10)
             await ctx.message.delete()
         except:
             await ctx.send(f"> {ctx.author.mention} Nothing's playing")

@@ -21,6 +21,7 @@ class MusicMixin(DiscordInit, commands.Cog):
     IS_PLAYING = False
     PREV_SONG = None
     SONG_QUEUE = {}
+    CURRENT_SONG = {}
 
     def basicYTSearch(self, search):
         query_string = urllib.parse.urlencode({'search_query': search})
@@ -71,16 +72,41 @@ class MusicMixin(DiscordInit, commands.Cog):
     async def queue(self, ctx):
         embed = discord.Embed(title=f"{ctx.guild.name}'s music Queue")
         totquetime = 0
+        _id_ = 0
         if(len(self.SONG_QUEUE[ctx.guild.id]) > 0):
             for SONGURL in self.SONG_QUEUE[ctx.guild.id]:
                 totquetime += SONGURL[3]
                 embed.add_field(
-                    name=f"{SONGURL[1]}", value=f"{SONGURL[3]} mins \nRequested by {SONGURL[2]}", inline=False)
+                    name=f"{_id_} : {SONGURL[1]}", value=f"{SONGURL[3]} mins \nRequested by {SONGURL[2]}", inline=False)
             embed.set_footer(
                 text=f"Runtime {totquetime} minutes", icon_url=self.avatar)
             await ctx.send(embed=embed)
+            _id_ += 1
         else:
             await ctx.send("> Queue is empty", delete_after=5.0)
+
+    @commands.command(pass_context=True, aliases=['rem'])
+    async def remove(self, ctx, *, num: int):
+        if(num > len(self.SONG_QUEUE[ctx.guild.id])):
+            await ctx.send("> Invalid number", delete_after=5.0)
+        else:
+            self.SONG_QUEUE[ctx.guild.id].pop(num)
+            await ctx.send(f"> Removed Entry ... Refreshing Queue for {ctx.guild.name}", delete_after=2.0)
+            await asyncio.sleep(0.5)
+            await ctx.invoke(self.client.get_command('queue'))
+    
+    @commands.command(pass_context=True, aliases=['npm'])
+    async def nowplayingmusic(self, ctx):
+        if(self.CURRENT_SONG[ctx.guild.id] is not None):
+            embed = discord.Embed(title=f"Now Playing")
+            embed.set_image(url=f"https://i.ytimg.com/vi/{self.CURRENT_SONG[ctx.guild.id][0][-11:]}/maxresdefault.jpg")
+            embed.set_footer(
+                text=f"Runtime {self.CURRENT_SONG[ctx.guild.id][1]} minutes", icon_url=self.avatar)
+            embed.set_author(name=ctx.message.author.name,
+                             icon_url=ctx.message.author.avatar_url)
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send("> No song is playing", delete_after=5.0)
 
     @commands.command(pass_context=True, aliases=['pnq', 'skip', 'next'])
     async def playNextQ(self, ctx):
@@ -92,7 +118,7 @@ class MusicMixin(DiscordInit, commands.Cog):
     # looping
     @commands.command(pass_context=True, aliases=['loop'])
     async def LoopDaMoosik(self, ctx):
-        await ctx.reply(f"> Looping {self.SONG_QUEUE[ctx.guild.id][0][1]} [Buggy mess]", delete_after=5.0)
+        await ctx.reply(f"> Looping {self.CURRENT_SONG[ctx.guild.id][0][0]} [Buggy mess]", delete_after=5.0)
         ctx.voice_state.loop = not ctx.voice_state.loop
 
     @commands.command(pass_context=True, aliases=['paq', 'addQueue', 'addq'])
@@ -121,6 +147,10 @@ class MusicMixin(DiscordInit, commands.Cog):
             flavour = self.SONG_QUEUE[ctx.guild.id][0][0]
             await ctx.send(f"> Playing Next Song from queue {self.SONG_QUEUE[ctx.guild.id][0][1]} ~ Req by {self.SONG_QUEUE[ctx.guild.id][0][2]}")
             voice = get(self.client.voice_clients, guild=ctx.guild)
+            try:
+                self.CURRENT_SONG[ctx.guild.id] = self.SONG_QUEUE[ctx.guild.id][0]
+            except:
+                pass
             voice.play(FFmpegPCMAudio(flavour, **self.FFMPEG_OPTIONS))
             wait_for = self.SONG_QUEUE[ctx.guild.id][3]
             self.SONG_QUEUE[ctx.guild.id].pop(0)
@@ -173,13 +203,23 @@ class MusicMixin(DiscordInit, commands.Cog):
                 embed.set_footer(
                     text=f"Requested by {ctx.author.name}", icon_url=ctx.author.avatar_url)
                 await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.red, label="Stop")],])
-            self.SONG_QUEUE[ctx.guild.id] = []  # making new list
+            try:
+                if(not len(self.SONG_QUEUE[ctx.guild.id]) > 0):
+                    self.SONG_QUEUE[ctx.guild.id] = []  # making new list
+            except:
+                self.SONG_QUEUE[ctx.guild.id] = []
+
+            try:
+                self.CURRENT_SONG[ctx.guild.id] = [
+                    URL, info['title'], info['duration'], info]
+            except:
+                pass
             voice.play(FFmpegPCMAudio(URL, **self.FFMPEG_OPTIONS))
             voice.is_playing()
             await asyncio.sleep(info['duration'] + 3.5)
-            await ctx.send(f"> Starting Recursive Queue Management")
             # check for queue
             if(len(self.SONG_QUEUE[ctx.guild.id]) > 0):
+                await ctx.send(f"> Starting Recursive Queue Management")
                 await self.SimplifiedRecursiveNextSongPlayback(ctx)
 
         elif(ctx.voice.is_playing()):

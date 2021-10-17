@@ -193,7 +193,7 @@ class MusicCore(commands.Cog):
     async def reprqueue(self, ctx):
         await ctx.send(f"{self.AUDIO_QUEUE[ctx.guild.id][0]}")
     
-    @commands.command(aliases=['dc','fuckoff','stop'])
+    @commands.command(aliases=['dc','fuckoff','stop','leave'])
     async def disconnect(self, ctx):
         await ctx.voice_client.disconnect()
         await ctx.message.add_reaction(Emotes.PACTICK)

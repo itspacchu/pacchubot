@@ -104,7 +104,7 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
                         Button(style=ButtonStyle.URL, label="Open in Spotify",
                                url=le_url + activity.track_id)
                     ]
-                    voice_state = ctx.member.voice
+                    voice_state = ctx.author.voice
                     if(voice_state != None and ctx.guild.id == voice_state.guild.id):
                         allbuttons.append(
                             Button(style=ButtonStyle.green, label="Spotify",
@@ -118,7 +118,7 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
                 color=0x1DB954)
             await ctx.send(embed=embed, delete_after=20)
 
-        if(voice_state != None and ctx.guild.id == voice_state.guild.id):
+        if(voice_state != None and ctx.channel.guild.id == voice_state.guild.id):
             while True:
                 res = await self.client.wait_for("button_click", timeout=300)
                 await ctx.invoke(self.client.get_command('play'), url=song_url_if_exists)

@@ -155,7 +155,7 @@ class Music(DiscordInit,commands.Cog):
         state = self.get_state(ctx.guild)
         client = ctx.guild.voice_client
         client.stop()
-        await ctx.send("> Fetching from queue ...",delete_after=1.0)
+        await ctx.send("> Fetching from queue ...",delete_after=5.0)
         await ctx.invoke(self.client.get_command('np'))
 
     def _play_song(self, client, state, song):

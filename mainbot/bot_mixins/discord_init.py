@@ -68,7 +68,7 @@ class DiscordInit:
                 match = self.MemberTaunt.find_one(query)['taunt']
                 await message.channel.send(match)
             except Exception as e:
-                asyncio.sleep(1)  # this error is on every goddamn message ffs
+                await asyncio.sleep(1)  # this error is on every goddamn message ffs
 
     def init_db(self):
         self.serverstat = self.db['serverstat']

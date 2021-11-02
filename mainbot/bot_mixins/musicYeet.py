@@ -225,7 +225,7 @@ class Music(DiscordInit,commands.Cog):
 
 
     @commands.command()
-    @commands.guid_only()
+    @commands.guild_only()
     async def lofi(self,ctx):
         lofi_url = "https://www.youtube.com/watch?v=5qap5aO4i9A"
         await ctx.invoke(self.client.get_command('play'), lofi_url)

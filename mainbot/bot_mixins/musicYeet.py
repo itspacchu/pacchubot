@@ -9,7 +9,8 @@ import youtube_dl as ytdl
 import discord
 from ..__imports__ import *
 from ..settings import *
-from .discord_init import DiscordInit
+from .discord_init import Discord_init_Color, DiscordInit
+import html
 
 YTDL_OPTS = {
     "default_search": "ytsearch",
@@ -18,6 +19,21 @@ YTDL_OPTS = {
     "extract_flat": "in_playlist"
 }
 
+
+# this is from my brother's bot
+# https://github.com/mackdroid/bored-bot
+
+def handle_spotify(self,query):
+        if 'https://open.spotify.com/track/' in query:
+            src = "spot"
+            response = requests.get(query)
+            filter = re.search("Spotify.Entity.*};",response.text).group(0)[17:-1]
+            spotinfo = json.loads(filter)
+            song_title = html.unescape(spotinfo["album"]["name"])
+            song_artist = html.unescape(spotinfo['album']['artists'][0]['name'])
+            return song_title + " " + song_artist
+        else:
+            return query
 
 class Video:
     """Class containing information about a particular video."""
@@ -46,10 +62,15 @@ class Video:
                 video = info
             return video
 
-    def get_embed(self):
+    def get_embed(self,source="YT"):
         """Makes an embed out of this Video's information."""
+        if(source == "YT"):
+            thiscolor = 0xff2222
+        elif(source == "SP"):
+            thiscolor = 0x2222ff
+
         embed = discord.Embed(
-            title=self.title, description=self.uploader, url=self.video_url)
+            title=self.title, description=self.uploader,colour=discord.Colour(thiscolor), url=self.video_url)
         embed.set_footer(
             text=f"Requested by {self.requested_by.name}",
             icon_url=self.requested_by.avatar_url)
@@ -68,7 +89,7 @@ async def audio_playing(ctx):
     if client and client.channel and client.source:
         return True
     else:
-        raise commands.CommandError("Not currently playing any audio.")
+        raise commands.CommandError("> Not currently playing any audio.")
 
 
 async def in_voice_channel(ctx):
@@ -79,23 +100,15 @@ async def in_voice_channel(ctx):
         return True
     else:
         raise commands.CommandError(
-            "You need to be in the channel to do that.")
+            "> You need to be in the channel to do that.")
 
 
 async def is_audio_requester(ctx):
-    """Checks that the command sender is the song requester."""
-    music = ctx.client.get_cog("Music")
-    state = music.get_state(ctx.guild)
-    permissions = ctx.channel.permissions_for(ctx.author)
-    if permissions.administrator or state.is_requester(ctx.author):
-        return True
-    else:
-        raise commands.CommandError(
-            "You need to be the song requester to do that.")
+    return True
 
 
 class Music(DiscordInit,commands.Cog):
-
+    states = {}
 
     def get_state(self, guild):
         """Gets the state for `guild`, creating it if it does not exist."""
@@ -105,11 +118,10 @@ class Music(DiscordInit,commands.Cog):
             self.states[guild.id] = GuildState()
             return self.states[guild.id]
 
-    @commands.command(aliases=["stop"])
+    @commands.command(aliases=["stop","fuckoff","disconnect","dc"])
     @commands.guild_only()
-    @commands.has_permissions(administrator=True)
     async def leave(self, ctx):
-        """Leaves the voice channel, if currently in one."""
+        await ctx.message.add_reaction(Emotes.PACSTOP)
         client = ctx.guild.voice_client
         state = self.get_state(ctx.guild)
         if client and client.channel:
@@ -117,13 +129,12 @@ class Music(DiscordInit,commands.Cog):
             state.playlist = []
             state.now_playing = None
         else:
-            raise commands.CommandError("Not in a voice channel.")
+            raise commands.CommandError("> Not in a voice channel.")
 
     @commands.command(aliases=["resume", "p"])
     @commands.guild_only()
     @commands.check(audio_playing)
     @commands.check(in_voice_channel)
-    @commands.check(is_audio_requester)
     async def pause(self, ctx):
         """Pauses any currently playing audio."""
         client = ctx.guild.voice_client
@@ -135,7 +146,7 @@ class Music(DiscordInit,commands.Cog):
         else:
             client.pause()
 
-    @commands.command()
+    @commands.command(aliases=["next"])
     @commands.guild_only()
     @commands.check(audio_playing)
     @commands.check(in_voice_channel)
@@ -147,9 +158,8 @@ class Music(DiscordInit,commands.Cog):
 
     def _play_song(self, client, state, song):
         state.now_playing = song
-        state.skip_votes = set()  # clear skip votes
         source = discord.PCMVolumeTransformer(
-            discord.FFmpegPCMAudio(song.stream_url, before_options=FFMPEG_BEFORE_OPTS), volume=state.volume)
+            discord.FFmpegPCMAudio(song.stream_url, before_options=FFMPEG_BEFORE_OPTS))
 
         def after_playing(err):
             if len(state.playlist) > 0:
@@ -168,40 +178,40 @@ class Music(DiscordInit,commands.Cog):
         """Displays information about the current song."""
         state = self.get_state(ctx.guild)
         message = await ctx.send("", embed=state.now_playing.get_embed())
-        await self._add_reaction_controls(message)
 
-    @commands.command(aliases=["queue","mq", "playlist"])
+    @commands.command(aliases=["q", "playlist"])
     @commands.guild_only()
     @commands.check(audio_playing)
     async def queue(self, ctx):
         """Display the current play queue."""
+        await ctx.message.add_reaction("✅")
         state = self.get_state(ctx.guild)
-        await ctx.send(self._queue_text(state.playlist))
 
-    def _queue_text(self, queue):
-        """Returns a block of text describing a given song queue."""
-        if len(queue) > 0:
-            message = [f"{len(queue)} songs in queue:"]
-            message += [
-                f"  {index+1}. **{song.title}** (requested by **{song.requested_by.name}**)"
-                for (index, song) in enumerate(queue)
-            ]  # add individual songs
-            return "\n".join(message)
+        embed = discord.Embed(title=f"{ctx.guild.name}'s music Queue")
+        _id_ = 0
+        if(len(state.playlist) > 0):
+            for song in self.SONG_QUEUE[ctx.guild.id]:
+                _id_ += 1
+                embed.add_field(name=f"{_id_} : {song.title}", value=f"Requested by {song.requested_by.name}", inline=False)
+            await ctx.send(embed=embed)
+            
         else:
-            return "The play queue is empty."
+            await ctx.send("> Queue is empty", delete_after=5.0)
 
-    @commands.command(aliases=["cq"])
+    @commands.command(aliases=["cq","removeq","rq"])
     @commands.guild_only()
     @commands.check(audio_playing)
     async def clearqueue(self, ctx):
+        await ctx.message.add_reaction("✅")
         """Clears the play queue without leaving the channel."""
         state = self.get_state(ctx.guild)
         state.playlist = []
 
-    @commands.command(aliases=["jq"])
+    @commands.command(aliases=["jump","skipto"])
     @commands.guild_only()
     @commands.check(audio_playing)
     async def jumpqueue(self, ctx, song: int, new_index: int):
+        await ctx.message.add_reaction("✅")
         """Moves song at an index to `new_index` in queue."""
         state = self.get_state(ctx.guild)  # get state for this guild
         if 1 <= song <= len(state.playlist) and 1 <= new_index:
@@ -215,8 +225,8 @@ class Music(DiscordInit,commands.Cog):
     @commands.command(brief="Plays audio from <url>.")
     @commands.guild_only()
     async def play(self, ctx, *, url):
-        """Plays audio hosted at <url> (or performs a search for <url> and plays the first result)."""
 
+        url = handle_spotify(url) #handling spotify
         client = ctx.guild.voice_client
         state = self.get_state(ctx.guild)  # get the guild's state
 
@@ -225,43 +235,59 @@ class Music(DiscordInit,commands.Cog):
                 video = Video(url, ctx.author)
             except youtube_dl.DownloadError as e:
                 logging.warn(f"Error downloading video: {e}")
-                await ctx.send("There was an error downloading your video, sorry.")
+                await ctx.send("> Something went wrong in getting the video")
                 return
+            
+            await ctx.message.add_reaction(Emotes.PACPLAY)
             state.playlist.append(video)
-            message = await ctx.send("Added to queue.", embed=video.get_embed())
-            await self._add_reaction_controls(message)
+            message = await ctx.send("> Added to queue", embed=video.get_embed())
         else:
             if ctx.author.voice is not None and ctx.author.voice.channel is not None:
                 channel = ctx.author.voice.channel
                 try:
                     video = Video(url, ctx.author)
                 except youtube_dl.DownloadError as e:
-                    await ctx.send("There was an error downloading your video, sorry.")
+                    await ctx.send("> Something went wrong!! \n```{e}```")
                     return
                 client = await channel.connect()
                 self._play_song(client, state, video)
+                await ctx.message.add_reaction(Emotes.PACPLAY)
                 message = await ctx.send("", embed=video.get_embed())
-                await self._add_reaction_controls(message)
                 logging.info(f"Now playing '{video.title}'")
             else:
                 raise commands.CommandError(
-                    "You need to be in a voice channel to do that.")
+                    "> You need to be in a voice channel to do that.")
 
-    async def on_reaction_add(self, reaction, user):
-        pass
+    @commands.check(audio_playing)
+    @commands.guild_only()               
+    @commands.command(aliases=['pau'])
+    async def pause(self, ctx):
+        try:
+            ctx.voice_client.pause()
+            await ctx.message.add_reaction(Emotes.PACPAUSE)
+            await asyncio.sleep(10)
+            await ctx.message.delete()
+        except:
+            await ctx.send(f"> {ctx.author.mention} I see-eth nothing playin")
 
+    @commands.guild_only()
+    @commands.command(aliases=['res'])
+    async def resume(self, ctx):
+        try:
+            await ctx.message.add_reaction(Emotes.PACPLAY)
+            ctx.voice_client.resume()
+            await asyncio.sleep(10)
+            await ctx.message.delete()
+        except:
+            await ctx.send(f"> {ctx.author.mention} Nothing's playing")
 
-    async def _add_reaction_controls(self, message):
-        pass
 
 
 class GuildState:
     """Helper class managing per-guild state."""
 
     def __init__(self):
-        self.volume = 1.0
         self.playlist = []
-        self.skip_votes = set()
         self.now_playing = None
 
     def is_requester(self, user):

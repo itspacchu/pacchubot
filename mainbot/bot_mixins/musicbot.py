@@ -498,26 +498,6 @@ class MusicMixin(DiscordInit, commands.Cog):
                 await ctx.voice_client.disconnect()
                 break
 
-    @commands.command(aliases=['pau'])
-    async def pause(self, ctx):
-        try:
-            ctx.voice_client.pause()
-            await ctx.message.add_reaction(Emotes.PACPAUSE)
-            await asyncio.sleep(10)
-            await ctx.message.delete()
-        except:
-            await ctx.send(f"> {ctx.author.mention} I see-eth nothing playin")
-
-    @commands.command(aliases=['res'])
-    async def resume(self, ctx):
-        try:
-            await ctx.message.add_reaction(Emotes.PACPLAY)
-            ctx.voice_client.resume()
-            await asyncio.sleep(10)
-            await ctx.message.delete()
-        except:
-            await ctx.send(f"> {ctx.author.mention} Nothing's playing")
-
     @commands.command(aliases=['fuckoff', 'dc', 'disconnect', 'stfu'])
     async def stop(self, ctx):
         if(ctx.author.voice.channel):

@@ -236,14 +236,16 @@ class Music(DiscordInit,commands.Cog):
         if(url == None):
             url = "https://youtu.be/dQw4w9WgXcQ"
             await ctx.send("> usage : play {url/spotify}")
-        url,src = handle_spotify(url)
+        url,whrc = handle_spotify(url)
+        if(whrc):
+            await ctx.send("> Fetching from spotify")
 
         client = ctx.guild.voice_client
         state = self.get_state(ctx.guild)  # get the guild's state
 
         if client and client.channel:
             try:
-                video = Video(url, ctx.author , src)
+                video = Video(url, ctx.author , src=whrc)
             except youtube_dl.DownloadError as e:
                 logging.warn(f"Error downloading video: {e}")
                 await ctx.send("> Something went wrong in getting the video")

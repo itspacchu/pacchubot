@@ -31,14 +31,14 @@ def handle_spotify(query):
             spotinfo = json.loads(filter)
             song_title = html.unescape(spotinfo["album"]["name"])
             song_artist = html.unescape(spotinfo['album']['artists'][0]['name'])
-            return song_title + " " + song_artist
+            return [song_title + " " + song_artist,"SP"]
         else:
-            return query
+            return [query,"YT"]
 
 class Video:
     """Class containing information about a particular video."""
 
-    def __init__(self, url_or_search, requested_by):
+    def __init__(self, url_or_search, requested_by,src="YT"):
         """Plays audio from (or searches for) a URL."""
         with ytdl.YoutubeDL(YTDL_OPTS) as ydl:
             video = self._get_info(url_or_search)
@@ -50,6 +50,7 @@ class Video:
             self.thumbnail = video[
                 "thumbnail"] if "thumbnail" in video else None
             self.requested_by = requested_by
+            self.src = src
 
     def _get_info(self, video_url):
         with ytdl.YoutubeDL(YTDL_OPTS) as ydl:
@@ -62,11 +63,11 @@ class Video:
                 video = info
             return video
 
-    def get_embed(self,source="YT"):
+    def get_embed(self):
         """Makes an embed out of this Video's information."""
-        if(source == "YT"):
+        if(self.src == "YT"):
             thiscolor = 0xff2222
-        elif(source == "SP"):
+        elif(self.src == "SP"):
             thiscolor = 0x2222ff
 
         embed = discord.Embed(
@@ -190,7 +191,7 @@ class Music(DiscordInit,commands.Cog):
         embed = discord.Embed(title=f"{ctx.guild.name}'s music Queue")
         _id_ = 0
         if(len(state.playlist) > 0):
-            for song in self.SONG_QUEUE[ctx.guild.id]:
+            for song in state.playlist:
                 _id_ += 1
                 embed.add_field(name=f"{_id_} : {song.title}", value=f"Requested by {song.requested_by.name}", inline=False)
             await ctx.send(embed=embed)
@@ -222,17 +223,24 @@ class Music(DiscordInit,commands.Cog):
         else:
             raise commands.CommandError("You must use a valid index.")
 
+
+    @commands.command()
+    @commands.guid_only()
+    async def lofi(self,ctx):
+        lofi_url = "https://www.youtube.com/watch?v=5qap5aO4i9A"
+        await ctx.invoke(self.client.get_command('play'), lofi_url)
+
     @commands.command(brief="Plays audio from <url>.")
     @commands.guild_only()
     async def play(self, ctx, *, url):
+        url,src = handle_spotify(url)
 
-        url = handle_spotify(url) #handling spotify
         client = ctx.guild.voice_client
         state = self.get_state(ctx.guild)  # get the guild's state
 
         if client and client.channel:
             try:
-                video = Video(url, ctx.author)
+                video = Video(url, ctx.author,src)
             except youtube_dl.DownloadError as e:
                 logging.warn(f"Error downloading video: {e}")
                 await ctx.send("> Something went wrong in getting the video")

@@ -65,9 +65,9 @@ class Video:
     def get_embed(self):
         """Makes an embed out of this Video's information."""
         if(self.src == "YT"):
-            thiscolor = 0xff2222
+            thiscolor = 0xff4444
         elif(self.src == "SP"):
-            thiscolor = 0x2222ff
+            thiscolor = 0x44ff44
 
         embed = discord.Embed(
             title=self.title, description=self.uploader,colour=discord.Colour(thiscolor), url=self.video_url)

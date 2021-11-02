@@ -107,7 +107,7 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
                     voice_state = ctx.author.voice
                     if(voice_state != None and ctx.guild.id == voice_state.channel.guild.id):
                         allbuttons.append(
-                            Button(style=ButtonStyle.green, label="Spotify",
+                            Button(style=ButtonStyle.green, label="Listen Along",
                                url=song_url_if_exists),
                         )
                     wait = await ctx.send(embed=embed, components=allbuttons)
@@ -121,8 +121,9 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
         if(voice_state != None and ctx.channel.guild.id == voice_state.channel.guild.id):
             while True:
                 res = await self.client.wait_for("button_click", timeout=300)
-                await ctx.invoke(self.client.get_command('play'), url=song_url_if_exists)
                 await res.respond(type=InteractionType.ChannelMessageWithSource, content="Connecting to Voice channel ...")
+                await ctx.invoke(self.client.get_command('play'), url=song_url_if_exists)
+                
         
 
     @commands.command(aliases=['linkify', 'li'])

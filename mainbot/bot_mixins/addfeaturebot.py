@@ -87,9 +87,9 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
         respo = requests.get(f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}").json()[0]
         partOfSpeech = respo['meanings'][0]['partOfSpeech']
         definition = respo['meanings'][0]['definitions'][0]['definition']
-        audioUrl = "http"+respo['phonetics'][0]['audio']
+        audioUrl = "https:"+respo['phonetics'][0]['audio']
         origin = respo['origin']
-        embed = discord.Embed(title=f"**{respo['word']}** _({partOfSpeech})_", colour=discord.Colour(0xfca16b), description=f"{definition}\nOrigin: {origin}")
+        embed = discord.Embed(title=f"**{respo['word']}** _({partOfSpeech})_", colour=discord.Colour(0xfca16b), description=f"{definition}\n\n**Origin**: {origin}")
         await ctx.send(embed=embed)
         await ctx.send(audioUrl)
 

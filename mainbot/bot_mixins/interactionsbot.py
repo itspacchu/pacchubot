@@ -12,7 +12,7 @@ class InteractionsMixin(DiscordInit, commands.Cog):
     async def avatar(self, ctx, member: discord.Member = None):
         hgp = member
         url_link = None
-        await ctx.message.add_reaction('🙄')
+        await ctx.message.add_reaction(Emotes.PACTICK)
         if(ctx.message.author == hgp or hgp == None):
             embed = discord.Embed(
                 title="OwO", description=f"{ctx.message.author.mention} steals ...wait thats your OWN", colour=find_dominant_color(ctx.message.author.avatar_url))

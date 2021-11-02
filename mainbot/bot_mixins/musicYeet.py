@@ -184,7 +184,7 @@ class Music(DiscordInit,commands.Cog):
     @commands.check(audio_playing)
     async def queue(self, ctx):
         """Display the current play queue."""
-        await ctx.message.add_reaction("✅")
+        await ctx.message.add_reaction(Emotes.PACTICK)
         state = self.get_state(ctx.guild)
 
         embed = discord.Embed(title=f"{ctx.guild.name}'s music Queue")
@@ -202,7 +202,7 @@ class Music(DiscordInit,commands.Cog):
     @commands.guild_only()
     @commands.check(audio_playing)
     async def clearqueue(self, ctx):
-        await ctx.message.add_reaction("✅")
+        await ctx.message.add_reaction(Emotes.PACTICK)
         """Clears the play queue without leaving the channel."""
         state = self.get_state(ctx.guild)
         state.playlist = []
@@ -211,7 +211,7 @@ class Music(DiscordInit,commands.Cog):
     @commands.guild_only()
     @commands.check(audio_playing)
     async def jumpqueue(self, ctx, song: int, new_index: int):
-        await ctx.message.add_reaction("✅")
+        await ctx.message.add_reaction(Emotes.PACTICK)
         """Moves song at an index to `new_index` in queue."""
         state = self.get_state(ctx.guild)  # get state for this guild
         if 1 <= song <= len(state.playlist) and 1 <= new_index:
@@ -220,26 +220,26 @@ class Music(DiscordInit,commands.Cog):
 
             await ctx.send(self._queue_text(state.playlist))
         else:
+            await ctx.message.add_reaction(Emotes.PACNO)
             raise commands.CommandError("You must use a valid index.")
 
 
     @commands.command()
     @commands.guild_only()
     async def lofi(self,ctx):
+        await ctx.message.add_reaction(Emotes.LOFISPARKO)
         lofi_url = "https://www.youtube.com/watch?v=5qap5aO4i9A"
         await ctx.invoke(self.client.get_command('play'), url=lofi_url)
 
     @commands.command(brief="Plays audio from <url>.")
     @commands.guild_only()
     async def play(self, ctx, *, url=None):
-        print("DEBUG:: " + url)    
         if(url == None):
             url = "https://youtu.be/dQw4w9WgXcQ"
             await ctx.send("> usage : play {url/spotify}")
         url,whrc = handle_spotify(url)
         if(whrc == "SP"):
             await ctx.send("> Fetching from spotify")
-        print("DEBUG:: " + url,whrc)    
         client = ctx.guild.voice_client
         state = self.get_state(ctx.guild)  # get the guild's state
 
@@ -265,9 +265,10 @@ class Music(DiscordInit,commands.Cog):
                 client = await channel.connect()
                 self._play_song(client, state, video)
                 await ctx.message.add_reaction(Emotes.PACPLAY)
-                message = await ctx.send("", embed=video.get_embed())
+                message = await ctx.send("", embed=video.get_embed(),components=[Button(style=ButtonStyle.URL, label="Youtube",url=url)])
                 logging.info(f"Now playing '{video.title}'")
             else:
+                await ctx.message.add_reaction(Emotes.PACNO)
                 raise commands.CommandError(
                     "> You need to be in a voice channel to do that.")
 
@@ -281,6 +282,7 @@ class Music(DiscordInit,commands.Cog):
             await asyncio.sleep(10)
             await ctx.message.delete()
         except:
+            await ctx.message.add_reaction(Emotes.PACNO)
             await ctx.send(f"> {ctx.author.mention} I see-eth nothing playin")
 
     @commands.guild_only()
@@ -292,6 +294,7 @@ class Music(DiscordInit,commands.Cog):
             await asyncio.sleep(10)
             await ctx.message.delete()
         except:
+            await ctx.message.add_reaction(Emotes.PACNO)
             await ctx.send(f"> {ctx.author.mention} Nothing's playing")
 
 

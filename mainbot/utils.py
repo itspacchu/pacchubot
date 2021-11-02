@@ -207,6 +207,10 @@ class Emotes:
     PACDEPRESS = "<:pacdepression:860277067730649135>"
     LOFISPARKO = "<:lofisparko:858551929977962547>"
     ANGRYPING = "<:Angryping:869550989328400434>"
+    PACYES = "<:pacyes:858677949812441088>"
+    PACTICK = "<:pactick:858677949486333973>"
+    PACCROSS = "<:paccross:858677949662363648>"
+    PACNO = "<:pacno:858677949716103198>"
 
 
 class bcolors:

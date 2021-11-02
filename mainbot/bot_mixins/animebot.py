@@ -47,7 +47,7 @@ class AnimeMixin(DiscordInit, commands.Cog):
                        url=chardetail['mangaography'][index]['url']),
             ],])
         except IndexError as e:
-            await ctx.message.add_reaction('😞')
+            await ctx.message.add_reaction(Emotes.PACDEPRESS)
             embed = discord.Embed(color=0xff0000)
             embed.add_field(name="Images Not Found",value=" Coudn't find any images on given Query try charID? ", inline=False)
             embed.set_footer(
@@ -132,7 +132,7 @@ class AnimeMixin(DiscordInit, commands.Cog):
                 Button(style=ButtonStyle.URL, label="MAL", url=asrc['url'])
             ])
         except KeyError:
-            await ctx.message.add_reaction('😭')
+            await ctx.message.add_reaction(Emotes.PACDEPRESS)
             embed = discord.Embed(color=0xff0000)
             embed.add_field(name="Anime Not Found", value="That Anime is not found on MAL", inline=False)
             await ctx.send(embed=embed)
@@ -190,7 +190,7 @@ class AnimeMixin(DiscordInit, commands.Cog):
                 Button(style=ButtonStyle.URL, label="Visit MAL", url=asrc['url'])
             ])
         except Exception as e:
-            await ctx.message.add_reaction('😿')
+            await ctx.message.add_reaction(Emotes.PACDEPRESS)
             embed = discord.Embed(color=0xff0000)
             embed.add_field(name="Manga Not Found", value="Manga Query not found on MAL", inline=False)
             await ctx.send(embed=embed)

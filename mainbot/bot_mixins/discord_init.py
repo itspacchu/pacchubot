@@ -46,20 +46,19 @@ class DiscordInit:
             return
 
         for x in message.mentions:
-            if(x == self.client.user and len(message.content)):
+            if(x == self.client.user):
                 if(len(message.content) > 25):
                     payload_to_send = message.content.replace(
                         "<@!709426015759368282>", "")
                 else:
                     payload_to_send = choice(
-                        ["Hey", "Sup", "Hi there", "Hi", "Nice to meet you", "Hello"])
+                        ["Bonjour", "Weather is good", "I'm good", "Hi", "Waddup"])
 
                 await message.channel.send(mention_convo(payload_to_send)["generated_text"] + " " + message.author.mention)
+    
+        await self.client.process_commands(message)
 
-        if(botReadyToRespond):  # or isItPacchu(str(message.author.id))):
-            await self.client.process_commands(message)
-
-        if('pacchu' in message.content.lower() and len(message.content) > 5):
+        if('pacchu' in message.content.lower() and len(message.content) > 10):
             await message.add_reaction(Emotes.PACCHU)
 
         qq = message.content.lower().split(' ')[0]
@@ -69,7 +68,7 @@ class DiscordInit:
                 match = self.MemberTaunt.find_one(query)['taunt']
                 await message.channel.send(match)
             except Exception as e:
-                pass  # this error is on every goddamn message ffs
+                asyncio.sleep(1)  # this error is on every goddamn message ffs
 
     def init_db(self):
         self.serverstat = self.db['serverstat']
@@ -87,23 +86,14 @@ class DiscordInit:
 
 
 class BaseBot(DiscordInit, commands.Cog):
-
     @commands.command()
     async def ping(self, ctx):
         await ctx.message.add_reaction('⌚')
         embed = discord.Embed(colour=discord.Colour(0x27ce89))
-        embed.add_field(
-            name="Latency", value=f"{round(self.client.latency,2)} ms")
-
-        embed.add_field(
-            name="Host Location", value=f"South East Asia MUMBAI Oracle")
-
-        embed.add_field(name="CPU Load",
-                        value=f"{round(psutil.cpu_percent(4))}% Usage")
-        embed.add_field(
-            name="Memory Load", value=f'{round(psutil.virtual_memory().available/1024**2,2)} MB / 900MB')
-        embed.add_field(
-            name="Servers", value=f"Sneaking in {str(len(self.client.guilds))} Servers", inline=True)
+        embed.add_field(name="Latency", value=f"> Latency {round(self.client.latency * 1000)}ms")
+        embed.add_field(name="CPU Load",value=f"{round(psutil.cpu_percent(4))}% Usage")
+        embed.add_field(name="Memory Load", value=f'{round(psutil.virtual_memory().available/1024**2,2)} MB / 900MB')
+        embed.add_field(name="Servers", value=f"Sneaking in {str(len(self.client.guilds))} Servers", inline=True)
         await better_send(ctx, embed=embed)
 
     @ commands.command()
@@ -144,11 +134,8 @@ class BaseBot(DiscordInit, commands.Cog):
         else:
             await ctx.send("> **SUDO COMMAND** This is a sudo command " + ctx.author.mention)
 
-    # add pagination to this
-
     @ commands.command(aliases=['h', 'halp', 'hel'])
     async def help(self, ctx, pgno=0):
-        # save avatar of user into a variable
         embedColor = find_dominant_color(ctx.author.avatar_url_as(
             format=None, static_format='png', size=64))
         embed = discord.Embed(
@@ -182,9 +169,6 @@ class BaseBot(DiscordInit, commands.Cog):
                             value="Fetches Wikipedia Picture of the Day", inline=False)
             embed.add_field(name=f"{self.pre}hubbleday/hb Date",
                             value="What Hubble saw on your birthday", inline=False)
-            embed.add_field(
-                name=f"{self.pre}stats", value="partially implemented **bugs**", inline=False)
-
             embed.add_field(name=f"{self.pre}invite",
                             value="Invite link for this bot", inline=False)
             embed.add_field(name=f"{self.pre}anipics/ap",
@@ -193,25 +177,22 @@ class BaseBot(DiscordInit, commands.Cog):
                             value="Image Processing Cartoonize AI", inline=True)
             embed.add_field(name=f"{self.pre}distort/id @mention/file",
                             value="Image Processing Distort Image based on VectorField", inline=True)
-
             embed.add_field(name=f"{self.pre}sticker/st [sticker name]",
                             value="Discord Stickers NQN clone", inline=False)
             embed.add_field(name=f"{self.pre}impersonate/sayas @mention 'Deez nuzz' ",
                             value="Impersonates the person mentioned", inline=False)
-            embed.add_field(name=f"{self.pre}gpt \"Today is a wonderful..\"",
-                            value="gpt neo text completion", inline=True)
+            embed.add_field(name=f"{self.pre}quote",
+                            value="Give a random quote", inline=True)
             embed.add_field(name=f"{self.pre}q \"Why is chocolate beautiful?\"",
                             value="gpt neo answering", inline=True)
 
             embed.add_field(name=f"{self.pre}github",
                             value="Contribute to this bot", inline=False)
-            embed.add_field(name=f"{self.pre}help",
-                            value="isnt it obvious :o", inline=False)
         embed.set_footer(
             text=f"{self.name} {self.VERSION}", icon_url=self.avatar)
         del_dis = await ctx.send(embed=embed, components=[[
             Button(style=ButtonStyle.gray, label="More help"),
-        ], ])
+        ],])
 
         res = await self.client.wait_for("button_click", timeout=100)
         if(await ButtonProcessor(ctx, res, "More help", userCheck=True)):

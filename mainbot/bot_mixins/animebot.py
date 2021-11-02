@@ -61,10 +61,8 @@ class AnimeMixin(DiscordInit, commands.Cog):
                 await del_dis.delete()
                 del_dis = None
                 await ctx.invoke(self.client.get_command('anipics'), charQuery, index=index+1)
+                break
         
-        
-            
-
     @commands.command(aliases=['ani', 'anim'])
     async def anime(self,ctx, *Query,index=0):
         del_dis = None
@@ -115,11 +113,6 @@ class AnimeMixin(DiscordInit, commands.Cog):
             except:
                 pass
             try:
-                embed.add_field(name="Views", value=str(
-                    asrc['members']) + " ", inline=True)
-            except:
-                pass
-            try:
                 embed.add_field(name="Rated", value=str(
                     asrc['rated']) + " ", inline=True)
             except:
@@ -134,7 +127,6 @@ class AnimeMixin(DiscordInit, commands.Cog):
                     embed.add_field(name="Endings", value=list_to_string(more_info['ending_themes'], 4) + " ", inline=False)
             except:
                 pass
-            embed.set_footer(text=f"Search for full title for more accurate results", icon_url=self.avatar)
             del_dis = await ctx.send(embed=embed,components=[
                 Button(style=ButtonStyle.green, label="Next Anime"),
                 Button(style=ButtonStyle.URL, label="MAL", url=asrc['url'])
@@ -143,14 +135,15 @@ class AnimeMixin(DiscordInit, commands.Cog):
             await ctx.message.add_reaction('😭')
             embed = discord.Embed(color=0xff0000)
             embed.add_field(name="Anime Not Found", value="That Anime is not found on MAL", inline=False)
-            embed.set_footer(text=self.name, icon_url=self.avatar)
             await ctx.send(embed=embed)
+        
         while True:
             res = await self.client.wait_for("button_click", timeout=100)
             if(await ButtonProcessor(ctx,res,"Next Anime")):
                 await del_dis.delete()
                 del_dis = None
                 await ctx.invoke(self.client.get_command('anime'), animeQuery , index=index+1)
+                break
         
 
     @commands.command(aliases=['asearch'])

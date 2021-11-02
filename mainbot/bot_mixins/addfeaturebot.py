@@ -3,13 +3,11 @@ from datetime import datetime as dt
 from datetime import date
 
 from discord_components import button
-from mainbot.core.injectPayload import FetchBookFromLibgenAPI
 #from typing_extensions import Unpack
 from mainbot.core import wikipedia_api, nasabirthday_api
 from ..__imports__ import *
 from ..settings import *
 from .discord_init import DiscordInit
-
 
 class AdditionalFeatureMixin(DiscordInit, commands.Cog):
     @commands.command(aliases=['g'])
@@ -105,21 +103,13 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
                     wait = await ctx.send(embed=embed, components=[[
                         Button(style=ButtonStyle.URL, label="Open in Spotify",
                                url=le_url + activity.track_id),
-                        Button(style=ButtonStyle.green, label="Spotify",
-                               url=song_url_if_exists),
-                    ], ])
+                    ],])
         if(flag == 0):
             embed = discord.Embed(
                 title=f"{user.name}'s Spotify",
                 description="Not Listening to anything",
                 color=0x1DB954)
             await ctx.send(embed=embed, delete_after=20)
-        while True:
-            res = await self.client.wait_for("button_click", timeout=300)
-            await res.respond(
-                type=InteractionType.ChannelMessageWithSource, content=song_url_if_exists
-            )
-            song_url_if_exists = "Expired"
 
     @commands.command(aliases=['linkify', 'li'])
     async def linkit(self, ctx, *, url):
@@ -148,23 +138,6 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
                 print(e)
         except requests.ConnectionError as exception:
             pass
-
-    @commands.command(aliases=['clear'])
-    async def clr(self, ctx, amount=10):
-        count = 0
-        await ctx.message.add_reaction(Emotes.PACEXCLAIM)
-        if(isItPacchu(ctx.message.author) or ctx.author.guild_permissions.administrator):
-            del_dis = await ctx.send(f"> Deleting last few messages sent by me")
-            try:
-                async for message in ctx.channel.history(limit=10):
-                    if message.author == self.client.user:
-                        count += 1
-                        await message.delete()
-                await del_dis.edit(content=f"> Deleted Messages [Found {count}]")
-            except:
-                await ctx.send(f"> I dont have permission to look at my old messages?")
-        else:
-            await ctx.send(f"> This is a sudo command")
             
 def setup(bot):
     bot.add_cog(AdditionalFeatureMixin(bot))

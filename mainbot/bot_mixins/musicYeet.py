@@ -239,7 +239,7 @@ class Music(DiscordInit,commands.Cog):
             await ctx.send("> usage : play {url/spotify}")
         url,whrc = handle_spotify(url)
         if(whrc == "SP"):
-            await ctx.send("> Fetching from spotify")
+            await ctx.send("> Fetching from spotify",delete_after=3.0)
         client = ctx.guild.voice_client
         state = self.get_state(ctx.guild)  # get the guild's state
 
@@ -265,7 +265,7 @@ class Music(DiscordInit,commands.Cog):
                 client = await channel.connect()
                 self._play_song(client, state, video)
                 await ctx.message.add_reaction(Emotes.PACPLAY)
-                message = await ctx.send("", embed=video.get_embed(),components=[Button(style=ButtonStyle.URL, label="Youtube",url=url)])
+                message = await ctx.send("", embed=video.get_embed(),components=[Button(style=ButtonStyle.URL, label="Youtube",url=video.video_url)])
                 logging.info(f"Now playing '{video.title}'")
             else:
                 await ctx.message.add_reaction(Emotes.PACNO)

@@ -100,16 +100,30 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
                     embed.set_thumbnail(url=activity.album_cover_url)
                     embed.add_field(name="Artist", value=activity.artist)
                     song_url_if_exists = le_url+activity.track_id
-                    wait = await ctx.send(embed=embed, components=[[
+                    allbuttons = [
                         Button(style=ButtonStyle.URL, label="Open in Spotify",
-                               url=le_url + activity.track_id),
-                    ],])
+                               url=le_url + activity.track_id)
+                    ]
+                    voice_state = ctx.member.voice
+                    if(voice_state != None and ctx.guild.id == voice_state.guild.id):
+                        allbuttons.append(
+                            Button(style=ButtonStyle.green, label="Spotify",
+                               url=song_url_if_exists),
+                        )
+                    wait = await ctx.send(embed=embed, components=[])
         if(flag == 0):
             embed = discord.Embed(
                 title=f"{user.name}'s Spotify",
                 description="Not Listening to anything",
                 color=0x1DB954)
             await ctx.send(embed=embed, delete_after=20)
+
+        if(voice_state != None and ctx.guild.id == voice_state.guild.id):
+            while True:
+                res = await self.client.wait_for("button_click", timeout=300)
+                await ctx.invoke(self.client.get_command('play'), url=song_url_if_exists)
+                await res.respond(type=InteractionType.ChannelMessageWithSource, content="Connecting to Voice channel ...")
+        
 
     @commands.command(aliases=['linkify', 'li'])
     async def linkit(self, ctx, *, url):

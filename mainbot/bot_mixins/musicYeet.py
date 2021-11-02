@@ -84,7 +84,7 @@ async def in_voice_channel(ctx):
 
 async def is_audio_requester(ctx):
     """Checks that the command sender is the song requester."""
-    music = ctx.bot.get_cog("Music")
+    music = ctx.client.get_cog("Music")
     state = music.get_state(ctx.guild)
     permissions = ctx.channel.permissions_for(ctx.author)
     if permissions.administrator or state.is_requester(ctx.author):
@@ -95,10 +95,7 @@ async def is_audio_requester(ctx):
 
 
 class Music(DiscordInit,commands.Cog):
-    """Bot commands to help play music."""
-    bot = None
-    def __init__(self):
-        self.bot = self.client
+
 
     def get_state(self, guild):
         """Gets the state for `guild`, creating it if it does not exist."""
@@ -160,7 +157,7 @@ class Music(DiscordInit,commands.Cog):
                 self._play_song(client, state, next_song)
             else:
                 asyncio.run_coroutine_threadsafe(client.disconnect(),
-                                                 self.bot.loop)
+                                                 self.client.loop)
 
         client.play(source, after=after_playing)
 

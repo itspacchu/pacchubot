@@ -85,13 +85,19 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
     @commands.command(pass_context=True, aliases=['def'])
     async def dictionary(self,ctx,*,word):
         respo = requests.get(f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}").json()[0]
-        partOfSpeech = respo['meanings'][0]['partOfSpeech']
+        try:
+            partOfSpeech = respo['meanings'][0]['partOfSpeech']
+        except:
+            await ctx.send("> Something seems wrong... is the spelling correct?")
+            return
         definition = respo['meanings'][0]['definitions'][0]['definition']
         audioUrl = "https:"+respo['phonetics'][0]['audio']
         origin = respo['origin']
         embed = discord.Embed(title=f"**{respo['word']}** _({partOfSpeech})_", colour=discord.Colour(0xfca16b), description=f"{definition}\n\n**Origin**: {origin}")
-        await ctx.send(embed=embed)
-        await ctx.send(audioUrl)
+        await ctx.send(embed=embed, components=[
+            Button(style=ButtonStyle.URL, label="Pronunciation",
+                   url=audioUrl),
+        ])
 
     @commands.command()
     async def spotify(self, ctx, user: discord.Member = None):

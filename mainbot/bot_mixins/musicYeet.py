@@ -38,7 +38,7 @@ def handle_spotify(query):
 class Video:
     """Class containing information about a particular video."""
 
-    def __init__(self, url_or_search, requested_by,src="YT"):
+    def __init__(self, url_or_search, requested_by,src):
         """Plays audio from (or searches for) a URL."""
         with ytdl.YoutubeDL(YTDL_OPTS) as ydl:
             video = self._get_info(url_or_search)
@@ -228,11 +228,14 @@ class Music(DiscordInit,commands.Cog):
     @commands.guild_only()
     async def lofi(self,ctx):
         lofi_url = "https://www.youtube.com/watch?v=5qap5aO4i9A"
-        await ctx.invoke(self.client.get_command('play'), lofi_url)
+        await ctx.invoke(self.client.get_command('play'), url=lofi_url)
 
     @commands.command(brief="Plays audio from <url>.")
     @commands.guild_only()
-    async def play(self, ctx, *, url):
+    async def play(self, ctx, *, url=None):
+        if(url == None):
+            url = "https://youtu.be/dQw4w9WgXcQ"
+            await ctx.send("> usage : play {url/spotify}")
         url,src = handle_spotify(url)
 
         client = ctx.guild.voice_client
@@ -240,7 +243,7 @@ class Music(DiscordInit,commands.Cog):
 
         if client and client.channel:
             try:
-                video = Video(url, ctx.author,src)
+                video = Video(url, ctx.author , src)
             except youtube_dl.DownloadError as e:
                 logging.warn(f"Error downloading video: {e}")
                 await ctx.send("> Something went wrong in getting the video")

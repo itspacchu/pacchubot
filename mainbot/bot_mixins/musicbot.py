@@ -49,11 +49,9 @@ class MusicMixin(DiscordInit, commands.Cog):
             'violet': 'https://www.youtube.com/watch?v=8mY3Udau4sE',
             'silentvoice': 'https://www.youtube.com/watch?v=Fu9hLWfOups',
             'yourname': 'https://www.youtube.com/watch?v=H9yfuYDoGf4',
-            'minecraft': 'https://www.youtube.com/watch?v=Dg0IjOzopYU',
-            'disco': 'https://www.youtube.com/watch?v=qz_Yzt_9ZbY',
-            'sad': 'https://www.youtube.com/watch?v=yf18K9g-XV0',
-            'avec': 'https://www.youtube.com/watch?v=tcjxT3m5UDE'
+            'minecraft': 'https://www.youtube.com/watch?v=Dg0IjOzopYU'
         }
+
         async with ctx.typing():
             with youtube_dl.YoutubeDL(ytdl_format_options) as ydl:
                 info = ydl.extract_info(flavoururls[flavour], download=False)
@@ -183,6 +181,7 @@ class MusicMixin(DiscordInit, commands.Cog):
             await ctx.send("> Fetching Youtube Results ...", delete_after=2.0)
             flavour = self.basicYTSearch(flavour)
 
+        
         voice = get(self.client.voice_clients, guild=ctx.guild)
         await ctx.message.add_reaction(Emotes.PACPLAY)
         try:
@@ -232,7 +231,6 @@ class MusicMixin(DiscordInit, commands.Cog):
             except:
                 pass
             voice.play(FFmpegPCMAudio(URL, **self.FFMPEG_OPTIONS))
-            voice.is_playing()
             await asyncio.sleep(info['duration'] + 3.5)
             # check for queue
             if(len(self.SONG_QUEUE[ctx.guild.id]) > 0):
@@ -414,7 +412,7 @@ class MusicMixin(DiscordInit, commands.Cog):
                 for episode_ in currentpod.ListEpisodes()[start:start+5]:
                     currentEpisodeDetail = currentpod.GetEpisodeDetails(ind)
                     embed.add_field(
-                        name=f"{ind} : " + currentEpisodeDetail['title'], value=f"_{currentEpisodeDetail['published'][:15]}_\n ```{sanitize(currentEpisodeDetail['summary'][:80])}...```\n", inline=False)
+                        name=f"{ind} : " + currentEpisodeDetail['title'], value=f"_{currentEpisodeDetail['published'][:16]}_\n ```{sanitize(currentEpisodeDetail['summary'][:80])}...```\n", inline=False)
                     ind += 1
                 embed.set_footer(
                     text=f"Page {start+1}/{paginationsize}", icon_url=self.avatar)
@@ -437,13 +435,6 @@ class MusicMixin(DiscordInit, commands.Cog):
         del_dis = await ctx.send(embed=embed, components=[[Button(style=ButtonStyle.green, label="Play Latest"), Button(style=ButtonStyle.red, label="Prev Page"), Button(style=ButtonStyle.blue, label="Next Page"), Button(style=ButtonStyle.grey, label="Next Search Result")]])
 
         while True:
-            try:
-                if len(ctx.voice_client.channel.members) == 1:
-                    await ctx.send("> Dont leave me alone " + Emotes.PACDEPRESS)
-                    await ctx.voice_client.disconnect()
-                    break
-            except:
-                pass
             res = await self.client.wait_for("button_click", timeout=100)
             if(await ButtonProcessor(ctx, res, "Play Latest")):
                 await ctx.invoke(self.client.get_command('podplay'))

@@ -15,7 +15,7 @@ class BotStore(DiscordInit):
 
     def add_cogs(self):
         directory = os.listdir('./mainbot/bot_mixins')
-        ignore_files = ["__init__.py", "musicbottest.py"]
+        ignore_files = ["__init__.py", "musicbottest.py","musicbot.py"]
         filtered_directory = [x for x in directory if x not in ignore_files]
         for filename in filtered_directory:
             if filename.endswith('.py'):

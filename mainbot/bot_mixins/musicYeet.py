@@ -319,7 +319,7 @@ class Music(DiscordInit,commands.Cog):
             url = info['formats'][0]['url']
         if(url != "Not Found"):
             try:
-                await ctx.reply(" ",components=[Button(style=ButtonStyle.URL, label="Download",url=url)])
+                await ctx.reply(Emotes.PACTICK,components=[Button(style=ButtonStyle.URL, label="Download",url=url)])
             except:
                 await ctx.send("> Dont delete your message .. no one will judge your kinks :<",components=[Button(style=ButtonStyle.URL, label="Download",url=url)])
         else:

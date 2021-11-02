@@ -258,7 +258,7 @@ class Music(DiscordInit,commands.Cog):
             if ctx.author.voice is not None and ctx.author.voice.channel is not None:
                 channel = ctx.author.voice.channel
                 try:
-                    video = Video(url, ctx.author)
+                    video = Video(url, ctx.author,whrc)
                 except youtube_dl.DownloadError as e:
                     await ctx.send("> Something went wrong!! \n```{e}```")
                     return

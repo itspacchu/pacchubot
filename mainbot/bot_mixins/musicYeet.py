@@ -23,9 +23,8 @@ YTDL_OPTS = {
 # this is from my brother's bot
 # https://github.com/mackdroid/bored-bot
 
-def handle_spotify(query):
+def handle_spotify(query=None):
         if 'https://open.spotify.com/track/' in query:
-            src = "spot"
             response = requests.get(query)
             filter = re.search("Spotify.Entity.*};",response.text).group(0)[17:-1]
             spotinfo = json.loads(filter)
@@ -233,13 +232,14 @@ class Music(DiscordInit,commands.Cog):
     @commands.command(brief="Plays audio from <url>.")
     @commands.guild_only()
     async def play(self, ctx, *, url=None):
+        print("DEBUG:: " + url)    
         if(url == None):
             url = "https://youtu.be/dQw4w9WgXcQ"
             await ctx.send("> usage : play {url/spotify}")
         url,whrc = handle_spotify(url)
-        if(whrc):
+        if(whrc == "SP"):
             await ctx.send("> Fetching from spotify")
-
+        print("DEBUG:: " + url,whrc)    
         client = ctx.guild.voice_client
         state = self.get_state(ctx.guild)  # get the guild's state
 

@@ -23,7 +23,7 @@ YTDL_OPTS = {
 # this is from my brother's bot
 # https://github.com/mackdroid/bored-bot
 
-def handle_spotify(self,query):
+def handle_spotify(query):
         if 'https://open.spotify.com/track/' in query:
             src = "spot"
             response = requests.get(query)

@@ -96,13 +96,9 @@ async def is_audio_requester(ctx):
 
 class Music(DiscordInit,commands.Cog):
     """Bot commands to help play music."""
-
-    def __init__(self, bot, config):
-        self.bot = bot
-        self.config = config[__name__.split(".")[
-            -1]]  # retrieve module name, find config entry
-        self.states = {}
-        self.bot.add_listener(self.on_reaction_add, "on_reaction_add")
+    bot = None
+    def __init__(self):
+        self.bot = self.client
 
     def get_state(self, guild):
         """Gets the state for `guild`, creating it if it does not exist."""

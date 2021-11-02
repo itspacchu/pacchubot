@@ -155,6 +155,8 @@ class Music(DiscordInit,commands.Cog):
         state = self.get_state(ctx.guild)
         client = ctx.guild.voice_client
         client.stop()
+        await ctx.send("> Fetching from queue ...",delete_after=1.0)
+        await ctx.invoke(self.client.get_command('np'))
 
     def _play_song(self, client, state, song):
         state.now_playing = song
@@ -296,6 +298,33 @@ class Music(DiscordInit,commands.Cog):
         except:
             await ctx.message.add_reaction(Emotes.PACNO)
             await ctx.send(f"> {ctx.author.mention} Nothing's playing")
+    
+    @commands.command(aliases=['getmp3','mp3'])
+    async def download_song(self,ctx,*,query=None):
+        downloadl = {
+            'format': 'bestaudio/best',
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': '320',
+            }]
+        }
+        if(query == None):
+            state = self.get_state(ctx.guild).now_playing
+            query = state.video_url
+
+        url = "Not Found"
+        with youtube_dl.YoutubeDL(downloadl) as ydl:
+            info = ydl.extract_info(query, download=False)
+            url = info['formats'][0]['url']
+        if(url != "Not Found"):
+            try:
+                await ctx.reply(" ",components=[Button(style=ButtonStyle.URL, label="Download",url=url)])
+            except:
+                await ctx.send("> Dont delete your message .. no one will judge your kinks :<",components=[Button(style=ButtonStyle.URL, label="Download",url=url)])
+        else:
+            await ctx.reply("> Not Found" , delete_after=3.0)
+
 
 
 

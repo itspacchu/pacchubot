@@ -6,7 +6,6 @@ from random import randint
 from .discord_init import DiscordInit
 import requests
 
-
 class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
     @commands.command()
     async def ecchi(self, ctx):
@@ -61,36 +60,6 @@ class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
             await webhook.delete()
         except:
             ctx.send("> Webhook permission not available")
-    
-    @commands.command()
-    async def echodetails(self, ctx):
-        if(isItPacchu(ctx.author)):
-            pass
-        else:
-            await ctx.send("> THIS IS A SUDO COMMAND !!! Only Bot Developers can run this command")
-            return
-        try:
-            await ctx.send(f"```USER : {ctx.author.name}#{ctx.author.discriminator}\n> {ctx.message.content}\n```")
-            try:
-                await ctx.send(f"```FILES FOUND : {ctx.attachments[0].url}```")
-            except:
-                pass
-        except:
-            await ctx.send("> Wat dis should work all the time some bug")
-    
-    @commands.command()
-    async def echoraw(self, ctx):
-        if(isItPacchu(ctx.author)):
-            pass
-        else:
-            await ctx.send("> THIS IS A SUDO COMMAND !!! Only Bot Developers can run this command")
-            return
-        try:
-            await ctx.send(f"```{ctx.message.content}```")
-        except:
-            await ctx.send("> Wat dis should work all the time some bug")
-
-
 
 def setup(bot):
     bot.add_cog(DeprecatedCommandsMixin(bot))

@@ -11,6 +11,7 @@ from ..__imports__ import *
 from ..settings import *
 from .discord_init import Discord_init_Color, DiscordInit
 import html
+import urllib
 
 YTDL_OPTS = {
     "default_search": "ytsearch",
@@ -18,6 +19,15 @@ YTDL_OPTS = {
     "quiet": True,
     "extract_flat": "in_playlist"
 }
+
+
+def basicYTSearch(search):
+    query_string = urllib.parse.urlencode({'search_query': search})
+    htm_content = urllib.request.urlopen(
+        'http://www.youtube.com/results?' + query_string)
+    search_results = re.findall(
+        r"/watch\?v=(.{11})", htm_content.read().decode())
+    return 'http://www.youtube.com/watch?v=' + search_results[0]
 
 
 # this is from my brother's bot
@@ -30,7 +40,8 @@ def handle_spotify(query=None):
             spotinfo = json.loads(filter)
             song_title = html.unescape(spotinfo["album"]["name"])
             song_artist = html.unescape(spotinfo['album']['artists'][0]['name'])
-            return [song_title + " " + song_artist,"SP"]
+            song_url = basicYTSearch(song_title + ' ' + song_artist)
+            return [song_url,"SP"]
         else:
             return [query,"YT"]
 
@@ -209,7 +220,7 @@ class Music(DiscordInit,commands.Cog):
         state = self.get_state(ctx.guild)
         state.playlist = []
 
-    @commands.command(aliases=["jump","skipto"])
+    @commands.command(aliases=["move","movesong"])
     @commands.guild_only()
     @commands.check(audio_playing)
     async def jumpqueue(self, ctx, song: int, new_index: int):
@@ -223,7 +234,20 @@ class Music(DiscordInit,commands.Cog):
             await ctx.send(self._queue_text(state.playlist))
         else:
             await ctx.message.add_reaction(Emotes.PACNO)
-            raise commands.CommandError("You must use a valid index.")
+            raise commands.CommandError("> Not a valid queue index")
+    
+    @commands.command(aliases=["delete"])
+    @commands.guild_only()
+    @commands.check(audio_playing)
+    async def remove(self, ctx, song: int, new_index: int):
+        state = self.get_state(ctx.guild) 
+        if 1 <= song <= len(state.playlist) and 1 <= new_index:
+            await ctx.message.add_reaction(Emotes.PACTICK)
+            song = state.playlist.pop(song - 1)  
+            await ctx.send(self._queue_text(state.playlist))
+        else:
+            await ctx.message.add_reaction(Emotes.PACNO)
+            raise commands.CommandError("> Index of song invalid!!")
 
 
     @commands.command()

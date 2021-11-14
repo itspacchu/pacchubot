@@ -91,7 +91,6 @@ class BaseBot(DiscordInit, commands.Cog):
         await ctx.message.add_reaction('⌚')
         embed = discord.Embed(colour=discord.Colour(0x27ce89))
         embed.add_field(name="Latency", value=f"> Latency {round(self.client.latency * 1000)}ms")
-        embed.add_field(name="CPU Load",value=f"{round(psutil.cpu_percent(4))}% Usage")
         embed.add_field(name="Memory Load", value=f'{round(psutil.virtual_memory().available/1024**2,2)} MB / 900MB')
         embed.add_field(name="Servers", value=f"Sneaking in {str(len(self.client.guilds))} Servers", inline=True)
         await better_send(ctx, embed=embed)

@@ -33,7 +33,7 @@ class DiscordInit:
             self.name = self.client.user.name
         if not hasattr(self, 'avatar'):
             self.avatar = "https://cdn.discordapp.com/attachments/715107506187272234/850379532459573288/pacslav.png"
-        statustxt = "Pacchu is doing No Nut November seriously"
+        statustxt = "Shovling bot"
         activity = discord.Game(name=statustxt)
         if(self.client):
             print("Connected to Database...")

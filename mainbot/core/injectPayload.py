@@ -13,6 +13,8 @@ from tqdm import tqdm
 import cv2
 from random import randint
 
+cv2.setNumThreads(1)
+
 def cartoonize(myfile,filname):
     downloadFileFromUrl(myfile,filname,none=None)
     s = requests.Session()

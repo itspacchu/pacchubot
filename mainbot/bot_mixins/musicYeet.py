@@ -231,7 +231,7 @@ class Music(DiscordInit,commands.Cog):
             song = state.playlist.pop(song - 1)  # take song at index...
             state.playlist.insert(new_index - 1, song)  # and insert it.
 
-            await ctx.send(self._queue_text(state.playlist))
+            await ctx.invoke(self.client.get_command('queue'))
         else:
             await ctx.message.add_reaction(Emotes.PACNO)
             raise commands.CommandError("> Not a valid queue index")
@@ -239,12 +239,12 @@ class Music(DiscordInit,commands.Cog):
     @commands.command(aliases=["delete"])
     @commands.guild_only()
     @commands.check(audio_playing)
-    async def remove(self, ctx, song: int, new_index: int):
+    async def remove(self, ctx, song: int):
         state = self.get_state(ctx.guild) 
-        if 1 <= song <= len(state.playlist) and 1 <= new_index:
+        if 1 <= song <= len(state.playlist):
             await ctx.message.add_reaction(Emotes.PACTICK)
             song = state.playlist.pop(song - 1)  
-            await ctx.send(self._queue_text(state.playlist))
+            await ctx.invoke(self.client.get_command('queue'))
         else:
             await ctx.message.add_reaction(Emotes.PACNO)
             raise commands.CommandError("> I am dumb yet I know we dont have that many songs in the queue")
@@ -344,8 +344,8 @@ class Music(DiscordInit,commands.Cog):
         if(url != "Not Found"):
             try:
                 await ctx.reply(Emotes.PACTICK,components=[Button(style=ButtonStyle.URL, label="Download",url=url)])
-            except:
-                await ctx.send("> Dont delete your message .. no one will judge your kinks :<",components=[Button(style=ButtonStyle.URL, label="Download",url=url)])
+            except Exception as e:
+                await ctx.send(f"**Download** : {url} \n Some Error Occurred while processing || {e} ||")
         else:
             await ctx.reply("> Not Found" , delete_after=3.0)
 

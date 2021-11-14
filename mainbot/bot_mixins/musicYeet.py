@@ -247,7 +247,7 @@ class Music(DiscordInit,commands.Cog):
             await ctx.send(self._queue_text(state.playlist))
         else:
             await ctx.message.add_reaction(Emotes.PACNO)
-            raise commands.CommandError("> Index of song invalid!!")
+            raise commands.CommandError("> I am dumb yet I know we dont have that many songs in the queue")
 
 
     @commands.command()

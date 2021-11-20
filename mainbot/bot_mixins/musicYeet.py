@@ -261,7 +261,7 @@ class Music(DiscordInit,commands.Cog):
             await ctx.send("> You didnt give a name ... should I load \"floopus dingus?\" (doesn't exist obviously) ")
         else:
             try:
-                queue = pickle.load(open(f"/{str(ctx.guild.id)}/{name}.playlist", "rb"))
+                queue = pickle.load(open(f"{os.getcwd()}/statics/playlists/{str(ctx.guild.id)}/{name}.playlist", "rb"))
                 state = self.get_state(ctx.guild)
                 for song in queue:
                     state.playlist.append(song)
@@ -276,7 +276,7 @@ class Music(DiscordInit,commands.Cog):
         """Lists all the saved playlists."""
         await ctx.message.add_reaction(Emotes.PACNO)
         try:
-            files = os.listdir(f"/{str(ctx.guild.id)}")
+            files = os.listdir(f"{os.getcwd()}/statics/playlists/{str(ctx.guild.id)}/")
             if(len(files) == 0):
                 await ctx.send("> No playlists found")
             else:

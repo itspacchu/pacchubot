@@ -12,6 +12,7 @@ from ..settings import *
 from .discord_init import Discord_init_Color, DiscordInit
 import html
 import urllib
+import pickle
 
 YTDL_OPTS = {
     "default_search": "ytsearch",
@@ -21,13 +22,23 @@ YTDL_OPTS = {
 }
 
 
-def basicYTSearch(search):
+def basicYTSearch(search,result_index=0):
     query_string = urllib.parse.urlencode({'search_query': search})
     htm_content = urllib.request.urlopen(
         'http://www.youtube.com/results?' + query_string)
     search_results = re.findall(
         r"/watch\?v=(.{11})", htm_content.read().decode())
-    return 'http://www.youtube.com/watch?v=' + search_results[0]
+    return 'http://www.youtube.com/watch?v=' + search_results[result_index]
+
+def basicYTPlaylist(playlist_url):
+    _raw_ = None
+    playlist = []
+    with youtube_dl.YoutubeDL(YTDL_OPTS) as ydl:
+        _raw_ = ydl.extract_info(playlist_url, download=False)
+    for _ in _raw_['entries']:
+        playlist.append('http://www.youtube.com/watch?v='+ _['url'])
+    return playlist
+
 
 
 # this is from my brother's bot
@@ -191,6 +202,8 @@ class Music(DiscordInit,commands.Cog):
         """Displays information about the current song."""
         state = self.get_state(ctx.guild)
         message = await ctx.send("", embed=state.now_playing.get_embed())
+    
+
 
     @commands.command(aliases=["q", "playlist"])
     @commands.guild_only()
@@ -219,6 +232,56 @@ class Music(DiscordInit,commands.Cog):
         """Clears the play queue without leaving the channel."""
         state = self.get_state(ctx.guild)
         state.playlist = []
+    
+    @commands.command(aliases=["qs","saveplaylist","queuesave"])
+    @commands.guild_only()
+    @commands.check(audio_playing)
+    async def savequeue(self, ctx, name: str):
+        """Saves the current queue as a playlist."""
+        if(len(name) > 0):
+            await ctx.message.add_reaction(Emotes.PACNO)
+            await ctx.send("> You didnt give a name ... should I save it as \"floopus dingus?\" Try again")
+        else:
+            queue = self.get_state(ctx.guild).playlist
+            if(len(queue) == 0):
+                await ctx.message.add_reaction(Emotes.PACNO)
+                await ctx.send("> The queue is empty ... nothing to save")
+            else:
+                await ctx.send("> Saving queue as \"{}\"".format(name))
+                pickle.dump(queue, open(f"/{str(ctx.guild.id)}/{name}.playlist", "wb"))
+                await ctx.message.add_reaction(Emotes.PACYES)
+
+    @commands.command(aliases=["lq","loadplaylist","queueload"])
+    @commands.guild_only()
+    async def loadqueue(self, ctx, name: str):
+        """Loads a playlist into the current queue."""
+        await ctx.message.add_reaction(Emotes.PACNO)
+        if(len(name) == 0):
+            await ctx.send("> You didnt give a name ... should I load \"floopus dingus?\" (doesn't exist obviously) ")
+        else:
+            try:
+                queue = pickle.load(open(f"/{str(ctx.guild.id)}/{name}.playlist", "rb"))
+                state = self.get_state(ctx.guild)
+                for song in queue:
+                    state.playlist.append(song)
+                await ctx.message.add_reaction(Emotes.PACYES)
+                await ctx.send("> Loaded queue \"{}\"".format(name))
+            except:
+                await ctx.send("> Queue \"{}\" not found".format(name))
+
+    @commands.command(aliases=["listplaylists"])
+    @commands.guild_only()
+    async def listqueues(self, ctx):
+        """Lists all the saved playlists."""
+        await ctx.message.add_reaction(Emotes.PACNO)
+        try:
+            files = os.listdir(f"/{str(ctx.guild.id)}")
+            if(len(files) == 0):
+                await ctx.send("> No playlists found")
+            else:
+                await ctx.send("> Playlists found : {}".format(files))
+        except:
+            await ctx.send("> No playlists found")
 
     @commands.command(aliases=["move","movesong"])
     @commands.guild_only()
@@ -263,9 +326,22 @@ class Music(DiscordInit,commands.Cog):
         if(url == None):
             url = "https://youtu.be/dQw4w9WgXcQ"
             await ctx.send("> usage : play {url/spotify}")
+        
+        try:
+            if("/playlist?list=" in url):
+                await ctx.send("> Parsing playlists",delete_after=5.0)
+                ytplaylist = basicYTPlaylist(url)
+                for song in ytplaylist.songs:
+                    await ctx.invoke(self.client.get_command('play'),url=song.url)
+                await ctx.send("> Done")
+                return
+        except Exception as e:
+            await ctx.send(f"> Something somewhere went wrong \n ||{e}||",delete_after=5.0)
+            return
+
         url,whrc = handle_spotify(url)
         if(whrc == "SP"):
-            await ctx.send("> Fetching from spotify",delete_after=3.0)
+            await ctx.send("> Fetching from spotify",delete_after=5.0)
         client = ctx.guild.voice_client
         state = self.get_state(ctx.guild)  # get the guild's state
 
@@ -296,7 +372,7 @@ class Music(DiscordInit,commands.Cog):
             else:
                 await ctx.message.add_reaction(Emotes.PACNO)
                 raise commands.CommandError(
-                    "> You need to be in a voice channel to do that.")
+                    "> I might be your music bot but I can't get your lazy ass to join voice channel :/")
 
     @commands.check(audio_playing)
     @commands.guild_only()               
@@ -309,7 +385,7 @@ class Music(DiscordInit,commands.Cog):
             await ctx.message.delete()
         except:
             await ctx.message.add_reaction(Emotes.PACNO)
-            await ctx.send(f"> {ctx.author.mention} I see-eth nothing playin")
+            await ctx.send(f"> {ctx.author.mention} wait .. I'm playing something??")
 
     @commands.guild_only()
     @commands.command(aliases=['res'])
@@ -321,7 +397,7 @@ class Music(DiscordInit,commands.Cog):
             await ctx.message.delete()
         except:
             await ctx.message.add_reaction(Emotes.PACNO)
-            await ctx.send(f"> {ctx.author.mention} Nothing's playing")
+            await ctx.send(f"> {ctx.author.mention} .. I dont remember pausing..? Something playing??")
     
     @commands.command(aliases=['getmp3','mp3'])
     async def download_song(self,ctx,*,query=None):

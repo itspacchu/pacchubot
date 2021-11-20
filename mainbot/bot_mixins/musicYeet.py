@@ -336,7 +336,7 @@ class Music(DiscordInit,commands.Cog):
                 await ctx.send("> Parsing playlists",delete_after=5.0)
                 ytplaylist = basicYTPlaylist(url)
                 for song in ytplaylist:
-                    await ctx.invoke(self.client.get_command('play'),url=song.url)
+                    await ctx.invoke(self.client.get_command('play'),url=song)
                 await ctx.send("> Done")
                 return
         except Exception as e:

@@ -111,7 +111,9 @@ async def audio_playing(ctx):
     if client and client.channel and client.source:
         return True
     else:
+        await ctx.send("> Not currently playing any audio.")
         raise commands.CommandError("> Not currently playing any audio.")
+        
 
 
 async def in_voice_channel(ctx):
@@ -121,6 +123,7 @@ async def in_voice_channel(ctx):
     if voice and bot_voice and voice.channel and bot_voice.channel and voice.channel == bot_voice.channel:
         return True
     else:
+        await ctx.send("> You ain't in VC")
         raise commands.CommandError(
             "> You need to be in the channel to do that.")
 

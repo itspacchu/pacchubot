@@ -3,13 +3,11 @@ from datetime import datetime as dt
 from datetime import date
 
 from discord_components import button
-from mainbot.core.injectPayload import FetchBookFromLibgenAPI
 #from typing_extensions import Unpack
 from mainbot.core import wikipedia_api, nasabirthday_api
 from ..__imports__ import *
 from ..settings import *
 from .discord_init import DiscordInit
-
 
 class AdditionalFeatureMixin(DiscordInit, commands.Cog):
     @commands.command(aliases=['g'])
@@ -83,6 +81,23 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
         query = queryToName(lquery)
         reply = g2a.questionreply(query)
         await ctx.reply(reply)
+    
+    @commands.command(pass_context=True, aliases=['def'])
+    async def dictionary(self,ctx,*,word):
+        respo = requests.get(f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}").json()[0]
+        try:
+            partOfSpeech = respo['meanings'][0]['partOfSpeech']
+        except:
+            await ctx.send("> Something seems wrong... is the spelling correct?")
+            return
+        definition = respo['meanings'][0]['definitions'][0]['definition']
+        audioUrl = "https:"+respo['phonetics'][0]['audio']
+        origin = respo['origin']
+        embed = discord.Embed(title=f"**{respo['word']}** _({partOfSpeech})_", colour=discord.Colour(0xfca16b), description=f"{definition}\n\n**Origin**: {origin}")
+        await ctx.send(embed=embed, components=[
+            Button(style=ButtonStyle.URL, label="Pronunciation",
+                   url=audioUrl),
+        ])
 
     @commands.command()
     async def spotify(self, ctx, user: discord.Member = None):
@@ -102,24 +117,31 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
                     embed.set_thumbnail(url=activity.album_cover_url)
                     embed.add_field(name="Artist", value=activity.artist)
                     song_url_if_exists = le_url+activity.track_id
-                    wait = await ctx.send(embed=embed, components=[[
+                    allbuttons = [
                         Button(style=ButtonStyle.URL, label="Open in Spotify",
-                               url=le_url + activity.track_id),
-                        Button(style=ButtonStyle.green, label="Spotify",
+                               url=le_url + activity.track_id)
+                    ]
+                    voice_state = ctx.author.voice
+                    if(voice_state != None and ctx.guild.id == voice_state.channel.guild.id):
+                        allbuttons.append(
+                            Button(style=ButtonStyle.green, label="Listen Along",
                                url=song_url_if_exists),
-                    ], ])
+                        )
+                    wait = await ctx.send(embed=embed, components=allbuttons)
         if(flag == 0):
             embed = discord.Embed(
                 title=f"{user.name}'s Spotify",
                 description="Not Listening to anything",
                 color=0x1DB954)
             await ctx.send(embed=embed, delete_after=20)
-        while True:
-            res = await self.client.wait_for("button_click", timeout=300)
-            await res.respond(
-                type=InteractionType.ChannelMessageWithSource, content=song_url_if_exists
-            )
-            song_url_if_exists = "Expired"
+
+        if(voice_state != None and ctx.channel.guild.id == voice_state.channel.guild.id):
+            while True:
+                res = await self.client.wait_for("button_click", timeout=300)
+                await res.respond(type=InteractionType.ChannelMessageWithSource, content="Connecting to Voice channel ...")
+                await ctx.invoke(self.client.get_command('play'), url=song_url_if_exists)
+                
+        
 
     @commands.command(aliases=['linkify', 'li'])
     async def linkit(self, ctx, *, url):
@@ -148,87 +170,6 @@ class AdditionalFeatureMixin(DiscordInit, commands.Cog):
                 print(e)
         except requests.ConnectionError as exception:
             pass
-
-    @commands.command(aliases=['clear'])
-    async def clr(self, ctx, amount=10):
-        count = 0
-        await ctx.message.add_reaction(Emotes.PACEXCLAIM)
-        if(isItPacchu(ctx.message.author) or ctx.author.guild_permissions.administrator):
-            del_dis = await ctx.send(f"> Deleting last few messages sent by me")
-            try:
-                async for message in ctx.channel.history(limit=10):
-                    if message.author == self.client.user:
-                        count += 1
-                        await message.delete()
-                await del_dis.edit(content=f"> Deleted Messages [Found {count}]")
-            except:
-                await ctx.send(f"> I dont have permission to look at my old messages?")
-        else:
-            await ctx.send(f"> This is a sudo command")
-
-    @commands.command(aliases=['searchbook', 'sb'])
-    async def book_search(self, ctx, *Query, index=0):
-        await ctx.message.add_reaction('🔎')
-        del_dis = None
-        try:
-            try:
-                split = queryToName(Query).split('-')
-                name_of_book, author = split
-            except ValueError:
-                name_of_book = queryToName(Query)
-                author = None
-
-            bookRes = FetchBookFromLibgenAPI(name_of_book, author, index)
-            print(bookRes)
-            if(bookRes == None):
-                embed = discord.Embed(
-                    title='404', colour=0xff0000)
-                await ctx.send(embed=embed)
-                return
-            s = requests.Session()
-            burl = 'http://libgen.lc'
-            try:
-                url = bookRes['Mirror_2']
-            except:
-                embed = discord.Embed(
-                    title='Libgen No Souce Found', colour=0xff0000)
-                await ctx.send(embed=embed)
-                return
-            soup = BeautifulSoup(requests.get(url).text, 'html.parser')
-            imglink = burl + str(soup.find_all('img')[0]['src'])
-            download = burl + str(soup.find_all('a', href=True)[0]['href'])
-
-            embed = discord.Embed(
-                title=bookRes['Title'], colour=find_dominant_color(imglink))
-            if(bookRes['Author']):
-                embed.add_field(
-                    name="Author", value=bookRes['Author'], inline=True)
-            if(bookRes['Publisher']):
-                embed.add_field(name="Publisher",
-                                value=bookRes['Publisher'], inline=True)
-            if(bookRes['Year']):
-                embed.add_field(
-                    name="Year", value=bookRes['Year'], inline=False)
-            if(imglink):
-                embed.set_image(url=imglink)
-            del_dis = await ctx.send(embed=embed, components=[[
-                Button(style=ButtonStyle.green, label="Next Result"),
-                Button(style=ButtonStyle.URL, label="Download",
-                       url=download),
-                Button(style=ButtonStyle.URL, label="libgen.lc",
-                       url=bookRes['Mirror_2']),
-            ], ])
-        except Exception as e:
-            await ctx.send(f"> Something went wrong!```{e}```")
-
-        while True:
-            res = await self.client.wait_for("button_click", timeout=200)
-            if(await ButtonProcessor(ctx, res, "Next Result")):
-                await del_dis.delete()
-                del_dis = None
-                await ctx.invoke(self.client.get_command('book_search'), name_of_book, index=index+1)
-                break
-
-
+            
 def setup(bot):
     bot.add_cog(AdditionalFeatureMixin(bot))

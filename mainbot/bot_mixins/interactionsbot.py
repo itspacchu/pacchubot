@@ -12,7 +12,7 @@ class InteractionsMixin(DiscordInit, commands.Cog):
     async def avatar(self, ctx, member: discord.Member = None):
         hgp = member
         url_link = None
-        await ctx.message.add_reaction('🙄')
+        await ctx.message.add_reaction(Emotes.PACTICK)
         if(ctx.message.author == hgp or hgp == None):
             embed = discord.Embed(
                 title="OwO", description=f"{ctx.message.author.mention} steals ...wait thats your OWN", colour=find_dominant_color(ctx.message.author.avatar_url))
@@ -31,104 +31,6 @@ class InteractionsMixin(DiscordInit, commands.Cog):
         embed.set_footer(text=f"{self.client.user.name}",
                          icon_url=self.client.user.avatar_url)
 
-        await ctx.send(embed=embed, components=[[
-            Button(style=ButtonStyle.blue, label="Cartoonize"),
-            Button(style=ButtonStyle.blue, label="Distort"),
-            Button(style=ButtonStyle.blue, label="Edge"),
-        ], ])
-        while True:
-            res = await self.client.wait_for("button_click", timeout=100)
-            if(res.channel == ctx.channel):
-                if(await ButtonProcessor(ctx, res, "Cartoonize")):
-                    await ctx.invoke(self.client.get_command('cartoonize'), attachedImg=url_link)
-                elif(await ButtonProcessor(ctx, res, "Distort")):
-                    await ctx.invoke(self.client.get_command('distortion'), attachedImg=url_link)
-                elif(await ButtonProcessor(ctx, res, "Edge")):
-                    await ctx.invoke(self.client.get_command('edgeDetect'), attachedImg=url_link)
-                elif(await ButtonProcessor(ctx, res, "LineArt")):
-                    await ctx.invoke(self.client.get_command('imla'), attachedImg=url_link)
-
-    @commands.command(aliases=['gb'])
-    async def guild_banner(self, ctx):
-        await ctx.message.add_reaction(Emotes.PACEXCLAIM)
-        try:
-            embed = discord.Embed(title="", colour=find_dominant_color(
-                ctx.message.guild.banner_url))
-            embed.set_image(url=ctx.message.guild.banner_url)
-        except:
-            embed = discord.Embed(
-                title="Server Doesn't have a banner", colour=0xff2020)
-        await better_send(ctx, embed=embed)
-
-    @commands.command()
-    async def hug(self, ctx, member: discord.Member):
-        hgp = member
-        await ctx.message.add_reaction('🤗')
-        if(ctx.message.author == hgp or hgp == None):
-            embed = discord.Embed(title=f"{ctx.message.author.mention} hugs themselves",
-                                  description=f"Don't worry {ctx.message.author.mention}.. {choice(self.perks['replies']['sadhugs'])}", colour=discord.Colour(0x00ffb7))
-            embed.set_image(url=choice(self.perks['links']['sadhugs']))
-        else:
-            embed = discord.Embed(
-                title=" ", description=f"{ctx.message.author.mention} hugs {hgp.mention}", colour=discord.Colour(0x00ffb7))
-            embed.set_image(url=choice(self.perks['links']['hugs']))
-        embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
-        embed.set_footer(text=f"{self.name}", icon_url=self.avatar)
-        await ctx.send(embed=embed)
-
-    @commands.command()
-    async def kiss(self, ctx, member: discord.Member):
-        hgp = member
-        await ctx.message.add_reaction('👄')
-        if(ctx.message.author == hgp or hgp == None):
-            embed = discord.Embed(
-                title=" ", description=f"{ctx.message.author.mention} kisses themselves..HOW!!!?", colour=discord.Colour(0x00ffb7))
-            embed.set_image(url=choice(self.perks['links']['erotic_perv']))
-        else:
-            embed = discord.Embed(
-                title="💋", description=f"{ctx.message.author.mention} kisses {hgp.mention}", colour=discord.Colour(0x00ffb7))
-            embed.set_image(url=choice(self.perks['links']['kiss']))
-        embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
-        embed.set_footer(text=f"{self.client.user.name}",
-                         icon_url=self.client.user.avatar_url)
-        await ctx.send(embed=embed)
-
-    @commands.command()
-    async def kill(self, ctx, member: discord.Member):
-        hgp = member
-        await ctx.message.add_reaction('🔪')
-        if(ctx.message.author == hgp or hgp == None):
-            embed = discord.Embed(
-                title=" ", description=f"{ctx.message.author.mention} you know there are better ways for than .. than to ask me", colour=discord.Colour(0x00ffb7))
-            embed.set_image(
-                url="https://i.pinimg.com/originals/53/4d/f2/534df2eed76c2b48bc9f892086f1e749.jpg")
-        else:
-            embed = discord.Embed(
-                title=" ", description=f"{ctx.message.author.mention} kills {hgp.mention}", colour=discord.Colour(0x00ffb7))
-            embed.set_image(url=choice(self.perks['links']['kill']))
-        embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
-        embed.set_footer(text=f"{self.client.user.name}",
-                         icon_url=self.client.user.avatar_url)
-        await ctx.send(embed=embed)
-
-    @commands.command()
-    async def pat(self, ctx, member: discord.Member):
-        hgp = member
-        await ctx.message.add_reaction('👋')
-        print(hgp)
-        if(ctx.message.author == hgp or hgp == None):
-            embed = discord.Embed(
-                title=" ", description=f"{ctx.message.author.mention} pats themselves", colour=discord.Colour(0x00ffb7))
-            embed.add_field(
-                name="👋", value=f"{ctx.message.author.mention}.. i'll pat you :3")
-            embed.set_image(url=choice(self.perks['links']['pats']))
-        else:
-            embed = discord.Embed(
-                title=" ", description=f"{ctx.message.author.mention} pats {hgp.mention}", colour=discord.Colour(0x00ffb7))
-            embed.set_image(url=choice(self.perks['links']['pats']))
-        embed.set_author(name=hgp.name, icon_url=hgp.avatar_url)
-        embed.set_footer(text=f"{self.client.user.name}",
-                         icon_url=self.client.user.avatar_url)
         await ctx.send(embed=embed)
 
     @commands.command(aliases=['sk'])

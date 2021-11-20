@@ -10,9 +10,10 @@ import requests,shutil
 from bs4 import BeautifulSoup
 import time
 from tqdm import tqdm
-from libgen_api import LibgenSearch
 import cv2
 from random import randint
+
+cv2.setNumThreads(1)
 
 def cartoonize(myfile,filname):
     downloadFileFromUrl(myfile,filname,none=None)
@@ -32,26 +33,6 @@ def downloadFileFromUrl(something:str,name:str):
     with open(f'{name}.png', 'wb') as out_file:
         shutil.copyfileobj(response.raw, out_file)
     del response
-
-
-def FetchBookFromLibgenAPI(searchQuery:str,bAuthor=None,index=0):
-    x = LibgenSearch().search_title(searchQuery)
-    if(bAuthor == None):
-        if(len(x)==0):
-            return None
-        return x[index]
-    else:
-        sanity_counter = 0
-        print(f"{searchQuery} by {bAuthor}")
-        for book in tqdm(x):
-            sanity_counter += 1
-            
-            print(book['Title'],' \n-----\n' ,book['Author'])
-            if(bAuthor.lower().replace(' ','') in str(book['Author']).replace(' ','').lower()):
-                return book
-            if(sanity_counter > 5):
-                return None
-
 
 def distortion_new(imgFilename, noisemodifier, preview=False):     
     try:

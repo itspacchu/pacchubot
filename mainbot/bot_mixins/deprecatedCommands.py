@@ -6,7 +6,6 @@ from random import randint
 from .discord_init import DiscordInit
 import requests
 
-
 class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
     @commands.command()
     async def ecchi(self, ctx):
@@ -61,7 +60,6 @@ class DeprecatedCommandsMixin(DiscordInit, commands.Cog):
             await webhook.delete()
         except:
             ctx.send("> Webhook permission not available")
-
 
 def setup(bot):
     bot.add_cog(DeprecatedCommandsMixin(bot))

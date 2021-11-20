@@ -115,7 +115,5 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
             return    
         
         
-
-
 def setup(bot):
     bot.add_cog(ImageProcessingMixin(bot))

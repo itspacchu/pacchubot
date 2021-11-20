@@ -238,7 +238,7 @@ class Music(DiscordInit,commands.Cog):
     @commands.check(audio_playing)
     async def savequeue(self, ctx, name: str):
         """Saves the current queue as a playlist."""
-        if(len(name) > 0):
+        if(len(name) < 0):
             await ctx.message.add_reaction(Emotes.PACNO)
             await ctx.send("> You didnt give a name ... should I save it as \"floopus dingus?\" Try again")
         else:
@@ -331,7 +331,7 @@ class Music(DiscordInit,commands.Cog):
             if("/playlist?list=" in url):
                 await ctx.send("> Parsing playlists",delete_after=5.0)
                 ytplaylist = basicYTPlaylist(url)
-                for song in ytplaylist.songs:
+                for song in ytplaylist:
                     await ctx.invoke(self.client.get_command('play'),url=song.url)
                 await ctx.send("> Done")
                 return

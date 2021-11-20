@@ -233,7 +233,7 @@ class Music(DiscordInit,commands.Cog):
         state = self.get_state(ctx.guild)
         state.playlist = []
     
-    @commands.command(aliases=["qs","saveplaylist","queuesave"])
+    @commands.command(aliases=["qs","savequeues","queuesave"])
     @commands.guild_only()
     @commands.check(audio_playing)
     async def savequeue(self, ctx, name: str):
@@ -247,11 +247,12 @@ class Music(DiscordInit,commands.Cog):
                 await ctx.message.add_reaction(Emotes.PACNO)
                 await ctx.send("> The queue is empty ... nothing to save")
             else:
+                os.mkdir(f"{os.getcwd()}/statics/playlists/{ctx.guild.id}")
                 await ctx.send("> Saving queue as \"{}\"".format(name))
-                pickle.dump(queue, open(f"/{str(ctx.guild.id)}/{name}.playlist", "wb"))
+                pickle.dump(queue, open(f"{os.getcwd()}/statics/playlists/{str(ctx.guild.id)}/{name}.playlist", "wb"))
                 await ctx.message.add_reaction(Emotes.PACYES)
 
-    @commands.command(aliases=["lq","loadplaylist","queueload"])
+    @commands.command(aliases=["lq","loadplaylist","loadqueues"])
     @commands.guild_only()
     async def loadqueue(self, ctx, name: str):
         """Loads a playlist into the current queue."""
@@ -269,7 +270,7 @@ class Music(DiscordInit,commands.Cog):
             except:
                 await ctx.send("> Queue \"{}\" not found".format(name))
 
-    @commands.command(aliases=["listplaylists"])
+    @commands.command(aliases=["listplaylists",'listpl','listsaved'])
     @commands.guild_only()
     async def listqueues(self, ctx):
         """Lists all the saved playlists."""
@@ -279,7 +280,7 @@ class Music(DiscordInit,commands.Cog):
             if(len(files) == 0):
                 await ctx.send("> No playlists found")
             else:
-                await ctx.send("> Playlists found : {}".format(files))
+                await ctx.send("> Playlists found : ```{}```".format(files))
         except:
             await ctx.send("> No playlists found")
 

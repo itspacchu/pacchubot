@@ -367,11 +367,14 @@ class Music(DiscordInit,commands.Cog):
         if(loopcount > 0):
             await ctx.send("> looping the song".format(loopcount))
             progbar = await ctx.send("```[==========] 0%```")
-            for i in range(int(loopcount)):
-                prog = int((i/loopcount)*100)
-                await progbar.edit(content=f"```[{'#'*int(prog/10)} {'='*int(10-(prog/10))}] {prog}%```")
-                await ctx.invoke(self.client.get_command('play'), url=url,showembed=False)
-            await progbar.edit(content=f"```[{'='*10}] Done```")
+            if(url == None):
+                for i in range(int(loopcount)):
+                    prog = int((i/loopcount)*100)
+                    await progbar.edit(content=f"```[{'#'*int(prog/10)} {'='*int(10-(prog/10))}] {prog}%```")
+                    await ctx.invoke(self.client.get_command('play'), url=url,showembed=False)
+                await progbar.edit(content=f"```[{'#'*10}] Done```")
+            else:
+                progbar = await ctx.send("```[== ERR ===] :: url not found```")
             return
         try:
             if("/playlist?list=" in url):
@@ -386,7 +389,7 @@ class Music(DiscordInit,commands.Cog):
                     await progbar.edit(content=f"```[{'#'*int(prog/10)} {'='*int(10-(prog/10))}] {prog}%```")
                     await ctx.invoke(self.client.get_command('play'),url=song,showembed=False)
                 await ctx.send("> Added {} songs to queue".format(len(ytplaylist)))
-                await progbar.edit(content=f"``` [{'='*10}] Done```")
+                await progbar.edit(content=f"``` [{'#'*10}] Done```")
                 return
         except Exception as e:
             await ctx.send(f"> Something somewhere went wrong \n ||{e}||",delete_after=5.0)
@@ -395,7 +398,7 @@ class Music(DiscordInit,commands.Cog):
         try:
             timegx = r"[\?&]t=\d*"
             seekamt = int(re.findall(timegx,url)[0][1:].replace("t=",''))
-            await ctx.send(f"> Seeking based on url {seekamt}",delete_after=5.0)
+            await ctx.send(f"> Seeking based on url {seconds_to_hhmmss(seekamt)} hours")
         except IndexError:
             seekamt = 0
 

@@ -367,14 +367,11 @@ class Music(DiscordInit,commands.Cog):
         if(loopcount > 0):
             await ctx.send("> looping the song".format(loopcount))
             progbar = await ctx.send("```[==========] 0%```")
-            if(url == None):
-                for i in range(int(loopcount)):
-                    prog = int((i/loopcount)*100)
-                    await progbar.edit(content=f"```[{'#'*int(prog/10)} {'='*int(10-(prog/10))}] {prog}%```")
-                    await ctx.invoke(self.client.get_command('play'), url=url,showembed=False)
-                await progbar.edit(content=f"```[{'#'*10}] Done```")
-            else:
-                await progbar.edit("```[== ERR ===] :: url not found```")
+            for i in range(int(loopcount)):
+                prog = int((i/loopcount)*100)
+                await progbar.edit(content=f"```[{'#'*int(prog/10)} {'='*int(10-(prog/10))}] {prog}%```")
+                await ctx.invoke(self.client.get_command('play'), url=url,showembed=False)
+            await progbar.edit(content=f"```[{'#'*10}] Done```")
             return
         try:
             if("/playlist?list=" in url):

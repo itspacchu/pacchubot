@@ -372,7 +372,7 @@ class Music(DiscordInit,commands.Cog):
 
         try:
             timegx = r"[\?&]t=\d*"
-            seekamt = int(re.findall(timegx,url)[0][:1].replace("t=",''))
+            seekamt = int(re.findall(timegx,url)[0][1:].replace("t=",''))
             await ctx.send(f"> Seeking based on url {seekamt}",delete_after=5.0)
         except IndexError:
             seekamt = 0

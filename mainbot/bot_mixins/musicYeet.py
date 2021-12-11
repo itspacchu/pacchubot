@@ -346,13 +346,13 @@ class Music(DiscordInit,commands.Cog):
 
         url_split = url.split("-loop")
         try:
-            loopcount = url_split[1]
+            loopcount = int(url_split[1])
         except:
             loopcount = 0
 
         url = url_split[0]
     
-        if(int(loopcount,10) > 0):
+        if(loopcount > 0):
             for i in range(int(loopcount)):
                 await ctx.invoke(self.client.get_command('play'), url=url,showembed=False)
             return
@@ -372,7 +372,7 @@ class Music(DiscordInit,commands.Cog):
 
         try:
             timegx = r"[\?&]t=\d*"
-            seekamt = int(re.findall(timegx,url)[0][:1].replace("t=",''),10)
+            seekamt = int(re.findall(timegx,url)[0][:1].replace("t=",''))
             await ctx.send(f"> Seeking based on url {seekamt}",delete_after=5.0)
         except IndexError:
             seekamt = 0

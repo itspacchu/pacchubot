@@ -342,7 +342,19 @@ class Music(DiscordInit,commands.Cog):
     async def play(self, ctx, *, url=None,showembed=True):
         if(url == None):
             url = "https://youtu.be/dQw4w9WgXcQ"
-            await ctx.send("> usage : play {url/spotify}")
+            embed=discord.Embed(color=0xc061cb)
+            embed.add_field(name="p.play [ url / search / spotify url ]  ", value="```-loop number``` to loop the song", inline=False)
+            embed.add_field(name="p.play <>  -loop number", value="loops the song in queue", inline=False)
+            embed.add_field(name="p.queue", value="shows the current queue", inline=False)
+            embed.add_field(name="p.move [ from ] [ to ]", value="moves song index : from → to", inline=False)
+            embed.add_field(name="p.remove [ index ]", value="removes the last song by default ", inline=False)
+            embed.add_field(name="p.nowplaying / p.np", value="shows now playing song", inline=False)
+            embed.add_field(name="p.clearqueue / p.cq", value="clears the queue", inline=False)
+            embed.add_field(name="p.lofi", value="plays lofigirl's lofi stream", inline=False)
+            embed.add_field(name="p.pod", value="Show Podcast help section", inline=True)
+            embed.set_footer(text="nub now get rollllled :D")
+            await ctx.send(embed=embed)
+
 
         url_split = url.split("-loop")
         try:

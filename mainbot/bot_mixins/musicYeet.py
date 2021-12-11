@@ -352,17 +352,15 @@ class Music(DiscordInit,commands.Cog):
 
         url = url_split[0]
     
-        if(loopcount > 0 and loopcount < 10):
+        if(loopcount > 0):
             await ctx.send("> looping the song".format(loopcount))
             progbar = await ctx.send("> [-----------] 0%")
             for i in range(int(loopcount)):
                 prog = int((i/loopcount)*100)
-                await progbar.edit(content=f"> [{'='*int(prog/10)} {'-'*int((10-prog)/10 -1)}] {prog}%")
+                await progbar.edit(content=f"> [{'='*int(prog/10)} {'-'*int((10-prog)/10)}] {prog}%")
                 await ctx.invoke(self.client.get_command('play'), url=url,showembed=False)
             await progbar.edit(content=f"> [{'='*10}] Done")
             return
-        else:
-            await ctx.send("> Use a loop value less than 10")
         try:
             if("/playlist?list=" in url):
                 await ctx.send("> Parsing playlists",delete_after=5.0)

@@ -374,7 +374,7 @@ class Music(DiscordInit,commands.Cog):
                     await ctx.invoke(self.client.get_command('play'), url=url,showembed=False)
                 await progbar.edit(content=f"```[{'#'*10}] Done```")
             else:
-                progbar = await ctx.send("```[== ERR ===] :: url not found```")
+                await progbar.edit("```[== ERR ===] :: url not found```")
             return
         try:
             if("/playlist?list=" in url):

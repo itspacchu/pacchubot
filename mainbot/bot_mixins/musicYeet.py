@@ -21,6 +21,13 @@ YTDL_OPTS = {
     "extract_flat": "in_playlist"
 }
 
+def seconds_to_str(t):
+    return '%02d:%02d' % divmod(t, 60)
+
+def seconds_to_hhmmss(seconds):
+    m, s = divmod(seconds, 60)
+    h, m = divmod(m, 60)
+    return "%d:%02d:%02d" % (h, m, s)
 
 def basicYTSearch(search,result_index=0):
     query_string = urllib.parse.urlencode({'search_query': search})
@@ -183,10 +190,11 @@ class Music(DiscordInit,commands.Cog):
         await ctx.send("> Fetching from queue ...",delete_after=5.0)
         await ctx.invoke(self.client.get_command('np'))
 
-    def _play_song(self, client, state, song):
+    def _play_song(self, client, state, song,seek=0):
+        append_seek_to_ffmpeg = FFMPEG_BEFORE_OPTS + f" -ss {seconds_to_hhmmss(seek)}"
         state.now_playing = song
         source = discord.PCMVolumeTransformer(
-            discord.FFmpegPCMAudio(song.stream_url, before_options=FFMPEG_BEFORE_OPTS))
+            discord.FFmpegPCMAudio(song.stream_url, before_options=append_seek_to_ffmpeg))
 
         def after_playing(err):
             if len(state.playlist) > 0:
@@ -297,7 +305,6 @@ class Music(DiscordInit,commands.Cog):
         if 1 <= song <= len(state.playlist) and 1 <= new_index:
             song = state.playlist.pop(song - 1)  # take song at index...
             state.playlist.insert(new_index - 1, song)  # and insert it.
-
             await ctx.invoke(self.client.get_command('queue'))
         else:
             await ctx.message.add_reaction(Emotes.PACNO)
@@ -306,12 +313,18 @@ class Music(DiscordInit,commands.Cog):
     @commands.command(aliases=["delete"])
     @commands.guild_only()
     @commands.check(audio_playing)
-    async def remove(self, ctx, song: int):
+    async def remove(self, ctx, song: int=None):
         state = self.get_state(ctx.guild) 
-        if 1 <= song <= len(state.playlist):
+        if(song == None):
+            await ctx.message.add_reaction(Emotes.PACTICK)
+            await ctx.send("> Popping last song in queue")
+            state.playlist.pop()
+
+        elif 1 <= song <= len(state.playlist):
             await ctx.message.add_reaction(Emotes.PACTICK)
             song = state.playlist.pop(song - 1)  
             await ctx.invoke(self.client.get_command('queue'))
+            
         else:
             await ctx.message.add_reaction(Emotes.PACNO)
             raise commands.CommandError("> I am dumb yet I know we dont have that many songs in the queue")
@@ -326,18 +339,31 @@ class Music(DiscordInit,commands.Cog):
 
     @commands.command(brief="Plays audio from <url>.")
     @commands.guild_only()
-    async def play(self, ctx, *, url=None):
+    async def play(self, ctx, *, url=None,showembed=True):
         if(url == None):
             url = "https://youtu.be/dQw4w9WgXcQ"
             await ctx.send("> usage : play {url/spotify}")
-        
+
+        url_split = url.split("-loop")
+        try:
+            loopcount = url_split[1]
+        except:
+            loopcount = 0
+
+        url = url_split[0]
+        if(loopcount > 0):
+            for i in range(int(loopcount)):
+                await ctx.invoke(self.client.get_command('play'), url=url,showembed=False)
+            return
+
         try:
             if("/playlist?list=" in url):
                 await ctx.send("> Parsing playlists",delete_after=5.0)
                 ytplaylist = basicYTPlaylist(url)
                 for song in ytplaylist:
-                    await ctx.invoke(self.client.get_command('play'),url=song)
-                await ctx.send("> Done")
+                    await ctx.invoke(self.client.get_command('play'),url=song,showembed=False)
+                await ctx.send("> Added {} songs to queue".format(len(ytplaylist)))
+                await ctx.invoke(self.client.get_command('queue'))
                 return
         except Exception as e:
             await ctx.send(f"> Something somewhere went wrong \n ||{e}||",delete_after=5.0)
@@ -359,7 +385,8 @@ class Music(DiscordInit,commands.Cog):
             
             await ctx.message.add_reaction(Emotes.PACPLAY)
             state.playlist.append(video)
-            message = await ctx.send("> Added to queue", embed=video.get_embed())
+            if(showembed):
+                message = await ctx.send("> Added to queue", embed=video.get_embed())
         else:
             if ctx.author.voice is not None and ctx.author.voice.channel is not None:
                 channel = ctx.author.voice.channel

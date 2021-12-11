@@ -109,7 +109,7 @@ class Video:
 
 
 # TODO: abstract FFMPEG options into their own file?
-FFMPEG_BEFORE_OPTS = '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'
+FFMPEG_BEFORE_OPTS = '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 '
 
 
 async def audio_playing(ctx):
@@ -324,7 +324,7 @@ class Music(DiscordInit,commands.Cog):
             await ctx.message.add_reaction(Emotes.PACTICK)
             song = state.playlist.pop(song - 1)  
             await ctx.invoke(self.client.get_command('queue'))
-            
+
         else:
             await ctx.message.add_reaction(Emotes.PACNO)
             raise commands.CommandError("> I am dumb yet I know we dont have that many songs in the queue")
@@ -351,6 +351,7 @@ class Music(DiscordInit,commands.Cog):
             loopcount = 0
 
         url = url_split[0]
+    
         if(loopcount > 0):
             for i in range(int(loopcount)):
                 await ctx.invoke(self.client.get_command('play'), url=url,showembed=False)
@@ -368,6 +369,12 @@ class Music(DiscordInit,commands.Cog):
         except Exception as e:
             await ctx.send(f"> Something somewhere went wrong \n ||{e}||",delete_after=5.0)
             return
+
+        try:
+            seekamt = re.findall('\\?t=\\d*',url)[0].replace("?t=",'')
+            await ctx.send(f"> Seeking based on url {seekamt}",delete_after=5.0)
+        except IndexError:
+            seekamt = 0
 
         url,whrc = handle_spotify(url)
         if(whrc == "SP"):
@@ -396,7 +403,7 @@ class Music(DiscordInit,commands.Cog):
                     await ctx.send("> Something went wrong!! \n```{e}```")
                     return
                 client = await channel.connect()
-                self._play_song(client, state, video)
+                self._play_song(client, state, video, seekamt)
                 await ctx.message.add_reaction(Emotes.PACPLAY)
                 message = await ctx.send("", embed=video.get_embed(),components=[Button(style=ButtonStyle.URL, label="Youtube",url=video.video_url)])
                 logging.info(f"Now playing '{video.title}'")

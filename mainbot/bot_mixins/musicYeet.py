@@ -375,7 +375,6 @@ class Music(DiscordInit,commands.Cog):
                     await ctx.invoke(self.client.get_command('play'),url=song,showembed=False)
                 await ctx.send("> Added {} songs to queue".format(len(ytplaylist)))
                 await progbar.edit(content=f"``` [{'='*10}] Done```")
-                await ctx.invoke(self.client.get_command('queue'))
                 return
         except Exception as e:
             await ctx.send(f"> Something somewhere went wrong \n ||{e}||",delete_after=5.0)

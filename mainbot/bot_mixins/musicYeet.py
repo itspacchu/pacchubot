@@ -354,27 +354,27 @@ class Music(DiscordInit,commands.Cog):
     
         if(loopcount > 0):
             await ctx.send("> looping the song".format(loopcount))
-            progbar = await ctx.send("> [-----------] 0%")
+            progbar = await ctx.send("```[==========] 0%```")
             for i in range(int(loopcount)):
                 prog = int((i/loopcount)*100)
-                await progbar.edit(content=f"> [{'='*int(prog/10)} {'-'*int((10-prog)/10)}] {prog}%")
+                await progbar.edit(content=f"```[{'#'*int(prog/10)} {'='*int((10-prog)/10)}] {prog}%```")
                 await ctx.invoke(self.client.get_command('play'), url=url,showembed=False)
-            await progbar.edit(content=f"> [{'='*10}] Done")
+            await progbar.edit(content=f"```[{'='*10}] Done```")
             return
         try:
             if("/playlist?list=" in url):
                 await ctx.send("> Parsing playlists",delete_after=5.0)
                 ytplaylist = basicYTPlaylist(url)
-                progbar = await ctx.send("> [-----------] 0%")
+                progbar = await ctx.send("```[==========] 0%```")
                 i=0
                 for song in ytplaylist: 
                     tot = len(ytplaylist)
                     prog = int((i/tot)*100)
                     i+=1
-                    await progbar.edit(content=f"> [{'='*int(prog/10)} {'-'*int((10-prog)/10 -1)}] {prog}%")
+                    await progbar.edit(content=f"```[{'#'*int(prog/10)} {'='*int((10-prog)/10 -1)}] {prog}%```")
                     await ctx.invoke(self.client.get_command('play'),url=song,showembed=False)
                 await ctx.send("> Added {} songs to queue".format(len(ytplaylist)))
-                await progbar.edit(content=f"> [{'='*10}] Done")
+                await progbar.edit(content=f"``` [{'='*10}] Done```")
                 await ctx.invoke(self.client.get_command('queue'))
                 return
         except Exception as e:

@@ -112,7 +112,7 @@ class Video:
 
 
 # TODO: abstract FFMPEG options into their own file?
-FFMPEG_BEFORE_OPTS = '-reconnect 1 -reconnect_streamed 1 -preset veryfast -reconnect_delay_max 5 -af bass=g=2:f=80:w=0.2'
+FFMPEG_BEFORE_OPTS = '-reconnect 1 -reconnect_streamed 1  -reconnect_delay_max 5'
 
 
 async def audio_playing(ctx):
@@ -197,7 +197,7 @@ class Music(DiscordInit,commands.Cog):
         append_seek_to_ffmpeg = FFMPEG_BEFORE_OPTS + f" -ss {seconds_to_hhmmss(seek)}"
         state.now_playing = song
         source = discord.PCMVolumeTransformer(
-            discord.FFmpegPCMAudio(song.stream_url, before_options=append_seek_to_ffmpeg))
+            discord.FFmpegPCMAudio(song.stream_url, before_options=append_seek_to_ffmpeg ,options=" -preset veryfast -af bass=g=2:f=80:w=0.2"))
 
         def after_playing(err):
             if len(state.playlist) > 0:

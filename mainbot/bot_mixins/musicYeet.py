@@ -197,7 +197,7 @@ class Music(DiscordInit,commands.Cog):
         append_seek_to_ffmpeg = FFMPEG_BEFORE_OPTS + f" -ss {seconds_to_hhmmss(seek)}"
         state.now_playing = song
         source = discord.PCMVolumeTransformer(
-            discord.FFmpegPCMAudio(song.stream_url, before_options=append_seek_to_ffmpeg ,options=" -preset veryfast -af bass=g=1.1:f=80:w=0.1"))
+            discord.FFmpegPCMAudio(song.stream_url, before_options=append_seek_to_ffmpeg ,options=" -preset veryfast -af bass=g=1.6:f=80:w=0.1"))
 
         def after_playing(err):
             if len(state.playlist) > 0:

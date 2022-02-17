@@ -14,7 +14,7 @@ def env_to_bool(env, default):
 
 # file imports
 # db init
-mongo_url = f"mongodb+srv://{os.environ['MONGO_INITDB_ROOT_USERNAME']}:{os.environ['MONGO_INITDB_ROOT_PASSWORD']}@{os.environ['MONGO_HOST']}"
+mongo_url = f"{os.environ['MONGO_KEY']}"
 mongo_client = MongoClient(mongo_url)
 
 # global variables

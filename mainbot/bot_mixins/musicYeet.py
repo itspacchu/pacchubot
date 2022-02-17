@@ -112,7 +112,7 @@ class Video:
 
 
 # TODO: abstract FFMPEG options into their own file?
-FFMPEG_BEFORE_OPTS = '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 '
+FFMPEG_BEFORE_OPTS = '-reconnect 1 -reconnect_streamed 1 -preset veryfast -reconnect_delay_max 5 -af bass=g=2:f=80:w=0.2'
 
 
 async def audio_playing(ctx):

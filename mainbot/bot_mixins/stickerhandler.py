@@ -13,6 +13,7 @@ dbStore = {
 
 
 class stickerHandler(DiscordInit, commands.Cog):
+    
     @commands.command(aliases=['st', 'sendsticker', 'sends'])
     async def sticker(self, ctx, stickername=None):
         try:

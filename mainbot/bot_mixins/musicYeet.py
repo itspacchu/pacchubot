@@ -53,11 +53,16 @@ def basicYTPlaylist(playlist_url):
 
 def handle_spotify(query=None):
         if 'https://open.spotify.com/track/' in query:
+            if type(query) == tuple:
+                res = ''
+                for i in query:
+                    res += i + ' '
+                query = res
             response = requests.get(query)
-            filter = re.search("Spotify.Entity.*};",response.text).group(0)[17:-1]
-            spotinfo = json.loads(filter)
-            song_title = html.unescape(spotinfo["album"]["name"])
-            song_artist = html.unescape(spotinfo['album']['artists'][0]['name'])
+            filter = re.search("\"entities\":.*\"podcasts\"",response.text).group(0)[11:-11]
+            response = json.loads(filter)
+            song_title = html.unescape(response["items"][list(response["items"].keys())[0]]["name"])
+            song_artist = html.unescape(response["items"][list(response["items"].keys())[0]]["artists"]["items"][0]["profile"]["name"])
             song_url = basicYTSearch(song_title + ' ' + song_artist)
             return [song_url,"SP"]
         else:

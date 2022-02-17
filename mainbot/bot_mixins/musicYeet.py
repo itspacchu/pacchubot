@@ -46,8 +46,6 @@ def basicYTPlaylist(playlist_url):
         playlist.append('http://www.youtube.com/watch?v='+ _['url'])
     return playlist
 
-
-
 # this is from my brother's bot
 # https://github.com/mackdroid/bored-bot
 

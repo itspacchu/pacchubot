@@ -44,21 +44,11 @@ class DiscordInit:
         global client, botcount, currentcount, http, command_prefix
         if(message.author == self.client.user or message.author.bot):
             return
-
-        for x in message.mentions:
-            if(x == self.client.user):
-                if(len(message.content) > 25):
-                    payload_to_send = message.content.replace(
-                        "<@!709426015759368282>", "")
-                else:
-                    payload_to_send = choice(
-                        ["Bonjour", "Weather is good", "I'm good", "Hi", "Waddup"])
-
-                await message.channel.send(mention_convo(payload_to_send)["generated_text"] + " " + message.author.mention)
     
+        # do other things
         await self.client.process_commands(message)
 
-        if('pacchu' in message.content.lower() and len(message.content) > 10):
+        if('pacchu' in message.content.lower() and len(message.content) < 40):
             await message.add_reaction(Emotes.PACCHU)
 
         qq = message.content.lower().split(' ')[0]
@@ -91,7 +81,7 @@ class BaseBot(DiscordInit, commands.Cog):
         await ctx.message.add_reaction('⌚')
         embed = discord.Embed(colour=discord.Colour(0x27ce89))
         embed.add_field(name="Latency", value=f"> Latency {round(self.client.latency * 1000)}ms")
-        embed.add_field(name="Memory Load", value=f'{round(psutil.virtual_memory().available/1024**2,2)} MB / 900MB')
+        embed.add_field(name="Memory Load", value=f'{round(psutil.virtual_memory().available/1024**2,2)} MB Used')
         embed.add_field(name="Servers", value=f"Sneaking in {str(len(self.client.guilds))} Servers", inline=True)
         await better_send(ctx, embed=embed)
 

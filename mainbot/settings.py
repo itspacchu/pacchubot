@@ -48,6 +48,5 @@ __all__ = [
     'self_avatar',
     'command_prefix',
     'mongo_client',
-    'ytdl_format_options',
-    'ffmpeg_options',
+    'ytdl_format_options'
 ]

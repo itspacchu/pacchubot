@@ -60,7 +60,7 @@ class OnWordleHandler(DiscordInit, commands.Cog):
         super().__init__(client=client)
 
     @commands.command(alias=['wordleset'])
-    async def setWord(self, ctx, *, word):
+    async def setword(self, ctx, *, word):
         if(isItPacchu(str(ctx.author.id)) or ctx.author.guild_permissions.administrator):
             word = word.lower()
             try:

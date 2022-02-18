@@ -58,21 +58,16 @@ class DiscordInit:
                 match = self.MemberTaunt.find_one(query)['taunt']
                 await message.channel.send(match)
             except Exception as e:
-                await asyncio.sleep(1)  # this error is on every goddamn message ffs
+                await asyncio.sleep(10)  # this error is on every goddamn message ffs
 
     def init_db(self):
-        self.serverstat = self.db['serverstat']
         self.bruhs = self.db['bruh']
-        self.animeSearch = self.db['animeSearch']
-        self.charSearch = self.db['charSearch']
         self.animePics = self.db['animePics']
-        self.mangaSearch = self.db['mangaSearch']
         self.gptDb = self.db['gptQuery']
-        self.PodcastSuggest = self.db['PodSuggest']
-        self.VoiceUsage = self.db['VoiceActivity']
         self.MemberTaunt = self.db['memberTaunt']
         self.MiscCollection = self.db['miscCollection']
         self.discordStickers = self.db['discordStickers']
+        self.wordleData = self.db['wordle']
 
 
 class BaseBot(DiscordInit, commands.Cog):

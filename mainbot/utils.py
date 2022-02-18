@@ -1,5 +1,3 @@
-# deprecated by mongo db ill remove it later
-
 from __future__ import print_function
 import binascii
 import struct
@@ -15,18 +13,7 @@ import requests
 from tqdm import tqdm
 from . import __imports__ as internalImports
 
-
-lifeChoice = [True, False]
-
 botReadyToRespond = True
-
-
-async def report_errors_to_channel(client, error):
-    pass
-    """print(repr(error))
-    channel = await client.get_channel(501237046854287365)
-    await client.send(f"```{str(repr(error))}```")"""
-
 
 distortionTypes = [lambda i, j:[2*np.sin(i/100) + 2, 2*np.sin(j/100) + 2],
                    lambda i, j:[2*np.sin(i/100) + 2, 0],
@@ -36,7 +23,6 @@ distortionTypes = [lambda i, j:[2*np.sin(i/100) + 2, 2*np.sin(j/100) + 2],
                    lambda i, j:[0, 4*np.tan(j/100)],
                    lambda i, j: [1*np.sin(i/100), 1*np.cos(j/100)],
                    ]
-
 
 async def ButtonProcessor(ctx, res, label: str, userCheck=True):
     try:
@@ -143,10 +129,6 @@ def list_to_string(the_list, no_of_items: int):
     return returnstr
 
 
-def embed_generator(embedContents, thumbUrl, imgUrl):
-    pass
-
-
 def get_file_or_link(ctx, qlink=None):
     try:
         return ctx.message.attachments[0].url
@@ -168,8 +150,7 @@ def better_send(ctx, content=None, embed=None, file=None):
 
 
 def isItPacchu(checkid: str):
-    #                   Pacchu              Pacchu              Macky            Leo                Monsieur
-    return int(checkid) in [749975627633000520, 170783707647442947, 741139834260815964, 520114282776625162, 627135815985659904]
+    return int(checkid) in [749975627633000520, 170783707647442947, 741139834260815964]
 
 
 def domain_finder(link):

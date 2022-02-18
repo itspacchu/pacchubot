@@ -66,6 +66,8 @@ class OnWordleHandler(DiscordInit, commands.Cog):
             try:
                 self.wordleData.update_one({'server': str(ctx.guild.id)}, {'$set': {'word': word ,'count': 5}}, upsert=True)
                 await ctx.send(f"> Wordle for **{ctx.guild.name}** updated on database")
+                self.WORDLE_WORD = self.wordleData.find_one({"server": str(ctx.guild.id)})['word']
+                self.WORDLE_MAX_PLAYABLE = self.wordleData.find_one({"server": str(ctx.guild.id)})['count']
             except:
                 self.wordleData.insert_one({'server': str(ctx.guild.id), 'word': word , 'count': 5})
                 await ctx.send(f"> Wordle for **{ctx.guild.name}** created on database")

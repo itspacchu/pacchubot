@@ -76,11 +76,11 @@ class OnWordleHandler(DiscordInit, commands.Cog):
             try:
                 self.wordleData.update_one({'server': str(ctx.guild.id)}, {'$set': {'word': word ,'count': 5}}, upsert=True)
                 await ctx.send(f"> Wordle for **{ctx.guild.name}** updated on database")
-                self.players[str(ctx.author.id)] = WordleInstance(word,5)
+                self.players[ctx.author.id] = WordleInstance(word,5)
             except:
                 self.wordleData.insert_one({'server': str(ctx.guild.id), 'word': word , 'count': 5})
                 await ctx.send(f"> Wordle for **{ctx.guild.name}** created on database")
-                self.players[str(ctx.author.id)] = WordleInstance(word,5)
+                self.players[ctx.author.id] = WordleInstance(word,5)
         else:
             await ctx.send("SUDO* command")
 

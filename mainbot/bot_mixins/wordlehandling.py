@@ -44,9 +44,10 @@ class WordleInstance():
                     elif((char[0] in inner_matcher)):
                         retStr[i] = "🟨"
                         inner_matcher[inner_matcher.index(char[0])] = "$"
+                        
                 retword += "".join(retStr)
                 if(retword == "🟩"*len(self.word)):
-                    return f"Noice! You guessed in {self.count}!\n"
+                    return "🟩"*len(self.word) + f" | Noice! You guessed in {self.count}!\n"
                 if(showGuess):
                     retword += f" [{self.count}/{self.MAX_PLAYABLE}] "
                 if(showWord):

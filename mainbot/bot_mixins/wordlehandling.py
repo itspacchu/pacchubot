@@ -61,15 +61,20 @@ class OnWordleHandler(DiscordInit, commands.Cog):
 
     @commands.command(alias=['wordleset'])
     async def setWord(self, ctx, *, word):
-        try:
-            self.wordleData.update_one({'server': str(ctx.guild.id)}, {'$set': {'word': word}}, upsert=True)
-        except:
-            self.wordleData.insert_one({'server': str(ctx.guild.id), 'word': word , 'count': 5})
-        await ctx.send("Wordle for current server created on database")
+        if(isItPacchu(str(ctx.author.id)) or ctx.author.guild_permissions.administrator):
+            word = word.lower()
+            try:
+                self.wordleData.update_one({'server': str(ctx.guild.id)}, {'$set': {'word': word ,'count': 5}}, upsert=True)
+                await ctx.send(f"> Wordle for **{ctx.guild.name}** updated on database")
+            except:
+                self.wordleData.insert_one({'server': str(ctx.guild.id), 'word': word , 'count': 5})
+                await ctx.send(f"> Wordle for **{ctx.guild.name}** created on database")
+        else:
+            await ctx.send("SUDO* command")
 
     @commands.command(name="w", aliases=["wordle"])
     async def wordleHandlerFunction(self, ctx, *, word):
-
+        word = word.lower()
         self.WORDLE_WORD = self.wordleData.find_one({"server": str(ctx.guild.id)})['word']
         self.WORDLE_MAX_PLAYABLE = self.wordleData.find_one({"server": str(ctx.guild.id)})['count']
 
@@ -78,7 +83,7 @@ class OnWordleHandler(DiscordInit, commands.Cog):
             print(self.players)
 
         if(self.players[ctx.author.id].playable()):
-            await ctx.reply(f"|| {self.players[ctx.author.id].process_guess(word)} ||")
+            await ctx.reply(f"|| {self.players[ctx.author.id].process_guess(word)} [{self.players[ctx.author.id].count}/{self.WORDLE_MAX_PLAYABLE}]||")
         else:
             await ctx.send(f"{ctx.author.mention} you're outta guesses buddy")
             self.players[ctx.author.id].reset()

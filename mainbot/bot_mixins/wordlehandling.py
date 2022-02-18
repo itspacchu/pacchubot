@@ -70,7 +70,7 @@ class OnWordleHandler(DiscordInit, commands.Cog):
         super().__init__(client=client)
 
 
-    @commands.command(alias=["wordleresetcount","wrc"])
+    @commands.command(aliases=["wordleresetcount","wrc"])
     async def wordlecountreset(self, ctx, member: discord.Member = None):
         if(isItPacchu(str(ctx.author.id)) or ctx.author.guild_permissions.administrator):
             if(member.id in self.players):
@@ -84,7 +84,7 @@ class OnWordleHandler(DiscordInit, commands.Cog):
             await ctx.send("> SUDO* command")
 
 
-    @commands.command(alias=['wordleset'])
+    @commands.command(aliases=['wordleset','ws'])
     async def setword(self, ctx, *, word):
         if(isItPacchu(str(ctx.author.id)) or ctx.author.guild_permissions.administrator):
             word = word.lower()

@@ -47,7 +47,6 @@ __all__ = [
     'self_name',
     'self_avatar',
     'command_prefix',
-    'guild_ids',
     'mongo_client',
     'ytdl_format_options',
     'ffmpeg_options',

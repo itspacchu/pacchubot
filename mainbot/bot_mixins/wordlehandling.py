@@ -70,13 +70,15 @@ class OnWordleHandler(DiscordInit, commands.Cog):
         super().__init__(client=client)
 
 
-    @commands.command()
+    @commands.command(alias=["wordleresetcount","wrc"])
     async def wordlecountreset(self, ctx, member: discord.Member = None):
         if(isItPacchu(str(ctx.author.id)) or ctx.author.guild_permissions.administrator):
             if(member.id in self.players):
                 self.players[member.id].reset()
+                await ctx.message.add_reaction(Emotes.PACTICK)
                 await ctx.send(f"> Reset {member.mention}'s wordle count")
             else:
+                await ctx.message.add_reaction(Emotes.PACNO)
                 await ctx.send(f"> {member.name} is not in the wordle database")
         else:
             await ctx.send("> SUDO* command")
@@ -88,13 +90,16 @@ class OnWordleHandler(DiscordInit, commands.Cog):
             word = word.lower()
             try:
                 self.wordleData.update_one({'server': str(ctx.guild.id)}, {'$set': {'word': word ,'count': 5}}, upsert=True)
+                await ctx.message.add_reaction(Emotes.PACTICK)
                 await ctx.send(f"> Wordle for **{ctx.guild.name}** updated on database")
                 self.players[ctx.author.id] = WordleInstance(word,5)
             except:
                 self.wordleData.insert_one({'server': str(ctx.guild.id), 'word': word , 'count': 5})
+                await ctx.message.add_reaction(Emotes.PACTICK)
                 await ctx.send(f"> Wordle for **{ctx.guild.name}** created on database")
                 self.players[ctx.author.id] = WordleInstance(word,5)
         else:
+            await ctx.message.add_reaction(Emotes.PACNO)
             await ctx.send("> SUDO* command")
 
     @commands.command(name="w", aliases=["wordle"])

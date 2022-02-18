@@ -82,7 +82,6 @@ class OnWordleHandler(DiscordInit, commands.Cog):
 
         if(ctx.author.id not in self.players):
             self.players[ctx.author.id] = WordleInstance(self.WORDLE_WORD,self.WORDLE_MAX_PLAYABLE)
-s
 
         if(self.players[ctx.author.id].playable()):
             await ctx.reply(f"|| {self.players[ctx.author.id].process_guess(word)} [{self.players[ctx.author.id].count}/{self.WORDLE_MAX_PLAYABLE}]||")

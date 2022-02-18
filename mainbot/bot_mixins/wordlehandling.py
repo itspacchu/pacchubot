@@ -44,7 +44,7 @@ class WordleInstance():
                     elif((char[0] in inner_matcher)):
                         retStr[i] = "🟨"
                         inner_matcher[inner_matcher.index(char[0])] = "$"
-                        
+
                 retword += "".join(retStr)
                 if(retword == "🟩"*len(self.word)):
                     return "🟩"*len(self.word) + f" | Noice! You guessed in {self.count}!\n"
@@ -80,6 +80,7 @@ class OnWordleHandler(DiscordInit, commands.Cog):
             except:
                 self.wordleData.insert_one({'server': str(ctx.guild.id), 'word': word , 'count': 5})
                 await ctx.send(f"> Wordle for **{ctx.guild.name}** created on database")
+                self.players[str(ctx.guild.id)] = WordleInstance(word,5)
         else:
             await ctx.send("SUDO* command")
 

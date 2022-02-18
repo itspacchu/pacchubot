@@ -57,7 +57,7 @@ class OnWordleHandler(DiscordInit, commands.Cog):
 
     def __init__(self, client):
         self.client = client
-        super().__init__()
+        super().__init__(client=client)
 
     @commands.command(alias=['wordleset'])
     async def setWord(self, ctx, *, word):

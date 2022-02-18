@@ -69,6 +69,19 @@ class OnWordleHandler(DiscordInit, commands.Cog):
         self.client = client
         super().__init__(client=client)
 
+
+    @commands.command()
+    async def wordlecountreset(self, ctx, member: discord.Member = None):
+        if(isItPacchu(str(ctx.author.id)) or ctx.author.guild_permissions.administrator):
+            if(member.id in self.players):
+                self.players[member.id].reset()
+                await ctx.send(f"> Reset {member.mention}'s wordle count")
+            else:
+                await ctx.send(f"> {member.name} is not in the wordle database")
+        else:
+            await ctx.send("> SUDO* command")
+
+
     @commands.command(alias=['wordleset'])
     async def setword(self, ctx, *, word):
         if(isItPacchu(str(ctx.author.id)) or ctx.author.guild_permissions.administrator):
@@ -82,7 +95,7 @@ class OnWordleHandler(DiscordInit, commands.Cog):
                 await ctx.send(f"> Wordle for **{ctx.guild.name}** created on database")
                 self.players[ctx.author.id] = WordleInstance(word,5)
         else:
-            await ctx.send("SUDO* command")
+            await ctx.send("> SUDO* command")
 
     @commands.command(name="w", aliases=["wordle"])
     async def wordleHandlerFunction(self, ctx, *, word):

@@ -21,9 +21,12 @@ class WordleInstance():
     def reset(self):
         self.count = 0
 
-    def process_guess(self,guess):
+    def process_guess(self,guess,showGuess=True,showWord=False):
         if(self.count <= self.MAX_PLAYABLE):
             if(len(guess) == len(self.word)):
+                retword = ""
+                if(showWord):
+                    retword += "||"
                 self.count += 1
                 retStr = list("⬛"*len(self.word))
                 inner_matcher = list(self.word)
@@ -41,7 +44,15 @@ class WordleInstance():
                     elif((char[0] in inner_matcher)):
                         retStr[i] = "🟨"
                         inner_matcher[inner_matcher.index(char[0])] = "$"
-                return "".join(retStr)
+                retword += "".join(retStr)
+                if(retword == "🟩"*len(self.word)):
+                    return f"Noice! You guessed in {self.count}!\n"
+                if(showGuess):
+                    retword += f" [{self.count}/{self.MAX_PLAYABLE}] "
+                if(showWord):
+                    retword += "||"
+                return retword
+
             else:
                 return f"Not a valid guess. Word is {len(self.word)} letters long"
         else:
@@ -52,8 +63,6 @@ class WordleInstance():
 class OnWordleHandler(DiscordInit, commands.Cog):
     client = None
     players = {}
-    WORDLE_WORD = None
-    WORDLE_MAX_PLAYABLE = 5
 
     def __init__(self, client):
         self.client = client
@@ -66,8 +75,6 @@ class OnWordleHandler(DiscordInit, commands.Cog):
             try:
                 self.wordleData.update_one({'server': str(ctx.guild.id)}, {'$set': {'word': word ,'count': 5}}, upsert=True)
                 await ctx.send(f"> Wordle for **{ctx.guild.name}** updated on database")
-                self.WORDLE_WORD = self.wordleData.find_one({"server": str(ctx.guild.id)})['word']
-                self.WORDLE_MAX_PLAYABLE = self.wordleData.find_one({"server": str(ctx.guild.id)})['count']
             except:
                 self.wordleData.insert_one({'server': str(ctx.guild.id), 'word': word , 'count': 5})
                 await ctx.send(f"> Wordle for **{ctx.guild.name}** created on database")
@@ -77,14 +84,15 @@ class OnWordleHandler(DiscordInit, commands.Cog):
     @commands.command(name="w", aliases=["wordle"])
     async def wordleHandlerFunction(self, ctx, *, word):
         word = word.lower()
-        self.WORDLE_WORD = self.wordleData.find_one({"server": str(ctx.guild.id)})['word']
-        self.WORDLE_MAX_PLAYABLE = self.wordleData.find_one({"server": str(ctx.guild.id)})['count']
+
+        WORDLE_WORD = self.wordleData.find_one({"server": str(ctx.guild.id)})['word']
+        WORDLE_MAX_PLAYABLE = self.wordleData.find_one({"server": str(ctx.guild.id)})['count']
 
         if(ctx.author.id not in self.players):
-            self.players[ctx.author.id] = WordleInstance(self.WORDLE_WORD,self.WORDLE_MAX_PLAYABLE)
+            self.players[ctx.author.id] = WordleInstance(WORDLE_WORD,WORDLE_MAX_PLAYABLE)
 
         if(self.players[ctx.author.id].playable()):
-            await ctx.reply(f"|| {self.players[ctx.author.id].process_guess(word)} [{self.players[ctx.author.id].count}/{self.WORDLE_MAX_PLAYABLE}]||")
+            await ctx.reply(f"|| {self.players[ctx.author.id].process_guess(word)}||")
         else:
             await ctx.send(f"{ctx.author.mention} you're outta guesses buddy")
             self.players[ctx.author.id].reset()

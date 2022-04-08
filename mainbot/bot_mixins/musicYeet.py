@@ -347,7 +347,7 @@ class Music(DiscordInit,commands.Cog):
             url = "https://youtu.be/dQw4w9WgXcQ"
             embed=discord.Embed(color=0xc061cb)
             embed.add_field(name="p.play [ url / search / spotify url ]  ", value="```-loop number``` to loop the song", inline=False)
-            embed.add_field(name="p.play <>  -loop number", value="loops the song in queue", inline=False)
+            embed.add_field(name="p.play <>  loop number", value="loops the song in queue", inline=False)
             embed.add_field(name="p.queue", value="shows the current queue", inline=False)
             embed.add_field(name="p.move [ from ] [ to ]", value="moves song index : from → to", inline=False)
             embed.add_field(name="p.remove [ index ]", value="removes the last song by default ", inline=False)
@@ -359,7 +359,7 @@ class Music(DiscordInit,commands.Cog):
             await ctx.send(embed=embed)
 
 
-        url_split = url.split("-loop")
+        url_split = url.split("loop")
         try:
             loopcount = int(url_split[1])
         except:

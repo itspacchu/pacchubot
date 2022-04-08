@@ -9,8 +9,8 @@ from discord.utils import get
 from discord import FFmpegPCMAudio
 from youtube_dl import YoutubeDL
 import urllib
-from musicYeet import FFMPEG_BEFORE_OPTS
 
+FFMPEG_BEFORE_OPTS = '-reconnect 1 -reconnect_streamed 1  -reconnect_delay_max 5'
 
 class MusicMixin(DiscordInit, commands.Cog):
     YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}

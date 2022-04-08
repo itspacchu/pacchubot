@@ -113,8 +113,6 @@ class Video:
             embed.set_thumbnail(url=self.thumbnail)
         return embed
 
-
-# TODO: abstract FFMPEG options into their own file?
 FFMPEG_BEFORE_OPTS = '-reconnect 1 -reconnect_streamed 1  -reconnect_delay_max 5'
 
 

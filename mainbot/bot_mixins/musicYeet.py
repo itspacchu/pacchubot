@@ -359,7 +359,7 @@ class Music(DiscordInit,commands.Cog):
             await ctx.send(embed=embed)
 
 
-        url_split = url.split("-loop")
+        url_split = url.split("loop")
         try:
             loopcount = int(url_split[1])
         except:

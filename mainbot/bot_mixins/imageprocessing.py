@@ -92,6 +92,7 @@ class ImageProcessingMixin(DiscordInit, commands.Cog):
         except Exception as e:
             await ctx.send(f"Something went wrong ```{self.pre}idh\n{e}```")
             return
+            
     @commands.command(aliases=['ila','lineart'])
     async def imla(self,ctx,member:discord.Member = None,attachedImg=None):
         try:

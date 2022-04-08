@@ -46,8 +46,6 @@ def basicYTPlaylist(playlist_url):
         playlist.append('http://www.youtube.com/watch?v='+ _['url'])
     return playlist
 
-
-
 # this is from my brother's bot
 # https://github.com/mackdroid/bored-bot
 
@@ -114,7 +112,7 @@ class Video:
 
 
 # TODO: abstract FFMPEG options into their own file?
-FFMPEG_BEFORE_OPTS = '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 '
+FFMPEG_BEFORE_OPTS = '-reconnect 1 -reconnect_streamed 1  -reconnect_delay_max 5'
 
 
 async def audio_playing(ctx):
@@ -199,7 +197,7 @@ class Music(DiscordInit,commands.Cog):
         append_seek_to_ffmpeg = FFMPEG_BEFORE_OPTS + f" -ss {seconds_to_hhmmss(seek)}"
         state.now_playing = song
         source = discord.PCMVolumeTransformer(
-            discord.FFmpegPCMAudio(song.stream_url, before_options=append_seek_to_ffmpeg))
+            discord.FFmpegPCMAudio(song.stream_url, before_options=append_seek_to_ffmpeg ,options=" -preset veryfast -af bass=g=1.6:f=80:w=0.1"))
 
         def after_playing(err):
             if len(state.playlist) > 0:
@@ -349,7 +347,7 @@ class Music(DiscordInit,commands.Cog):
             url = "https://youtu.be/dQw4w9WgXcQ"
             embed=discord.Embed(color=0xc061cb)
             embed.add_field(name="p.play [ url / search / spotify url ]  ", value="```-loop number``` to loop the song", inline=False)
-            embed.add_field(name="p.play <>  -loop number", value="loops the song in queue", inline=False)
+            embed.add_field(name="p.play <>  loop number", value="loops the song in queue", inline=False)
             embed.add_field(name="p.queue", value="shows the current queue", inline=False)
             embed.add_field(name="p.move [ from ] [ to ]", value="moves song index : from → to", inline=False)
             embed.add_field(name="p.remove [ index ]", value="removes the last song by default ", inline=False)
@@ -361,7 +359,7 @@ class Music(DiscordInit,commands.Cog):
             await ctx.send(embed=embed)
 
 
-        url_split = url.split("-loop")
+        url_split = url.split("loop")
         try:
             loopcount = int(url_split[1])
         except:

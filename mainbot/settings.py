@@ -11,28 +11,18 @@ def env_to_bool(env, default):
     str_val = os.environ.get(env)
     return default if str_val is None else str_val == 'True'
 
-
-# file imports
 # db init
-mongo_url = f"mongodb+srv://{os.environ['MONGO_INITDB_ROOT_USERNAME']}:{os.environ['MONGO_INITDB_ROOT_PASSWORD']}@{os.environ['MONGO_HOST']}"
+mongo_url = f"{os.environ['MONGO_KEY']}"
 mongo_client = MongoClient(mongo_url)
 
 # global variables
-version = "v2.2 beta"
+version = "v3 beta"
 http = urllib3.PoolManager()
 ani = Jikan()
 self_name = "Pacchu's Bot"
 self_avatar = "https://raw.githubusercontent.com/itspacchu/Pacchu-s-Slave/master/Screenshot%202021-04-09%20225421.png"
 command_prefix = "p."
 command_prefix_use = ['p.', '_']
-
-guild_ids = [685469328929587268, 705682250460823602, 737504783937830924]
-
-
-ffmpeg_options = '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -loglevel quiet'
-
-FFMPEG_OPTIONS = {
-    'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
 
 ytdl_format_options = {
     'format': 'bestaudio/best',
@@ -57,8 +47,6 @@ __all__ = [
     'self_name',
     'self_avatar',
     'command_prefix',
-    'guild_ids',
     'mongo_client',
-    'ytdl_format_options',
-    'ffmpeg_options',
+    'ytdl_format_options'
 ]

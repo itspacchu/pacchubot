@@ -1,17 +1,5 @@
 perkdict = {
     "links": {
-        "iruma": [
-            "https://static.wikia.nocookie.net/mairimashita-irumakun/images/c/c9/Iruma_Suzuki.png/revision/latest?cb=20191217095641",
-            "https://www.monstersandcritics.com/wp-content/uploads/2019/12/Welcome-to-Demon-School-Iruma-kun-Season-2-release-date-Mairimashita-Iruma-kun-manga-compared-to-the-anime.jpg",
-            "https://static.wikia.nocookie.net/mairimashita-irumakun/images/b/b9/WickedIruma.png/revision/latest?cb=20200430234437",
-            "https://spoilerguy.com/wp-content/uploads/2020/02/Welcome-to-Demon-School-Iruma-kun-Episode-19.jpg",
-            "https://i.ytimg.com/vi/kXmUWo7jTdk/maxresdefault.jpg",
-            "https://simkl.net/episodes/88/8887367035de32433_w.jpg",
-            "https://media1.tenor.com/images/e17290e12dc0f60ab3021e100fa33438/tenor.gif?itemid=15870136",
-            "https://64.media.tumblr.com/60aabf00e266eae4253fcdaf60076d49/tumblr_pywk6pYme91v6bs4yo4_r1_250.gifv",
-            "https://media.discordapp.net/attachments/757838382419279903/760583834764181554/318964034116201.png"
-        ],
-
         "nsfw_error": [
             "https://toxicmuffin.files.wordpress.com/2016/06/kono-subarashi-sekai-ni-shukufuku-wo-22.jpg",
             "https://i.pinimg.com/originals/d3/7a/2f/d37a2faaa1f0d37ef4dca3d892548cb5.jpg",
@@ -35,33 +23,18 @@ perkdict = {
             "https://64.media.tumblr.com/350c512200d6cbb6506774f2cddc9641/tumblr_ooonx9vM691qzxv73o1_540.gifv"
 
         ],
-
         "sadhugs": [
             "https://thumbs.gfycat.com/BlueDecimalAardwolf-small.gif",
             "https://pa1.narvii.com/5832/9dc1ac88f89c07299c548c4e435863248c6b12e0_hq.gif",
             "https://media.tenor.com/images/a6d2f888123111cfb2f537e346c2b700/tenor.gif",
             "https://media.tenor.com/images/8ef91f6b2dca2c3c8bb581357083ad47/tenor.gif"
         ],
-
         "erotic_perv": [
             "https://media1.tenor.com/images/9862e3023816f54bc451ee1cfed2351f/tenor.gif?itemid=5453531",
             "https://media1.tenor.com/images/5917526c0ef2100e56c139b6e4d36e40/tenor.gif?itemid=5677612",
             "https://static.myfigurecollection.net/pics/avatar/200/153164_1568300836.gif",
             "https://media1.tenor.com/images/0a664c5a8ba78b8bb0e07b4859af142f/tenor.gif?itemid=17999805",
             "https://static.fjcdn.com/gifs/Mako+x+tennis+balls+more+here+wwwyoutubecomusersquabanimeand+here+wwwfacebookcompagessquab220040661488110refhl_29797c_5090805.gif"
-        ],
-
-        "kiss": [
-            "https://i.pinimg.com/originals/e3/4e/31/e34e31123f8f35d5c771a2d6a70bef52.gif",
-            "https://i.pinimg.com/originals/e0/0f/31/e00f3104927ae27d7d6a32393d163176.gif",
-            "https://media1.tenor.com/images/0d70e1c91378712021717d2f6424fd07/tenor.gif?itemid=14375357",
-            "https://64.media.tumblr.com/b07eea0b9fa296d31a0899463b667570/tumblr_p3y8vmIlll1vptudso5_500.gifv",
-            "https://media1.tenor.com/images/4928450feab1e9ff4b7689b4dc8e2546/tenor.gif?itemid=16047779",
-            "https://media.tenor.com/images/197df534507bd229ba790e8e1b5f63dc/tenor.gif",
-            "https://24.media.tumblr.com/76566278887049d8ca58878e7a3daf65/tumblr_n2g8oillKp1t6rkqbo1_500.gif",
-            "https://i.pinimg.com/originals/8c/ab/4f/8cab4f4c73547d077c56066461c40a5e.gif",
-            "https://media1.tenor.com/images/810ad376d5e6d76f5ac4223a1a738782/tenor.gif?itemid=16079566",
-            "https://pa1.narvii.com/6515/2c49e3830b8b6d3c935aa48a7b2c548ae661aeb2_hq.gif"
         ],
 
         "pats": [

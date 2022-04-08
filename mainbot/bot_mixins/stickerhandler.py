@@ -13,6 +13,7 @@ dbStore = {
 
 
 class stickerHandler(DiscordInit, commands.Cog):
+    RECENT_WHO = {}
     @commands.command(aliases=['st', 'sendsticker', 'sends'])
     async def sticker(self, ctx, stickername=None):
         try:
@@ -60,15 +61,8 @@ class stickerHandler(DiscordInit, commands.Cog):
                 await ctx.message.delete()
             except discord.ext.commands.errors.CommandInvokeError as e:
                 print(bcolors.FAIL + f"{e} -- deleted message error")
-
             print(
                 f"{bcolors.OKCYAN}{ctx.author} -> {member} : {bcolors.OKGREEN}{message}")
-            dbStore = {
-                "createdby": f"{ctx.author.name}#{ctx.author.discriminator}",
-                "clone": member.name,
-                "message": message
-            }
-            self.PodcastSuggest.insert_one(dbStore)
 
         except Exception as e:
             await ctx.message.add_reaction(Emotes.PACEXCLAIM)

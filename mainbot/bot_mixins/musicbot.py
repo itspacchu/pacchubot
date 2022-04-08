@@ -9,6 +9,7 @@ from discord.utils import get
 from discord import FFmpegPCMAudio
 from youtube_dl import YoutubeDL
 import urllib
+from musicYeet import FFMPEG_BEFORE_OPTS
 
 
 class MusicMixin(DiscordInit, commands.Cog):
@@ -247,7 +248,7 @@ class MusicMixin(DiscordInit, commands.Cog):
             self.client.voice_clients, guild=ctx.guild)
         audio_source = discord.FFmpegPCMAudio(mp3link)
         self.source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(
-            mp3link, before_options=ffmpeg_options), volume=80)
+            mp3link, before_options=FFMPEG_BEFORE_OPTS), volume=80)
         if not voice_client.is_playing():
             voice_client.play(audio_source, after=None)
             await ctx.guild.change_voice_state(channel=ctx.author.voice.channel, self_mute=False, self_deaf=True)

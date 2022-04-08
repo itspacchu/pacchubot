@@ -82,6 +82,9 @@ class Video:
                 "thumbnail"] if "thumbnail" in video else None
             self.requested_by = requested_by
             self.src = src
+    
+    def _get_videoUrl(self):
+        return self.stream_url
 
     def _get_info(self, video_url):
         with ytdl.YoutubeDL(YTDL_OPTS) as ydl:
@@ -246,57 +249,27 @@ class Music(DiscordInit,commands.Cog):
         """Clears the play queue without leaving the channel."""
         state = self.get_state(ctx.guild)
         state.playlist = []
-    
-    @commands.command(aliases=["qs","savequeues","queuesave"])
+
+    @commands.command()
     @commands.guild_only()
     @commands.check(audio_playing)
-    async def savequeue(self, ctx, name: str):
-        """Saves the current queue as a playlist."""
-        if(len(name) < 0):
-            await ctx.message.add_reaction(Emotes.PACNO)
-            await ctx.send("> You didnt give a name ... should I save it as \"floopus dingus?\" Try again")
+    async def loop(self, ctx, loopcount: int):
+        """Loops the current song a specified number of times."""
+        state = self.get_state(ctx.guild)
+        url = state.now_playing._get_videoUrl()
+        if(loopcount > 0):
+            await ctx.send("> looping the song".format(loopcount))
+            progbar = await ctx.send("```[==========] 0%```")
+            for i in range(int(loopcount)):
+                prog = int((i/loopcount)*100)
+                await progbar.edit(content=f"```[{'#'*int(prog/10)} {'='*int(10-(prog/10))}] {prog}%```")
+                await ctx.invoke(self.client.get_command('play'), url=url,showembed=False)
+            await progbar.edit(content=f"```[{'#'*10}] Done```")
+            await ctx.message.add_reaction(Emotes.PACTICK)
+            return
         else:
-            queue = self.get_state(ctx.guild).playlist
-            if(len(queue) == 0):
-                await ctx.message.add_reaction(Emotes.PACNO)
-                await ctx.send("> The queue is empty ... nothing to save")
-            else:
-                os.mkdir(f"{os.getcwd()}/statics/playlists/{ctx.guild.id}")
-                await ctx.send("> Saving queue as \"{}\"".format(name))
-                pickle.dump(queue, open(f"{os.getcwd()}/statics/playlists/{str(ctx.guild.id)}/{name}.playlist", "wb"))
-                await ctx.message.add_reaction(Emotes.PACYES)
-
-    @commands.command(aliases=["lq","loadplaylist","loadqueues"])
-    @commands.guild_only()
-    async def loadqueue(self, ctx, name: str):
-        """Loads a playlist into the current queue."""
-        await ctx.message.add_reaction(Emotes.PACNO)
-        if(len(name) == 0):
-            await ctx.send("> You didnt give a name ... should I load \"floopus dingus?\" (doesn't exist obviously) ")
-        else:
-            try:
-                queue = pickle.load(open(f"{os.getcwd()}/statics/playlists/{str(ctx.guild.id)}/{name}.playlist", "rb"))
-                state = self.get_state(ctx.guild)
-                for song in queue:
-                    state.playlist.append(song)
-                await ctx.message.add_reaction(Emotes.PACYES)
-                await ctx.send("> Loaded queue \"{}\"".format(name))
-            except:
-                await ctx.send("> Queue \"{}\" not found".format(name))
-
-    @commands.command(aliases=["listplaylists",'listpl','listsaved'])
-    @commands.guild_only()
-    async def listqueues(self, ctx):
-        """Lists all the saved playlists."""
-        await ctx.message.add_reaction(Emotes.PACNO)
-        try:
-            files = os.listdir(f"{os.getcwd()}/statics/playlists/{str(ctx.guild.id)}/")
-            if(len(files) == 0):
-                await ctx.send("> No playlists found")
-            else:
-                await ctx.send("> Playlists found : ```{}```".format(files))
-        except:
-            await ctx.send("> No playlists found")
+            raise commands.CommandError("> Loop count must be greater than 0")
+        
 
     @commands.command(aliases=["move","movesong"])
     @commands.guild_only()
@@ -346,8 +319,9 @@ class Music(DiscordInit,commands.Cog):
         if(url == None):
             url = "https://youtu.be/dQw4w9WgXcQ"
             embed=discord.Embed(color=0xc061cb)
-            embed.add_field(name="p.play [ url / search / spotify url ]  ", value="```-loop number``` to loop the song", inline=False)
-            embed.add_field(name="p.play <>  loop number", value="loops the song in queue", inline=False)
+            embed.add_field(name="p.play [ url / search / spotify url ]  ", value="```loop number``` to loop the song", inline=False)
+            embed.add_field(name="p.play <song quert>  loop <times>", value="loops the song in queue", inline=True)
+            embed.add_field(name="p.loop <times>", value="loops the current song in queue", inline=True)
             embed.add_field(name="p.queue", value="shows the current queue", inline=False)
             embed.add_field(name="p.move [ from ] [ to ]", value="moves song index : from → to", inline=False)
             embed.add_field(name="p.remove [ index ]", value="removes the last song by default ", inline=False)

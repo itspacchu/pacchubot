@@ -1,0 +1,6 @@
+nextcord==2.5.0
+PyNaCl==1.4.0
+requests==2.31.0
+yt-dlp @ https://github.com/yt-dlp/yt-dlp/archive/master.tar.gz
+pillow
+scipy

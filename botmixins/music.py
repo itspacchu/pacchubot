@@ -8,7 +8,6 @@ import asyncio
 import json
 import nextcord as nc
 import requests
-import youtube_dl
 from nextcord import FFmpegOpusAudio
 from nextcord.ext import commands
 import yt_dlp as youtube_dl
@@ -168,7 +167,7 @@ class PLAYER():
         authorChannel = ctx.author.voice.channel if ctx.author.voice else None
         if authorChannel is None:
             embed = nc.Embed(title="You must be in a voice channel to use this.", color=Colors.ERR)
-            await ctx.send(embed=embed,colors=Colors.ERR)
+            await ctx.send(embed=embed)
             return False
         else:
             if guild_id not in songqueue.keys():
@@ -332,6 +331,20 @@ class MusicCog(commands.Cog):
     async def command_join(self, ctx):
         await ctx.message.add_reaction(Emotes.PACYES)
         await self.p.ensure_voice(ctx)
+    
+    @commands.command(name="loop")
+    async def command_loop_current(self,ctx,lc):
+        loopcount = int(lc)
+        if(loopcount > 0):
+            curr_song = QUEUE().get_current_song(ctx)[3]
+            await ctx.send("> looping the song".format(loopcount))
+            progbar = await ctx.send("```[==========] 0%```")
+            for i in range(int(loopcount)):
+                prog = int((i/loopcount)*100)
+                await progbar.edit(content=f"```[{'#'*int(prog/10)} {'='*int(10-(prog/10) - 1)}] {prog}%```")
+                await ctx.invoke(self.client.get_command('play'),curr_song)
+            await progbar.edit(content=f"```[{'#'*10}] Done```")
+            return
 
     @commands.command(name="stop", aliases=["st", "end", "fuckoff"])  # stop the bot from playing music
     async def command_stop(self, ctx):

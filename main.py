@@ -1,6 +1,7 @@
 import nextcord
 from nextcord.ext import commands
 from botmixins.music import MusicCog  # Import the music cog
+import os
 
 intents = nextcord.Intents.default()
 intents.message_content = True
@@ -16,4 +17,4 @@ bot.add_cog(MusicCog(bot))
 async def on_ready():
     print(f'Logged in as {bot.user.name}')
 
-bot.run('')
+bot.run(os.environ["TOKEN"])

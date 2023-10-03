@@ -174,7 +174,7 @@ class PLAYER():
                 songqueue[guild_id] = []
             if voice is None:
                 await ctx.author.voice.channel.connect()
-                embed = nc.Embed(title="Connected to your voice channel.", color=colors["success"])
+                embed = nc.Embed(title="Connected to your voice channel.", color=Colors.SUCC)
                 await ctx.send(embed=embed)
             elif ctx.author.voice.channel is not voice.channel:
                 await voice.move_to(ctx.author.voice.channel)
@@ -197,7 +197,7 @@ class PLAYER():
             if(nxt is None and QUEUE().get_current_song != None):
                 coro = ctx.send(embed=nc.Embed(title="Song ended.",
                                             description="No next song to play, you can add a song to queue using the play command",
-                                            color=colors["success"]))
+                                            color=Colors.SUCC))
             else:
                 url, src, title = nxt[0], nxt[1], nxt[3]
                 embed = nc.Embed(title="Playing Next", description="**" + title + "**", color=colors[src])
@@ -265,7 +265,7 @@ class PLAYER():
             if nxt is None:
                 await ctx.send(embed=nc.Embed(title="Skipped song.",
                                               description="Queue is empty cannot proceed, add songs using the play/add command",
-                                              color=colors["success"]))
+                                              color=Colors.SUCC))
             else:
                 url, src, title = nxt[0], nxt[1], nxt[3]
                 await ctx.send(embed=nc.Embed(title="Skipped song, Playing Next", description="**" + title + "**",

@@ -353,7 +353,7 @@ class MusicCog(commands.Cog):
             await ctx.message.add_reaction(Emotes.PACSTOP)
             QUEUE().clear(ctx)
             await voice.disconnect()
-            embed = nc.Embed(title="Stopped playing music, and cleared song queue", color=colors["success"])
+            embed = nc.Embed(title="Stopped playing music, and cleared song queue", color=Colors.SUCC)
         else:
             await ctx.message.add_reaction(Emotes.PACCROSS)
             embed = nc.Embed(title="Bot not in a voice channel", color=Colors.ERR)

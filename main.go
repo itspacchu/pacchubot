@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"pacgobot/handlers"
 
 	"github.com/bwmarrin/discordgo"
@@ -17,7 +18,7 @@ type BotHandler struct {
 var PREFIX = "p."
 
 func main() {
-	token := "ODYxMTIyNDc2NzAwMzM2MTI4.GZn33d.AQZBRzscmUDbtbGtFtS6WdPW1DCaexWAB0WGZs"
+	token := os.Getenv("BOT_TOKEN")
 	if token == "" {
 		fmt.Println("Error: BOT_TOKEN environment variable not set!")
 		return
